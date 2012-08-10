@@ -82,6 +82,7 @@
             this.txtHeaderName.Name = "txtHeaderName";
             this.txtHeaderName.Size = new System.Drawing.Size(219, 20);
             this.txtHeaderName.TabIndex = 0;
+            this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
             // 
             // txtHeaderType
             // 
@@ -91,6 +92,7 @@
             this.txtHeaderType.Name = "txtHeaderType";
             this.txtHeaderType.Size = new System.Drawing.Size(219, 20);
             this.txtHeaderType.TabIndex = 1;
+            this.txtHeaderType.TextChanged += new System.EventHandler(this.txtHeaderType_TextChanged);
             // 
             // label1
             // 

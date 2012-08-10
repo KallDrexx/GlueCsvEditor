@@ -17,6 +17,8 @@ namespace GlueCsvEditor.Controls
         protected IGlueCommands _glueCommands;
         protected IGlueState _gluState;
         protected string _csvPath;
+        protected int _currentColumnIndex = -1;
+        protected bool _dataLoading;
 
         public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath)
         {
@@ -58,6 +60,9 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
+            _currentColumnIndex = e.ColumnIndex;
+            _dataLoading = true;
+
             // Update the selected header
             txtHeaderName.Text = string.Empty;
             txtHeaderType.Text = string.Empty;
@@ -78,11 +83,39 @@ namespace GlueCsvEditor.Controls
             {
                 txtHeaderName.Text = header.Name;
             }
+
+            _dataLoading = false;
+        }
+
+        private void txtHeaderName_TextChanged(object sender, EventArgs e)
+        {
+            UpdateColumnDetails();
+        }
+
+        private void txtHeaderType_TextChanged(object sender, EventArgs e)
+        {
+            UpdateColumnDetails();
         }
 
         protected void SaveCsv()
         {
             
+        }
+
+        protected void UpdateColumnDetails()
+        {
+            if (_dataLoading)
+                return;
+
+            if (dgrEditor.Columns.Count <= _currentColumnIndex || _currentColumnIndex < 0)
+                return; // column is out of bounds
+
+            var header = (CsvHeader)dgrEditor.Columns[_currentColumnIndex].Tag;
+            header.Name = string.Concat(txtHeaderName.Text.Trim(), " (", txtHeaderType.Text.Trim(), ")");
+            dgrEditor.Columns[_currentColumnIndex].Tag = header;
+
+            // Update the column display
+            dgrEditor.Columns[_currentColumnIndex].HeaderText = header.Name;
         }
     }
 }
