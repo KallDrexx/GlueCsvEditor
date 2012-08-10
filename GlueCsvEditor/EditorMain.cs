@@ -36,7 +36,7 @@ namespace GlueCsvEditor.Controls
             // Add the CSV headers to the datagrid
             for (int x = 0; x < csv.Headers.Length; x++)
             {
-                dgrEditor.Columns.Add(csv.Headers[x].Name, string.Concat(csv.Headers[x].Name, " (", csv.Headers[x].MemberTypes.ToString(), ")"));
+                dgrEditor.Columns.Add(csv.Headers[x].Name, csv.Headers[x].Name);
                 dgrEditor.Columns[x].Tag = csv.Headers[x];
             }
 
@@ -49,6 +49,40 @@ namespace GlueCsvEditor.Controls
                     dgrEditor.Rows[x].Cells[y].Value = csv.Records[x][y];
                 }
             }
+        }
+
+        private void dgrEditor_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            SaveCsv();
+        }
+
+        private void dgrEditor_CellEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            // Update the selected header
+            txtHeaderName.Text = string.Empty;
+            txtHeaderType.Text = string.Empty;
+            var header = (CsvHeader)dgrEditor.Columns[e.ColumnIndex].Tag;
+
+            if (header.Name.Contains("("))
+            {
+                txtHeaderName.Text = header.Name.Substring(0, header.Name.IndexOf('('));
+
+                if (header.Name.Contains(')'))
+                {
+                    int startIndex = header.Name.IndexOf('(');
+                    int endIndex = header.Name.IndexOf(')');
+                    txtHeaderType.Text = header.Name.Substring(startIndex + 1, endIndex - startIndex - 1);
+                }
+            }
+            else
+            {
+                txtHeaderName.Text = header.Name;
+            }
+        }
+
+        protected void SaveCsv()
+        {
+            
         }
     }
 }
