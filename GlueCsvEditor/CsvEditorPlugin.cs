@@ -100,12 +100,10 @@ namespace GlueCsvEditor
 
                 try
                 {
-                    var csvRep = CsvFileManager.CsvDeserializeToRuntime(path);
-
                     _tab = new PluginTab();
                     _tab.Text = "CSV Editor";
 
-                    _editor = new EditorMain(GlueCommands, GlueState, csvRep);
+                    _editor = new EditorMain(GlueCommands, GlueState, path);
                     _tab.Controls.Add(_editor);
                     _tabContainer.Controls.Add(_tab);
                 }

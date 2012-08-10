@@ -34,15 +34,13 @@
             // 
             // dgrEditor
             // 
-            this.dgrEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.dgrEditor.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dgrEditor.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dgrEditor.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgrEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgrEditor.Location = new System.Drawing.Point(0, 0);
             this.dgrEditor.Name = "dgrEditor";
-            this.dgrEditor.Size = new System.Drawing.Size(309, 293);
+            this.dgrEditor.Size = new System.Drawing.Size(581, 493);
             this.dgrEditor.TabIndex = 0;
             // 
             // EditorMain
@@ -52,7 +50,7 @@
             this.AutoSize = true;
             this.Controls.Add(this.dgrEditor);
             this.Name = "EditorMain";
-            this.Size = new System.Drawing.Size(312, 297);
+            this.Size = new System.Drawing.Size(581, 493);
             this.Load += new System.EventHandler(this.EditorMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).EndInit();
             this.ResumeLayout(false);
