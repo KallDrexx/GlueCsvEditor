@@ -31,20 +31,14 @@ namespace GlueCsvEditor.Controls
         {
             // Add the CSV headers to the datagrid
             for (int x = 0; x < _csv.Headers.Length; x++)
-                dgrEditor.Columns.Add("Column" + x, "Column " + x);
-
-            for (int x = 0; x < _csv.Headers.Length; x++)
-            {
-                dgrEditor.Rows.Add();
-                dgrEditor.Rows[0].Cells[x].Value = _csv.Headers[x].OriginalText;
-            }
+                dgrEditor.Columns.Add(_csv.Headers[x].Name, string.Concat(_csv.Headers[x].Name, " (", _csv.Headers[x].MemberTypes.ToString(), ")"));
 
             // Add the records
             for (int x = 0; x < _csv.Records.Count; x++)
             {
                 dgrEditor.Rows.Add();
                 for (int y = 0; y < _csv.Records[x].Length; y++)
-                    dgrEditor.Rows[x + 1].Cells[y].Value = _csv.Records[x][y];
+                    dgrEditor.Rows[x].Cells[y].Value = _csv.Records[x][y];
             }
         }
     }
