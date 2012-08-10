@@ -25,6 +25,7 @@ namespace GlueCsvEditor.Controls
             _csvPath = csvPath;
 
             InitializeComponent();
+            this.Dock = DockStyle.Fill;
         }
 
         private void EditorMain_Load(object sender, EventArgs e)
