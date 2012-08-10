@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" InitialTargets="ValidateSolutionConfiguration;ValidateToolsVersions;ValidateProjects">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\SolutionFile\ImportBefore\*" Condition="'$(ImportByWildcardBeforeSolution)' != 'false' and exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\SolutionFile\ImportBefore')" />
+  <Import Project="C:\BuildServer\TeamCity\buildAgent\work\FlatRedBallProjects\Templates\GluePluginTemplate\before.GluePluginTemplate.sln.targets" Condition="exists('C:\BuildServer\TeamCity\buildAgent\work\FlatRedBallProjects\Templates\GluePluginTemplate\before.GluePluginTemplate.sln.targets')" />
+  <PropertyGroup Condition=" '$(Configuration)' == '' ">
+    <Configuration>Debug</Configuration>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == '' ">
+    <Platform>Any CPU</Platform>
+  </PropertyGroup>
+  <PropertyGroup Condition=" ('$(AspNetConfiguration)' == '') ">
+    <AspNetConfiguration>$(Configuration)</AspNetConfiguration>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SolutionDir>C:\BuildServer\TeamCity\buildAgent\work\FlatRedBallProjects\Templates\GluePluginTemplate\</SolutionDir>
+    <SolutionExt>.sln</SolutionExt>
+    <SolutionFileName>GluePluginTemplate.sln</SolutionFileName>
+    <SolutionName>GluePluginTemplate</SolutionName>
+    <SolutionPath>C:\BuildServer\TeamCity\buildAgent\work\FlatRedBallProjects\Templates\GluePluginTemplate\GluePluginTemplate.sln</SolutionPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and '$(MSBuildToolsVersion)' == '2.0'">v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and ('$(MSBuildToolsVersion)' == '3.5' or '$(MSBuildToolsVersion)' == '3.0')">v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and '$(MSBuildToolsVersion)' == '4.0'">v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" ('$(Configuration)' == 'Debug') and ('$(Platform)' == 'Any CPU') ">
+    <CurrentSolutionConfigurationContents>
+      <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D73086FC-957E-4E3F-97FA-742CBBF02EA6}" AbsolutePath="C:\BuildServer\TeamCity\buildAgent\work\FlatRedBallProjects\Templates\GluePluginTemplate\GluePluginTemplate\GluePluginTemplate.csproj" BuildProjectInSolution="True">Debug|AnyCPU</ProjectConfiguration>
+</SolutionConfiguration>
+    </CurrentSolutionConfigurationContents>
+  </PropertyGroup>
+  <PropertyGroup Condition=" ('$(Configuration)' == 'Release') and ('$(Platform)' == 'Any CPU') ">
+    <CurrentSolutionConfigurationContents>
+      <SolutionConfiguration xmlns="">
+  <ProjectConfiguration Project="{D73086FC-957E-4E3F-97FA-742CBBF02EA6}" AbsolutePath="C:\BuildServer\TeamCity\buildAgent\work\FlatRedBallProjects\Templates\GluePluginTemplate\GluePluginTemplate\GluePluginTemplate.csproj" BuildProjectInSolution="True">Release|AnyCPU</ProjectConfiguration>
+</SolutionConfiguration>
+    </CurrentSolutionConfigurationContents>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\SolutionFile\ImportAfter\*" Condition="'$(ImportByWildcardBeforeSolution)' != 'false' and exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\SolutionFile\ImportAfter')" />
+  <Import Project="C:\BuildServer\TeamCity\buildAgent\work\FlatRedBallProjects\Templates\GluePluginTemplate\after.GluePluginTemplate.sln.targets" Condition="exists('C:\BuildServer\TeamCity\buildAgent\work\FlatRedBallProjects\Templates\GluePluginTemplate\after.GluePluginTemplate.sln.targets')" />
+  <Target Name="Build" />
+  <Target Name="Rebuild" />
+  <Target Name="Clean" />
+  <Target Name="Publish" />
+</Project>
