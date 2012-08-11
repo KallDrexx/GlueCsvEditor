@@ -34,6 +34,7 @@
             this.txtHeaderType = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.chkIsRequired = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -66,6 +67,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.chkIsRequired);
             this.splitContainer1.Panel2.Controls.Add(this.label3);
             this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
@@ -112,6 +114,17 @@
             this.label3.TabIndex = 4;
             this.label3.Text = "Type:";
             // 
+            // chkIsRequired
+            // 
+            this.chkIsRequired.AutoSize = true;
+            this.chkIsRequired.Location = new System.Drawing.Point(85, 82);
+            this.chkIsRequired.Name = "chkIsRequired";
+            this.chkIsRequired.Size = new System.Drawing.Size(75, 17);
+            this.chkIsRequired.TabIndex = 5;
+            this.chkIsRequired.Text = "Required?";
+            this.chkIsRequired.UseVisualStyleBackColor = true;
+            this.chkIsRequired.CheckedChanged += new System.EventHandler(this.chkIsRequired_CheckedChanged);
+            // 
             // EditorMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -139,5 +152,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtHeaderType;
         private System.Windows.Forms.TextBox txtHeaderName;
+        private System.Windows.Forms.CheckBox chkIsRequired;
     }
 }

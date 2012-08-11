@@ -37,19 +37,14 @@ namespace GlueCsvEditor.Controls
 
             // Add the CSV headers to the datagrid
             for (int x = 0; x < csv.Headers.Length; x++)
-            {
                 dgrEditor.Columns.Add(csv.Headers[x].Name, csv.Headers[x].Name);
-                dgrEditor.Columns[x].Tag = csv.Headers[x];
-            }
 
             // Add the records
             for (int x = 0; x < csv.Records.Count; x++)
             {
                 dgrEditor.Rows.Add();
                 for (int y = 0; y < csv.Records[x].Length; y++)
-                {
                     dgrEditor.Rows[x].Cells[y].Value = csv.Records[x][y];
-                }
             }
         }
 
@@ -66,22 +61,25 @@ namespace GlueCsvEditor.Controls
             // Update the selected header
             txtHeaderName.Text = string.Empty;
             txtHeaderType.Text = string.Empty;
-            var header = (CsvHeader)dgrEditor.Columns[e.ColumnIndex].Tag;
+            var header = dgrEditor.Columns[e.ColumnIndex].HeaderText;
 
-            if (header.Name.Contains("("))
+            if (header.Contains("("))
             {
-                txtHeaderName.Text = header.Name.Substring(0, header.Name.IndexOf('('));
+                txtHeaderName.Text = header.Substring(0, header.IndexOf('('));
 
-                if (header.Name.Contains(')'))
+                if (header.Contains(')'))
                 {
-                    int startIndex = header.Name.IndexOf('(');
-                    int endIndex = header.Name.IndexOf(')');
-                    txtHeaderType.Text = header.Name.Substring(startIndex + 1, endIndex - startIndex - 1);
+                    int startIndex = header.IndexOf('(');
+                    int endIndex = header.IndexOf(')');
+
+                    string types = header.Substring(startIndex + 1, endIndex - startIndex - 1);
+                    chkIsRequired.Checked = types.Contains("required");
+                    txtHeaderType.Text = types.Replace(", required", "");
                 }
             }
             else
             {
-                txtHeaderName.Text = header.Name;
+                txtHeaderName.Text = header;
             }
 
             _dataLoading = false;
@@ -93,6 +91,11 @@ namespace GlueCsvEditor.Controls
         }
 
         private void txtHeaderType_TextChanged(object sender, EventArgs e)
+        {
+            UpdateColumnDetails();
+        }
+
+        private void chkIsRequired_CheckedChanged(object sender, EventArgs e)
         {
             UpdateColumnDetails();
         }
@@ -110,12 +113,13 @@ namespace GlueCsvEditor.Controls
             if (dgrEditor.Columns.Count <= _currentColumnIndex || _currentColumnIndex < 0)
                 return; // column is out of bounds
 
-            var header = (CsvHeader)dgrEditor.Columns[_currentColumnIndex].Tag;
-            header.Name = string.Concat(txtHeaderName.Text.Trim(), " (", txtHeaderType.Text.Trim(), ")");
-            dgrEditor.Columns[_currentColumnIndex].Tag = header;
+            string header = string.Concat(txtHeaderName.Text.Trim(), " (", txtHeaderType.Text.Trim());
+            if (chkIsRequired.Checked)
+                header += ", required";
 
-            // Update the column display
-            dgrEditor.Columns[_currentColumnIndex].HeaderText = header.Name;
+            header += ")";
+
+            dgrEditor.Columns[_currentColumnIndex].HeaderText = header;
         }
     }
 }
