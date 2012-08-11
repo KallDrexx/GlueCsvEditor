@@ -73,6 +73,18 @@ namespace GlueCsvEditor.Controls
                     int endIndex = header.IndexOf(')');
 
                     string types = header.Substring(startIndex + 1, endIndex - startIndex - 1);
+                    if (types.StartsWith("List<"))
+                    {
+                        chkIsList.Checked = true;
+                        types = types.Replace("List<", "");
+                        if (types.IndexOf('>') >= 0)
+                            types = types.Remove(types.IndexOf(">"), 1);
+                    }
+                    else
+                    {
+                        chkIsList.Checked = false;
+                    }
+
                     chkIsRequired.Checked = types.Contains("required");
                     txtHeaderType.Text = types.Replace(", required", "");
                 }
@@ -100,6 +112,11 @@ namespace GlueCsvEditor.Controls
             UpdateColumnDetails();
         }
 
+        private void chkIsList_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateColumnDetails();
+        }
+
         protected void SaveCsv()
         {
             
@@ -113,7 +130,15 @@ namespace GlueCsvEditor.Controls
             if (dgrEditor.Columns.Count <= _currentColumnIndex || _currentColumnIndex < 0)
                 return; // column is out of bounds
 
-            string header = string.Concat(txtHeaderName.Text.Trim(), " (", txtHeaderType.Text.Trim());
+            string header = txtHeaderName.Text.Trim() + " (";
+            if (chkIsList.Checked)
+                header += "List<";
+
+            header += txtHeaderType.Text.Trim();
+
+            if (chkIsList.Checked)
+                header += ">";
+
             if (chkIsRequired.Checked)
                 header += ", required";
 
