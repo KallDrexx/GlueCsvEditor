@@ -35,12 +35,12 @@ namespace GlueCsvEditor.Controls
         {
             // Serialize the csv
             _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
-            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
+            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();            
 
             // Add the CSV headers to the datagrid
             for (int x = 0; x < _csv.Headers.Length; x++)
             {
-                int index = dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].Name);
+                int index = dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].OriginalText);
                 dgrEditor.Columns[index].Tag = _csv.Headers[x];
             }
 
@@ -116,7 +116,7 @@ namespace GlueCsvEditor.Controls
 
         protected void SaveCsv()
         {
-            
+            CsvFileManager.Serialize(_csv, _csvPath);
         }
 
         protected void UpdateColumnDetails()
@@ -153,6 +153,10 @@ namespace GlueCsvEditor.Controls
 
             dgrEditor.Columns[_currentColumnIndex].Tag = header;
             dgrEditor.Columns[_currentColumnIndex].HeaderText = text.ToString();
+            _csv.Headers[_currentColumnIndex] = header;
+
+            // Save after every change
+            SaveCsv();
         }
     }
 }
