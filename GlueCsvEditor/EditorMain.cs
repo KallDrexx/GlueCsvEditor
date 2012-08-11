@@ -19,6 +19,7 @@ namespace GlueCsvEditor.Controls
         protected string _csvPath;
         protected int _currentColumnIndex = -1;
         protected bool _dataLoading;
+        protected RuntimeCsvRepresentation _csv;
 
         public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath)
         {
@@ -33,18 +34,22 @@ namespace GlueCsvEditor.Controls
         private void EditorMain_Load(object sender, EventArgs e)
         {
             // Serialize the csv
-            var csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
+            _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
+            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
 
             // Add the CSV headers to the datagrid
-            for (int x = 0; x < csv.Headers.Length; x++)
-                dgrEditor.Columns.Add(csv.Headers[x].Name, csv.Headers[x].Name);
+            for (int x = 0; x < _csv.Headers.Length; x++)
+            {
+                int index = dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].Name);
+                dgrEditor.Columns[index].Tag = _csv.Headers[x];
+            }
 
             // Add the records
-            for (int x = 0; x < csv.Records.Count; x++)
+            for (int x = 0; x < _csv.Records.Count; x++)
             {
-                dgrEditor.Rows.Add();
-                for (int y = 0; y < csv.Records[x].Length; y++)
-                    dgrEditor.Rows[x].Cells[y].Value = csv.Records[x][y];
+                int rowIndex = dgrEditor.Rows.Add();
+                for (int y = 0; y < _csv.Records[x].Length; y++)
+                    dgrEditor.Rows[rowIndex].Cells[y].Value = _csv.Records[x][y];
             }
         }
 
@@ -61,38 +66,30 @@ namespace GlueCsvEditor.Controls
             // Update the selected header
             txtHeaderName.Text = string.Empty;
             txtHeaderType.Text = string.Empty;
-            var header = dgrEditor.Columns[e.ColumnIndex].HeaderText;
 
-            if (header.Contains("("))
+            var header = (CsvHeader)dgrEditor.Columns[e.ColumnIndex].Tag;
+            string type = CsvHeader.GetClassNameFromHeader(header.Name) ?? "string";
+            
+            int typeDataIndex = header.Name.IndexOf("(");
+            if (typeDataIndex < 0)
+                typeDataIndex = header.Name.Length;
+
+            // Strip out the List<and > values
+            if (type.Contains("List<"))
             {
-                txtHeaderName.Text = header.Substring(0, header.IndexOf('('));
-
-                if (header.Contains(')'))
-                {
-                    int startIndex = header.IndexOf('(');
-                    int endIndex = header.IndexOf(')');
-
-                    string types = header.Substring(startIndex + 1, endIndex - startIndex - 1);
-                    if (types.StartsWith("List<"))
-                    {
-                        chkIsList.Checked = true;
-                        types = types.Replace("List<", "");
-                        if (types.IndexOf('>') >= 0)
-                            types = types.Remove(types.IndexOf(">"), 1);
-                    }
-                    else
-                    {
-                        chkIsList.Checked = false;
-                    }
-
-                    chkIsRequired.Checked = types.Contains("required");
-                    txtHeaderType.Text = types.Replace(", required", "");
-                }
+                chkIsList.Checked = true;
+                type = type.Replace("List<", "");
+                if (type.Contains(">"))
+                    type = type.Remove(type.LastIndexOf(">"), 1);
             }
             else
             {
-                txtHeaderName.Text = header;
+                chkIsList.Checked = false;
             }
+
+            txtHeaderName.Text = header.Name.Substring(0, typeDataIndex);
+            txtHeaderType.Text = type;
+            chkIsRequired.Checked = header.IsRequired;
 
             _dataLoading = false;
         }
@@ -130,21 +127,32 @@ namespace GlueCsvEditor.Controls
             if (dgrEditor.Columns.Count <= _currentColumnIndex || _currentColumnIndex < 0)
                 return; // column is out of bounds
 
-            string header = txtHeaderName.Text.Trim() + " (";
-            if (chkIsList.Checked)
-                header += "List<";
+            // Form the new text value
+            var text = new StringBuilder();
+            text.Append(txtHeaderName.Text.Trim());
+            text.Append(" (");
 
-            header += txtHeaderType.Text.Trim();
+            if (chkIsList.Checked)
+                text.Append("List<");
+
+            text.Append(txtHeaderType.Text.Trim());
 
             if (chkIsList.Checked)
-                header += ">";
+                text.Append(">");
 
             if (chkIsRequired.Checked)
-                header += ", required";
+                text.Append(", required");
 
-            header += ")";
+            text.Append(")");
 
-            dgrEditor.Columns[_currentColumnIndex].HeaderText = header;
+            // Update the header details
+            var header = (CsvHeader)dgrEditor.Columns[_currentColumnIndex].Tag;
+            header.OriginalText = text.ToString();
+            header.Name = text.ToString();
+            header.IsRequired = chkIsRequired.Checked;
+
+            dgrEditor.Columns[_currentColumnIndex].Tag = header;
+            dgrEditor.Columns[_currentColumnIndex].HeaderText = text.ToString();
         }
     }
 }
