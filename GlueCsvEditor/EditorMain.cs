@@ -55,6 +55,14 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+            // Update the value of the specified record in the RCR
+            if (e.RowIndex >= _csv.Records.Count || e.RowIndex < 0)
+                throw new InvalidOperationException("Row index out of range");
+
+            if (e.ColumnIndex >= _csv.Records[e.RowIndex].Length || e.ColumnIndex < 0)
+                throw new InvalidOperationException("Column index out of range");
+
+            _csv.Records[e.RowIndex][e.ColumnIndex] = dgrEditor[e.ColumnIndex, e.RowIndex].Value as string;
             SaveCsv();
         }
 
