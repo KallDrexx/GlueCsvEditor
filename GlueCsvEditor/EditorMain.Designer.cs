@@ -43,13 +43,13 @@
             // 
             // dgrEditor
             // 
-            this.dgrEditor.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            this.dgrEditor.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgrEditor.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dgrEditor.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgrEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgrEditor.Location = new System.Drawing.Point(0, 0);
             this.dgrEditor.Name = "dgrEditor";
-            this.dgrEditor.Size = new System.Drawing.Size(262, 493);
+            this.dgrEditor.Size = new System.Drawing.Size(357, 493);
             this.dgrEditor.TabIndex = 0;
             this.dgrEditor.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEndEdit);
             this.dgrEditor.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEnter);
@@ -71,7 +71,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(581, 493);
-            this.splitContainer1.SplitterDistance = 262;
+            this.splitContainer1.SplitterDistance = 357;
             this.splitContainer1.TabIndex = 1;
             // 
             // txtHeaderName
@@ -80,7 +80,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtHeaderName.Location = new System.Drawing.Point(85, 29);
             this.txtHeaderName.Name = "txtHeaderName";
-            this.txtHeaderName.Size = new System.Drawing.Size(219, 20);
+            this.txtHeaderName.Size = new System.Drawing.Size(124, 20);
             this.txtHeaderName.TabIndex = 0;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
             // 
@@ -90,7 +90,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtHeaderType.Location = new System.Drawing.Point(85, 55);
             this.txtHeaderType.Name = "txtHeaderType";
-            this.txtHeaderType.Size = new System.Drawing.Size(219, 20);
+            this.txtHeaderType.Size = new System.Drawing.Size(124, 20);
             this.txtHeaderType.TabIndex = 1;
             this.txtHeaderType.TextChanged += new System.EventHandler(this.txtHeaderType_TextChanged);
             // 
