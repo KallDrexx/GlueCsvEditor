@@ -106,6 +106,7 @@ namespace GlueCsvEditor
                     _editor = new EditorMain(GlueCommands, GlueState, path);
                     _tab.Controls.Add(_editor);
                     _tabContainer.Controls.Add(_tab);
+                    _tabContainer.SelectTab(_tabContainer.Controls.Count - 1);
                 }
                 catch (Exception ex)
                 {
