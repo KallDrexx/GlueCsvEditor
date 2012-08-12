@@ -230,7 +230,12 @@ namespace GlueCsvEditor.Controls
 
         protected void SaveCsv()
         {
-            CsvFileManager.Serialize(_csv, _csvPath);
+            try { CsvFileManager.Serialize(_csv, _csvPath); }
+            catch (Exception ex)
+            {
+                string message = string.Format("Error saving CSV: {0} - {1}", ex.GetType(), ex.Message);
+                MessageBox.Show(message, "Error Saving CSV", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         protected void UpdateColumnDetails()
