@@ -50,12 +50,13 @@
             this.dgrEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgrEditor.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dgrEditor.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.dgrEditor.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dgrEditor.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgrEditor.Location = new System.Drawing.Point(3, 3);
             this.dgrEditor.Name = "dgrEditor";
-            this.dgrEditor.Size = new System.Drawing.Size(399, 483);
+            this.dgrEditor.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
+            this.dgrEditor.Size = new System.Drawing.Size(396, 483);
             this.dgrEditor.TabIndex = 0;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEnter);
@@ -89,7 +90,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(581, 493);
-            this.splitContainer1.SplitterDistance = 409;
+            this.splitContainer1.SplitterDistance = 406;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 1;
             // 

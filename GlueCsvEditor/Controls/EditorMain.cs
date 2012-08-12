@@ -41,15 +41,17 @@ namespace GlueCsvEditor.Controls
 
             // Add the CSV headers to the datagrid
             for (int x = 0; x < _csv.Headers.Length; x++)
-            {
                 dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].OriginalText);
-                if (_csv.Headers[x].IsRequired)
-                    dgrEditor.Columns[x].Frozen = true;
-            }
 
             // Add the records
             dgrEditor.Rows.Add(_csv.Records.Count);
-            _dataLoading = false;
+
+            // Add the first value of each record to the row text
+            if (_csv.Headers.Length > 0)
+                for (int x = 0; x < _csv.Records.Count; x++)
+                    dgrEditor.Rows[x].HeaderCell.Value = _csv.Records[x][0];
+
+                _dataLoading = false;
         }
 
         private void txtHeaderName_TextChanged(object sender, EventArgs e)
@@ -82,6 +84,11 @@ namespace GlueCsvEditor.Controls
                 throw new InvalidOperationException("Column index out of range");
 
             _csv.Records[e.RowIndex][e.ColumnIndex] = e.Value as string;
+
+            // If this was an update to a value in the first column, update the header cell text
+            if (e.ColumnIndex == 0)
+                dgrEditor.Rows[e.RowIndex].HeaderCell.Value = e.Value as string;
+
             SaveCsv();
         }
 
@@ -157,6 +164,11 @@ namespace GlueCsvEditor.Controls
                 _csv.Records[x] = values.ToArray();
             }
 
+            // If the new column is the first column, blank out all the header cell values
+            if (e.Column.Index == 0)
+                foreach (DataGridViewRow row in dgrEditor.Rows)
+                    row.HeaderCell.Value = string.Empty;
+
             SaveCsv();
         }
 
@@ -177,6 +189,12 @@ namespace GlueCsvEditor.Controls
                 values.RemoveAt(e.Column.Index);
                 _csv.Records[x] = values.ToArray();
             }
+
+            // If the first column was removed, update the header cell values
+            if (e.Column.Index == 0)
+                if (_csv.Headers.Length > 0)
+                    for (int x = 0; x < _csv.Records.Count; x++)
+                        dgrEditor.Rows[x].HeaderCell.Value = _csv.Records[x][0];
 
             SaveCsv();
         }
@@ -249,7 +267,6 @@ namespace GlueCsvEditor.Controls
 
             dgrEditor.Columns[_currentColumnIndex].HeaderText = text.ToString();
             _csv.Headers[_currentColumnIndex] = header;
-            dgrEditor.Columns[_currentColumnIndex].Frozen = header.IsRequired;
 
             // Save after every change
             SaveCsv();
