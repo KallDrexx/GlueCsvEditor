@@ -30,14 +30,14 @@
         {
             this.dgrEditor = new System.Windows.Forms.DataGridView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnAddColumn = new System.Windows.Forms.Button();
+            this.btnRemove = new System.Windows.Forms.Button();
             this.chkIsList = new System.Windows.Forms.CheckBox();
             this.chkIsRequired = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderType = new System.Windows.Forms.TextBox();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
-            this.btnAddColumn = new System.Windows.Forms.Button();
-            this.btnRemove = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -55,7 +55,7 @@
             this.dgrEditor.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgrEditor.Location = new System.Drawing.Point(3, 39);
             this.dgrEditor.Name = "dgrEditor";
-            this.dgrEditor.Size = new System.Drawing.Size(351, 451);
+            this.dgrEditor.Size = new System.Drawing.Size(349, 449);
             this.dgrEditor.TabIndex = 0;
             this.dgrEditor.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEndEdit);
             this.dgrEditor.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEnter);
@@ -66,7 +66,9 @@
             // 
             // splitContainer1
             // 
+            this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Name = "splitContainer1";
             // 
@@ -86,7 +88,28 @@
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(581, 493);
             this.splitContainer1.SplitterDistance = 357;
+            this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 1;
+            // 
+            // btnAddColumn
+            // 
+            this.btnAddColumn.Location = new System.Drawing.Point(3, 10);
+            this.btnAddColumn.Name = "btnAddColumn";
+            this.btnAddColumn.Size = new System.Drawing.Size(75, 23);
+            this.btnAddColumn.TabIndex = 7;
+            this.btnAddColumn.Text = "Add Column";
+            this.btnAddColumn.UseVisualStyleBackColor = true;
+            this.btnAddColumn.Click += new System.EventHandler(this.btnAddColumn_Click);
+            // 
+            // btnRemove
+            // 
+            this.btnRemove.Location = new System.Drawing.Point(5, 10);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(102, 23);
+            this.btnRemove.TabIndex = 7;
+            this.btnRemove.Text = "Remove Column";
+            this.btnRemove.UseVisualStyleBackColor = true;
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
             // chkIsList
             // 
@@ -134,7 +157,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtHeaderType.Location = new System.Drawing.Point(93, 65);
             this.txtHeaderType.Name = "txtHeaderType";
-            this.txtHeaderType.Size = new System.Drawing.Size(124, 20);
+            this.txtHeaderType.Size = new System.Drawing.Size(119, 20);
             this.txtHeaderType.TabIndex = 1;
             this.txtHeaderType.TextChanged += new System.EventHandler(this.txtHeaderType_TextChanged);
             // 
@@ -144,29 +167,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtHeaderName.Location = new System.Drawing.Point(93, 39);
             this.txtHeaderName.Name = "txtHeaderName";
-            this.txtHeaderName.Size = new System.Drawing.Size(124, 20);
+            this.txtHeaderName.Size = new System.Drawing.Size(119, 20);
             this.txtHeaderName.TabIndex = 0;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
-            // 
-            // btnAddColumn
-            // 
-            this.btnAddColumn.Location = new System.Drawing.Point(3, 10);
-            this.btnAddColumn.Name = "btnAddColumn";
-            this.btnAddColumn.Size = new System.Drawing.Size(75, 23);
-            this.btnAddColumn.TabIndex = 7;
-            this.btnAddColumn.Text = "Add Column";
-            this.btnAddColumn.UseVisualStyleBackColor = true;
-            this.btnAddColumn.Click += new System.EventHandler(this.btnAddColumn_Click);
-            // 
-            // btnRemove
-            // 
-            this.btnRemove.Location = new System.Drawing.Point(5, 10);
-            this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(102, 23);
-            this.btnRemove.TabIndex = 7;
-            this.btnRemove.Text = "Remove Column";
-            this.btnRemove.UseVisualStyleBackColor = true;
-            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
             // EditorMain
             // 
