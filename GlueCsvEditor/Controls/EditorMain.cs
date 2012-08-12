@@ -78,7 +78,7 @@ namespace GlueCsvEditor.Controls
             txtHeaderType.Text = string.Empty;
 
             var header = _csv.Headers[e.ColumnIndex];
-            string type = CsvHeader.GetClassNameFromHeader(header.Name) ?? "string";
+            string type = CsvHeader.GetClassNameFromHeader(header.OriginalText) ?? "string";
             
             int typeDataIndex = header.Name.IndexOf("(");
             if (typeDataIndex < 0)
