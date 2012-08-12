@@ -30,12 +30,12 @@
         {
             this.dgrEditor = new System.Windows.Forms.DataGridView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.txtHeaderName = new System.Windows.Forms.TextBox();
-            this.txtHeaderType = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.chkIsRequired = new System.Windows.Forms.CheckBox();
             this.chkIsList = new System.Windows.Forms.CheckBox();
+            this.chkIsRequired = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtHeaderType = new System.Windows.Forms.TextBox();
+            this.txtHeaderName = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -55,6 +55,8 @@
             this.dgrEditor.TabIndex = 0;
             this.dgrEditor.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEndEdit);
             this.dgrEditor.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEnter);
+            this.dgrEditor.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgrEditor_RowsAdded);
+            this.dgrEditor.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.dgrEditor_RowsRemoved);
             // 
             // splitContainer1
             // 
@@ -78,43 +80,16 @@
             this.splitContainer1.SplitterDistance = 357;
             this.splitContainer1.TabIndex = 1;
             // 
-            // txtHeaderName
+            // chkIsList
             // 
-            this.txtHeaderName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtHeaderName.Location = new System.Drawing.Point(85, 29);
-            this.txtHeaderName.Name = "txtHeaderName";
-            this.txtHeaderName.Size = new System.Drawing.Size(124, 20);
-            this.txtHeaderName.TabIndex = 0;
-            this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
-            // 
-            // txtHeaderType
-            // 
-            this.txtHeaderType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtHeaderType.Location = new System.Drawing.Point(85, 55);
-            this.txtHeaderType.Name = "txtHeaderType";
-            this.txtHeaderType.Size = new System.Drawing.Size(124, 20);
-            this.txtHeaderType.TabIndex = 1;
-            this.txtHeaderType.TextChanged += new System.EventHandler(this.txtHeaderType_TextChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 29);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(76, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Column Name:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(45, 55);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(34, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Type:";
+            this.chkIsList.AutoSize = true;
+            this.chkIsList.Location = new System.Drawing.Point(85, 106);
+            this.chkIsList.Name = "chkIsList";
+            this.chkIsList.Size = new System.Drawing.Size(59, 17);
+            this.chkIsList.TabIndex = 6;
+            this.chkIsList.Text = "Is List?";
+            this.chkIsList.UseVisualStyleBackColor = true;
+            this.chkIsList.CheckedChanged += new System.EventHandler(this.chkIsList_CheckedChanged);
             // 
             // chkIsRequired
             // 
@@ -127,16 +102,43 @@
             this.chkIsRequired.UseVisualStyleBackColor = true;
             this.chkIsRequired.CheckedChanged += new System.EventHandler(this.chkIsRequired_CheckedChanged);
             // 
-            // chkIsList
+            // label3
             // 
-            this.chkIsList.AutoSize = true;
-            this.chkIsList.Location = new System.Drawing.Point(85, 106);
-            this.chkIsList.Name = "chkIsList";
-            this.chkIsList.Size = new System.Drawing.Size(59, 17);
-            this.chkIsList.TabIndex = 6;
-            this.chkIsList.Text = "Is List?";
-            this.chkIsList.UseVisualStyleBackColor = true;
-            this.chkIsList.CheckedChanged += new System.EventHandler(this.chkIsList_CheckedChanged);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(45, 55);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(34, 13);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Type:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 29);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(76, 13);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Column Name:";
+            // 
+            // txtHeaderType
+            // 
+            this.txtHeaderType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtHeaderType.Location = new System.Drawing.Point(85, 55);
+            this.txtHeaderType.Name = "txtHeaderType";
+            this.txtHeaderType.Size = new System.Drawing.Size(124, 20);
+            this.txtHeaderType.TabIndex = 1;
+            this.txtHeaderType.TextChanged += new System.EventHandler(this.txtHeaderType_TextChanged);
+            // 
+            // txtHeaderName
+            // 
+            this.txtHeaderName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtHeaderName.Location = new System.Drawing.Point(85, 29);
+            this.txtHeaderName.Name = "txtHeaderName";
+            this.txtHeaderName.Size = new System.Drawing.Size(124, 20);
+            this.txtHeaderName.TabIndex = 0;
+            this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
             // 
             // EditorMain
             // 

@@ -33,6 +33,8 @@ namespace GlueCsvEditor.Controls
 
         private void EditorMain_Load(object sender, EventArgs e)
         {
+            _dataLoading = true;
+
             // Serialize the csv
             _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
             _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();            
@@ -47,10 +49,13 @@ namespace GlueCsvEditor.Controls
             // Add the records
             for (int x = 0; x < _csv.Records.Count; x++)
             {
+                _dataLoading = true; // Required because CellEnter will set it to false
                 int rowIndex = dgrEditor.Rows.Add();
                 for (int y = 0; y < _csv.Records[x].Length; y++)
                     dgrEditor.Rows[rowIndex].Cells[y].Value = _csv.Records[x][y];
             }
+
+            _dataLoading = false;
         }
 
         private void dgrEditor_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -120,6 +125,24 @@ namespace GlueCsvEditor.Controls
         private void chkIsList_CheckedChanged(object sender, EventArgs e)
         {
             UpdateColumnDetails();
+        }
+
+        private void dgrEditor_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            if (_dataLoading)
+                return;
+
+            _csv.Records.Add(new string[dgrEditor.Columns.Count]);
+            SaveCsv();
+        }
+
+        private void dgrEditor_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
+        {
+            if (_dataLoading)
+                return;
+
+            _csv.Records.RemoveAt(e.RowIndex);
+            SaveCsv();
         }
 
         protected void SaveCsv()
