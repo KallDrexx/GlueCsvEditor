@@ -63,17 +63,17 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EditorMain.cs">
+    <Compile Include="Controls\EditorMain.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorMain.Designer.cs">
+    <Compile Include="Controls\EditorMain.Designer.cs">
       <DependentUpon>EditorMain.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvEditorPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EditorMain.resx">
+    <EmbeddedResource Include="Controls\EditorMain.resx">
       <DependentUpon>EditorMain.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
