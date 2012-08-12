@@ -41,7 +41,11 @@ namespace GlueCsvEditor.Controls
 
             // Add the CSV headers to the datagrid
             for (int x = 0; x < _csv.Headers.Length; x++)
+            {
                 dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].OriginalText);
+                if (_csv.Headers[x].IsRequired)
+                    dgrEditor.Columns[x].Frozen = true;
+            }
 
             // Add the records
             for (int x = 0; x < _csv.Records.Count; x++)
@@ -240,6 +244,7 @@ namespace GlueCsvEditor.Controls
 
             dgrEditor.Columns[_currentColumnIndex].HeaderText = text.ToString();
             _csv.Headers[_currentColumnIndex] = header;
+            dgrEditor.Columns[_currentColumnIndex].Frozen = header.IsRequired;
 
             // Save after every change
             SaveCsv();
