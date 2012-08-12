@@ -48,18 +48,31 @@ namespace GlueCsvEditor.Controls
             }
 
             // Add the records
-            for (int x = 0; x < _csv.Records.Count; x++)
-            {
-                _dataLoading = true; // Required because CellEnter will set it to false
-                int rowIndex = dgrEditor.Rows.Add();
-                for (int y = 0; y < _csv.Records[x].Length; y++)
-                    dgrEditor.Rows[rowIndex].Cells[y].Value = _csv.Records[x][y];
-            }
-
+            dgrEditor.Rows.Add(_csv.Records.Count);
             _dataLoading = false;
         }
 
-        private void dgrEditor_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        private void txtHeaderName_TextChanged(object sender, EventArgs e)
+        {
+            UpdateColumnDetails();
+        }
+
+        private void txtHeaderType_TextChanged(object sender, EventArgs e)
+        {
+            UpdateColumnDetails();
+        }
+
+        private void chkIsRequired_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateColumnDetails();
+        }
+
+        private void chkIsList_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateColumnDetails();
+        }
+
+        private void dgrEditor_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
             // Update the value of the specified record in the RCR
             if (e.RowIndex >= _csv.Records.Count || e.RowIndex < 0)
@@ -68,7 +81,7 @@ namespace GlueCsvEditor.Controls
             if (e.ColumnIndex >= _csv.Records[e.RowIndex].Length || e.ColumnIndex < 0)
                 throw new InvalidOperationException("Column index out of range");
 
-            _csv.Records[e.RowIndex][e.ColumnIndex] = dgrEditor[e.ColumnIndex, e.RowIndex].Value as string;
+            _csv.Records[e.RowIndex][e.ColumnIndex] = e.Value as string;
             SaveCsv();
         }
 
@@ -83,7 +96,7 @@ namespace GlueCsvEditor.Controls
 
             var header = _csv.Headers[e.ColumnIndex];
             string type = CsvHeader.GetClassNameFromHeader(header.OriginalText) ?? "string";
-            
+
             int typeDataIndex = header.Name.IndexOf("(");
             if (typeDataIndex < 0)
                 typeDataIndex = header.Name.Length;
@@ -106,26 +119,6 @@ namespace GlueCsvEditor.Controls
             chkIsRequired.Checked = header.IsRequired;
 
             _dataLoading = false;
-        }
-
-        private void txtHeaderName_TextChanged(object sender, EventArgs e)
-        {
-            UpdateColumnDetails();
-        }
-
-        private void txtHeaderType_TextChanged(object sender, EventArgs e)
-        {
-            UpdateColumnDetails();
-        }
-
-        private void chkIsRequired_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateColumnDetails();
-        }
-
-        private void chkIsList_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateColumnDetails();
         }
 
         private void dgrEditor_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
@@ -186,6 +179,18 @@ namespace GlueCsvEditor.Controls
             }
 
             SaveCsv();
+        }
+
+        private void dgrEditor_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
+        {
+            // Make sure the row/column is valid
+            if (e.RowIndex >= _csv.Records.Count)
+                return;
+
+            if (e.ColumnIndex >= _csv.Headers.Length)
+                return;
+
+            e.Value = _csv.Records[e.RowIndex][e.ColumnIndex];
         }
 
         private void btnAddColumn_Click(object sender, EventArgs e)

@@ -57,8 +57,10 @@
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.Size = new System.Drawing.Size(399, 483);
             this.dgrEditor.TabIndex = 0;
-            this.dgrEditor.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEndEdit);
+            this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEnter);
+            this.dgrEditor.CellValueNeeded += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dgrEditor_CellValueNeeded);
+            this.dgrEditor.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dgrEditor_CellValuePushed);
             this.dgrEditor.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgrEditor_ColumnAdded);
             this.dgrEditor.ColumnRemoved += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgrEditor_ColumnRemoved);
             this.dgrEditor.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgrEditor_RowsAdded);
