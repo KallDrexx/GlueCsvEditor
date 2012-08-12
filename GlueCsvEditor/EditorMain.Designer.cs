@@ -36,6 +36,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderType = new System.Windows.Forms.TextBox();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
+            this.btnAddColumn = new System.Windows.Forms.Button();
+            this.btnRemove = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -45,16 +47,20 @@
             // 
             // dgrEditor
             // 
+            this.dgrEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dgrEditor.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgrEditor.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dgrEditor.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgrEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgrEditor.Location = new System.Drawing.Point(0, 0);
+            this.dgrEditor.Location = new System.Drawing.Point(3, 39);
             this.dgrEditor.Name = "dgrEditor";
-            this.dgrEditor.Size = new System.Drawing.Size(357, 493);
+            this.dgrEditor.Size = new System.Drawing.Size(351, 451);
             this.dgrEditor.TabIndex = 0;
             this.dgrEditor.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEndEdit);
             this.dgrEditor.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEnter);
+            this.dgrEditor.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgrEditor_ColumnAdded);
+            this.dgrEditor.ColumnRemoved += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgrEditor_ColumnRemoved);
             this.dgrEditor.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgrEditor_RowsAdded);
             this.dgrEditor.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.dgrEditor_RowsRemoved);
             // 
@@ -66,10 +72,12 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnAddColumn);
             this.splitContainer1.Panel1.Controls.Add(this.dgrEditor);
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.btnRemove);
             this.splitContainer1.Panel2.Controls.Add(this.chkIsList);
             this.splitContainer1.Panel2.Controls.Add(this.chkIsRequired);
             this.splitContainer1.Panel2.Controls.Add(this.label3);
@@ -83,7 +91,7 @@
             // chkIsList
             // 
             this.chkIsList.AutoSize = true;
-            this.chkIsList.Location = new System.Drawing.Point(85, 106);
+            this.chkIsList.Location = new System.Drawing.Point(93, 116);
             this.chkIsList.Name = "chkIsList";
             this.chkIsList.Size = new System.Drawing.Size(59, 17);
             this.chkIsList.TabIndex = 6;
@@ -94,7 +102,7 @@
             // chkIsRequired
             // 
             this.chkIsRequired.AutoSize = true;
-            this.chkIsRequired.Location = new System.Drawing.Point(85, 82);
+            this.chkIsRequired.Location = new System.Drawing.Point(93, 92);
             this.chkIsRequired.Name = "chkIsRequired";
             this.chkIsRequired.Size = new System.Drawing.Size(75, 17);
             this.chkIsRequired.TabIndex = 5;
@@ -105,7 +113,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(45, 55);
+            this.label3.Location = new System.Drawing.Point(53, 65);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(34, 13);
             this.label3.TabIndex = 4;
@@ -114,7 +122,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 29);
+            this.label1.Location = new System.Drawing.Point(11, 39);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(76, 13);
             this.label1.TabIndex = 2;
@@ -124,7 +132,7 @@
             // 
             this.txtHeaderType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtHeaderType.Location = new System.Drawing.Point(85, 55);
+            this.txtHeaderType.Location = new System.Drawing.Point(93, 65);
             this.txtHeaderType.Name = "txtHeaderType";
             this.txtHeaderType.Size = new System.Drawing.Size(124, 20);
             this.txtHeaderType.TabIndex = 1;
@@ -134,11 +142,31 @@
             // 
             this.txtHeaderName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtHeaderName.Location = new System.Drawing.Point(85, 29);
+            this.txtHeaderName.Location = new System.Drawing.Point(93, 39);
             this.txtHeaderName.Name = "txtHeaderName";
             this.txtHeaderName.Size = new System.Drawing.Size(124, 20);
             this.txtHeaderName.TabIndex = 0;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
+            // 
+            // btnAddColumn
+            // 
+            this.btnAddColumn.Location = new System.Drawing.Point(3, 10);
+            this.btnAddColumn.Name = "btnAddColumn";
+            this.btnAddColumn.Size = new System.Drawing.Size(75, 23);
+            this.btnAddColumn.TabIndex = 7;
+            this.btnAddColumn.Text = "Add Column";
+            this.btnAddColumn.UseVisualStyleBackColor = true;
+            this.btnAddColumn.Click += new System.EventHandler(this.btnAddColumn_Click);
+            // 
+            // btnRemove
+            // 
+            this.btnRemove.Location = new System.Drawing.Point(5, 10);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(102, 23);
+            this.btnRemove.TabIndex = 7;
+            this.btnRemove.Text = "Remove Column";
+            this.btnRemove.UseVisualStyleBackColor = true;
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
             // EditorMain
             // 
@@ -169,5 +197,7 @@
         private System.Windows.Forms.TextBox txtHeaderName;
         private System.Windows.Forms.CheckBox chkIsRequired;
         private System.Windows.Forms.CheckBox chkIsList;
+        private System.Windows.Forms.Button btnAddColumn;
+        private System.Windows.Forms.Button btnRemove;
     }
 }

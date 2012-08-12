@@ -41,10 +41,7 @@ namespace GlueCsvEditor.Controls
 
             // Add the CSV headers to the datagrid
             for (int x = 0; x < _csv.Headers.Length; x++)
-            {
-                int index = dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].OriginalText);
-                dgrEditor.Columns[index].Tag = _csv.Headers[x];
-            }
+                dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].OriginalText);
 
             // Add the records
             for (int x = 0; x < _csv.Records.Count; x++)
@@ -80,7 +77,7 @@ namespace GlueCsvEditor.Controls
             txtHeaderName.Text = string.Empty;
             txtHeaderType.Text = string.Empty;
 
-            var header = (CsvHeader)dgrEditor.Columns[e.ColumnIndex].Tag;
+            var header = _csv.Headers[e.ColumnIndex];
             string type = CsvHeader.GetClassNameFromHeader(header.Name) ?? "string";
             
             int typeDataIndex = header.Name.IndexOf("(");
@@ -145,6 +142,65 @@ namespace GlueCsvEditor.Controls
             SaveCsv();
         }
 
+        private void dgrEditor_ColumnAdded(object sender, DataGridViewColumnEventArgs e)
+        {
+            if (_dataLoading)
+                return;
+
+            // Add this column to the RCR
+            var headers = new List<CsvHeader>(_csv.Headers);
+            headers.Insert(e.Column.Index, new CsvHeader { Name = string.Empty, OriginalText = string.Empty });
+            _csv.Headers = headers.ToArray();
+
+            // Add the column to all the records
+            for (int x = 0; x < _csv.Records.Count; x++)
+            {
+                var values = new List<string>(_csv.Records[x]);
+                values.Insert(e.Column.Index, string.Empty);
+                _csv.Records[x] = values.ToArray();
+            }
+
+            SaveCsv();
+        }
+
+        private void dgrEditor_ColumnRemoved(object sender, DataGridViewColumnEventArgs e)
+        {
+            if (_dataLoading)
+                return;
+
+            // Remove this column to the RCR
+            var headers = new List<CsvHeader>(_csv.Headers);
+            headers.RemoveAt(e.Column.Index);
+            _csv.Headers = headers.ToArray();
+
+            // Remove the column to all the records
+            for (int x = 0; x < _csv.Records.Count; x++)
+            {
+                var values = new List<string>(_csv.Records[x]);
+                values.RemoveAt(e.Column.Index);
+                _csv.Records[x] = values.ToArray();
+            }
+
+            SaveCsv();
+        }
+
+        private void btnAddColumn_Click(object sender, EventArgs e)
+        {
+            dgrEditor.Columns.Add(string.Empty, "");
+        }
+
+        private void btnRemove_Click(object sender, EventArgs e)
+        {
+            string message = string.Format("Are you sure you want to remove the '{0}' column?",
+                _csv.Headers[_currentColumnIndex].OriginalText);
+            var result = MessageBox.Show(message, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            if (result != DialogResult.Yes)
+                return;
+
+            // Delete the current column
+            dgrEditor.Columns.RemoveAt(_currentColumnIndex);
+        }
+
         protected void SaveCsv()
         {
             CsvFileManager.Serialize(_csv, _csvPath);
@@ -177,12 +233,11 @@ namespace GlueCsvEditor.Controls
             text.Append(")");
 
             // Update the header details
-            var header = (CsvHeader)dgrEditor.Columns[_currentColumnIndex].Tag;
+            var header = _csv.Headers[_currentColumnIndex];
             header.OriginalText = text.ToString();
             header.Name = text.ToString();
             header.IsRequired = chkIsRequired.Checked;
 
-            dgrEditor.Columns[_currentColumnIndex].Tag = header;
             dgrEditor.Columns[_currentColumnIndex].HeaderText = text.ToString();
             _csv.Headers[_currentColumnIndex] = header;
 
