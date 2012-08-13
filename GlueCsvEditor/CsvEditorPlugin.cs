@@ -16,9 +16,8 @@ using FlatRedBall.IO.Csv;
 
 namespace GlueCsvEditor
 {
-    [Export(typeof(ICenterTab))]
-    [Export(typeof(ITreeItemSelect))]
-    public class CsvEditorPlugin : IPlugin, ICenterTab, ITreeItemSelect
+    [Export(typeof(PluginBase))]
+    public class CsvEditorPlugin : PluginBase
     {
         protected EditorMain _editor;
         protected TabControl _tabContainer;
@@ -45,12 +44,9 @@ namespace GlueCsvEditor
 		    set;
         }
 
-        public string FriendlyName
-        {
-            get { return "Csv Editor"; }
-        }
+        public override string FriendlyName { get { return "Csv Editor"; } }
 
-        public bool ShutDown(PluginShutDownReason reason)
+        public override bool ShutDown(PluginShutDownReason reason)
         {
             if (_tab != null)
                 _tabContainer.Controls.Remove(_tab);
@@ -62,17 +58,19 @@ namespace GlueCsvEditor
             return true;
         }
 
-        public void StartUp()
+        public override void StartUp()
         {
-            // Do anything your plugin needs to do when it first starts up
+            // Initialize the handlers I need
+            this.InitializeCenterTabHandler = InitializeTab;
+            this.ReactToItemSelectHandler = ReactToItemSelect;
         }
 
-        public Version Version
+        public override Version Version
         {
             get { return new Version(1, 0); }
         }
 
-        public void InitializeTab(TabControl tabControl)
+        protected void InitializeTab(TabControl tabControl)
         {
             _tabContainer = tabControl;
         }
@@ -82,7 +80,7 @@ namespace GlueCsvEditor
             PluginManager.ShutDownPlugin(this);
         }
 
-        public void ReactToItemSelect(TreeNode selectedTreeNode)
+        protected void ReactToItemSelect(TreeNode selectedTreeNode)
         {
             // Close the existing tab
             if (_tab != null)
