@@ -95,13 +95,29 @@ namespace GlueCsvEditor
             {
                 var csv = selectedTreeNode.Tag as ReferencedFileSave;
                 string path = ProjectManager.MakeAbsolute(csv.Name, true);
+                char delimiter;
+                switch (csv.CsvDelimiter)
+                {
+                    case AvailableDelimiters.Pipe:
+                        delimiter = '|';
+                        break;
+
+                    case AvailableDelimiters.Tab:
+                        delimiter = '\t';
+                        break;
+
+                    case AvailableDelimiters.Comma:
+                    default:
+                        delimiter = ',';
+                        break;
+                }
 
                 try
                 {
                     _tab = new PluginTab();
                     _tab.Text = "CSV Editor";
 
-                    _editor = new EditorMain(GlueCommands, GlueState, path);
+                    _editor = new EditorMain(GlueCommands, GlueState, path, delimiter);
                     _tab.Controls.Add(_editor);
                     _tabContainer.Controls.Add(_tab);
                     _tabContainer.SelectTab(_tabContainer.Controls.Count - 1);

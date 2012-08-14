@@ -20,12 +20,14 @@ namespace GlueCsvEditor.Controls
         protected int _currentColumnIndex = -1;
         protected bool _dataLoading;
         protected RuntimeCsvRepresentation _csv;
+        protected char _delimiter;
 
-        public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath)
+        public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath, char delimiter)
         {
             _glueCommands = glueCommands;
             _gluState = glueState;
             _csvPath = csvPath;
+            _delimiter = delimiter;
 
             InitializeComponent();
             this.Dock = DockStyle.Fill;
@@ -36,6 +38,7 @@ namespace GlueCsvEditor.Controls
             _dataLoading = true;
 
             // Serialize the csv
+            CsvFileManager.Delimiter = _delimiter;
             _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
             _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();            
 
@@ -51,7 +54,7 @@ namespace GlueCsvEditor.Controls
                 for (int x = 0; x < _csv.Records.Count; x++)
                     dgrEditor.Rows[x].HeaderCell.Value = _csv.Records[x][0];
 
-                _dataLoading = false;
+            _dataLoading = false;
         }
 
         private void txtHeaderName_TextChanged(object sender, EventArgs e)
@@ -230,6 +233,7 @@ namespace GlueCsvEditor.Controls
 
         protected void SaveCsv()
         {
+            CsvFileManager.Delimiter = _delimiter;
             try { CsvFileManager.Serialize(_csv, _csvPath); }
             catch (Exception ex)
             {
