@@ -50,21 +50,15 @@
             this.dgrEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgrEditor.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
-            this.dgrEditor.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
-            this.dgrEditor.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgrEditor.Location = new System.Drawing.Point(3, 3);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
-            this.dgrEditor.Size = new System.Drawing.Size(396, 483);
+            this.dgrEditor.Size = new System.Drawing.Size(390, 483);
             this.dgrEditor.TabIndex = 0;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEnter);
-            this.dgrEditor.CellValueNeeded += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dgrEditor_CellValueNeeded);
-            this.dgrEditor.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dgrEditor_CellValuePushed);
             this.dgrEditor.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgrEditor_ColumnAdded);
             this.dgrEditor.ColumnRemoved += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgrEditor_ColumnRemoved);
-            this.dgrEditor.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgrEditor_RowsAdded);
             this.dgrEditor.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.dgrEditor_RowsRemoved);
             // 
             // splitContainer1
@@ -90,7 +84,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(581, 493);
-            this.splitContainer1.SplitterDistance = 406;
+            this.splitContainer1.SplitterDistance = 400;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 1;
             // 
