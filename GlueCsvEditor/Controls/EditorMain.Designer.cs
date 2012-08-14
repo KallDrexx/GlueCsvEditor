@@ -52,7 +52,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgrEditor.Location = new System.Drawing.Point(3, 3);
             this.dgrEditor.Name = "dgrEditor";
-            this.dgrEditor.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             this.dgrEditor.Size = new System.Drawing.Size(390, 483);
             this.dgrEditor.TabIndex = 0;
             this.dgrEditor.VirtualMode = true;
