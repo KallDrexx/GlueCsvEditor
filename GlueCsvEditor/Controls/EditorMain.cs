@@ -23,6 +23,7 @@ namespace GlueCsvEditor.Controls
         protected bool _dataLoading;
         protected RuntimeCsvRepresentation _csv;
         protected char _delimiter;
+        protected bool _currentlyEditing;
 
         public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath, char delimiter)
         {
@@ -101,6 +102,7 @@ namespace GlueCsvEditor.Controls
                 dgrEditor.Rows[e.RowIndex].HeaderCell.Value = e.Value as string;
 
             SaveCsv();
+            _currentlyEditing = false;
         }
 
         private void dgrEditor_CellEnter(object sender, DataGridViewCellEventArgs e)
@@ -137,6 +139,11 @@ namespace GlueCsvEditor.Controls
             chkIsRequired.Checked = header.IsRequired;
 
             _dataLoading = false;
+        }
+
+        private void dgrEditor_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            _currentlyEditing = true;
         }
 
         private void dgrEditor_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
@@ -220,6 +227,19 @@ namespace GlueCsvEditor.Controls
                 return;
 
             e.Value = _csv.Records[e.RowIndex][e.ColumnIndex];
+        }
+
+        private void dgrEditor_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == System.Windows.Forms.Keys.V && e.Control)
+            {
+                string data = Clipboard.GetData(DataFormats.Text).ToString();
+                string[] cells = data.Split('\t');
+                for (int i = 0; i < cells.Length; i++)
+                    dgrEditor[_currentColumnIndex + i, dgrEditor.CurrentRow.Index].Value = cells[i];
+
+                
+            }
         }
 
         private void btnAddColumn_Click(object sender, EventArgs e)
