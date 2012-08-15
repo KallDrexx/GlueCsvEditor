@@ -36,34 +36,17 @@ namespace GlueCsvEditor.Controls
             this.Dock = DockStyle.Fill;
         }
 
+        public void NotifyOfCsvUpdate()
+        {
+            string message = "Warning: This CSV has been updated externally.  Do you want to reload?";
+            var result = MessageBox.Show(message, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.Yes)
+                LoadCsv();
+        }
+
         private void EditorMain_Load(object sender, EventArgs e)
         {
-            this.SuspendLayout();
-            _dataLoading = true;
-
-            // Serialize the csv
-            CsvFileManager.Delimiter = _delimiter;
-            _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
-            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
-
-            // Add the CSV headers to the datagrid
-            for (int x = 0; x < _csv.Headers.Length; x++)
-                dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].OriginalText);
-
-            // Add the records
-            dgrEditor.RowCount = _csv.Records.Count;
-
-            // Add the first value of each record to the row text
-            if (_csv.Headers.Length > 0)
-                for (int x = 0; x < _csv.Records.Count; x++)
-                    dgrEditor.Rows[x].HeaderCell.Value = _csv.Records[x][0];
-
-            // Add the cell value needed and rows added event after load for performance reasons
-            dgrEditor.CellValueNeeded += dgrEditor_CellValueNeeded;
-            dgrEditor.RowsAdded += dgrEditor_RowsAdded;
-
-            this.ResumeLayout();
-            _dataLoading = false;
+            LoadCsv();
         }
 
         private void txtHeaderName_TextChanged(object sender, EventArgs e)
@@ -257,6 +240,33 @@ namespace GlueCsvEditor.Controls
 
             // Delete the current column
             dgrEditor.Columns.RemoveAt(_currentColumnIndex);
+        }
+
+        protected void LoadCsv()
+        {
+            this.SuspendLayout();
+            _dataLoading = true;
+
+            // Serialize the csv
+            CsvFileManager.Delimiter = _delimiter;
+            _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
+            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
+
+            // Add the CSV headers to the datagrid
+            dgrEditor.Columns.Clear();
+            for (int x = 0; x < _csv.Headers.Length; x++)
+                dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].OriginalText);
+
+            // Add the records
+            dgrEditor.RowCount = _csv.Records.Count;
+
+            // Add the first value of each record to the row text
+            if (_csv.Headers.Length > 0)
+                for (int x = 0; x < _csv.Records.Count; x++)
+                    dgrEditor.Rows[x].HeaderCell.Value = _csv.Records[x][0];
+
+            this.ResumeLayout();
+            _dataLoading = false;
         }
 
         protected void SaveCsv()

@@ -22,6 +22,7 @@ namespace GlueCsvEditor
         protected EditorMain _editor;
         protected TabControl _tabContainer;
         protected PluginTab _tab;
+        protected string _currentCsv;
 
         [Import("GlueProjectSave")]
         public GlueProjectSave GlueProjectSave
@@ -63,6 +64,7 @@ namespace GlueCsvEditor
             // Initialize the handlers I need
             this.InitializeCenterTabHandler = InitializeTab;
             this.ReactToItemSelectHandler = ReactToItemSelect;
+            this.ReactToFileChangeHandler = ReactToFileChange;
         }
 
         public override Version Version
@@ -88,13 +90,14 @@ namespace GlueCsvEditor
                 _tabContainer.Controls.Remove(_tab);
                 _editor = null;
                 _tab = null;
+                _currentCsv = null;
             }
 
             // Determine if a csv was selected
             if (IsCsv(selectedTreeNode.Tag))
             {
                 var csv = selectedTreeNode.Tag as ReferencedFileSave;
-                string path = ProjectManager.MakeAbsolute(csv.Name, true);
+                _currentCsv = ProjectManager.MakeAbsolute(csv.Name, true);
                 char delimiter;
                 switch (csv.CsvDelimiter)
                 {
@@ -117,7 +120,7 @@ namespace GlueCsvEditor
                     _tab = new PluginTab();
                     _tab.Text = "CSV Editor";
 
-                    _editor = new EditorMain(GlueCommands, GlueState, path, delimiter);
+                    _editor = new EditorMain(GlueCommands, GlueState, _currentCsv, delimiter);
                     _tab.Controls.Add(_editor);
                     _tabContainer.Controls.Add(_tab);
                     _tabContainer.SelectTab(_tabContainer.Controls.Count - 1);
@@ -127,6 +130,12 @@ namespace GlueCsvEditor
                     MessageBox.Show("Failed to create a CSV runtime representation: " + ex.Message, "Error");
                 }
             }
+        }
+
+        protected void ReactToFileChange(string filename)
+        {
+            if (filename.Equals(_currentCsv, StringComparison.OrdinalIgnoreCase))
+                _editor.NotifyOfCsvUpdate();
         }
 
         protected bool IsCsv(object obj)
