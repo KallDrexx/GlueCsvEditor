@@ -38,10 +38,7 @@ namespace GlueCsvEditor.Controls
 
         public void NotifyOfCsvUpdate()
         {
-            string message = "Warning: This CSV has been updated externally.  Do you want to reload?";
-            var result = MessageBox.Show(message, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (result == DialogResult.Yes)
-                LoadCsv();
+            LoadCsv();
         }
 
         private void EditorMain_Load(object sender, EventArgs e)
