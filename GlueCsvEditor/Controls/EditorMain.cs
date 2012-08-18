@@ -20,6 +20,7 @@ namespace GlueCsvEditor.Controls
         protected IGlueCommands _glueCommands;
         protected IGlueState _gluState;
         protected int _currentColumnIndex = -1;
+        protected int _currentRowIndex = -1;
         protected bool _dataLoading;
         protected bool _currentlyEditing;
         protected bool _ignoreNextFileChange;
@@ -86,6 +87,8 @@ namespace GlueCsvEditor.Controls
         private void dgrEditor_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
             _currentColumnIndex = e.ColumnIndex;
+            _currentRowIndex = e.RowIndex;
+
             _dataLoading = true;
 
             // Update the selected header
@@ -180,6 +183,18 @@ namespace GlueCsvEditor.Controls
 
             // Delete the current column
             dgrEditor.Columns.RemoveAt(_currentColumnIndex);
+        }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtSearch.Text))
+                return;
+
+            var cell = _data.FindNextValue(txtSearch.Text, _currentRowIndex, _currentColumnIndex);
+            if (cell == null)
+                return;
+
+            dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
         }
 
         protected void LoadCsv()

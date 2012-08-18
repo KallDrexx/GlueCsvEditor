@@ -72,6 +72,7 @@
     <Compile Include="CsvEditorPlugin.cs" />
     <Compile Include="Data\CsvColumnHeader.cs" />
     <Compile Include="Data\CsvData.cs" />
+    <Compile Include="Data\FoundCell.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

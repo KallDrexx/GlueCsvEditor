@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FlatRedBall.IO.Csv;
+using Microsoft.Xna.Framework;
 
 namespace GlueCsvEditor.Data
 {
@@ -214,6 +215,45 @@ namespace GlueCsvEditor.Data
 
             _csv.Headers[column] = header;
             return text.ToString();
+        }
+
+        /// <summary>
+        /// Searches the CSV for the next cell containing a string, 
+        /// starting from the specified row and column
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <param name="startRow"></param>
+        /// <param name="startColumn"></param>
+        /// <returns></returns>
+        public FoundCell FindNextValue(string searchString, int startRow, int startColumn)
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+                return null;            
+
+            int row = startRow;
+            int column = startColumn;
+            searchString = searchString.Trim();
+
+            do
+            {
+                // Traverse through the records of the RCR until we find the next match
+                if (_csv.Records[row][column].IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0)
+                    return new FoundCell { ColumnIndex = column, RowIndex = row };
+
+                // This cell doesn't have the record, go to the next
+                column++;
+                if (column >= _csv.Headers.Length)
+                {
+                    column = 0;
+                    row++;
+
+                    if (row >= _csv.Records.Count)
+                        row = 0;
+                }
+
+            } while (row != startRow || column != startColumn);
+
+            return null;
         }
 
         /// <summary>
