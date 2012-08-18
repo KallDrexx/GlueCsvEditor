@@ -225,7 +225,7 @@ namespace GlueCsvEditor.Data
         /// <param name="startRow"></param>
         /// <param name="startColumn"></param>
         /// <returns></returns>
-        public FoundCell FindNextValue(string searchString, int startRow, int startColumn, bool ignoreStartingCell = false)
+        public FoundCell FindNextValue(string searchString, int startRow, int startColumn, bool ignoreStartingCell = false, bool reverse = false)
         {
             if (string.IsNullOrWhiteSpace(searchString))
                 return null;            
@@ -243,14 +243,30 @@ namespace GlueCsvEditor.Data
                         return new FoundCell { ColumnIndex = column, RowIndex = row };
 
                 // This cell doesn't have the record, go to the next
-                column++;
-                if (column >= _csv.Headers.Length)
+                if (!reverse)
                 {
-                    column = 0;
-                    row++;
+                    column++;
+                    if (column >= _csv.Headers.Length)
+                    {
+                        column = 0;
+                        row++;
 
-                    if (row >= _csv.Records.Count)
-                        row = 0;
+                        if (row >= _csv.Records.Count)
+                            row = 0;
+                    }
+                }
+
+                else
+                {
+                    column--;
+                    if (column < 0)
+                    {
+                        column = _csv.Headers.Length - 1;
+                        row--;
+
+                        if (row < 0)
+                            row = _csv.Records.Count - 1;
+                    }
                 }
 
                 isFirstSearchedCell = false;

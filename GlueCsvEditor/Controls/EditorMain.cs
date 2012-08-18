@@ -19,8 +19,8 @@ namespace GlueCsvEditor.Controls
     {
         protected IGlueCommands _glueCommands;
         protected IGlueState _gluState;
-        protected int _currentColumnIndex = -1;
-        protected int _currentRowIndex = -1;
+        protected int _currentColumnIndex = 0;
+        protected int _currentRowIndex = 0;
         protected bool _dataLoading;
         protected bool _currentlyEditing;
         protected bool _ignoreNextFileChange;
@@ -167,6 +167,15 @@ namespace GlueCsvEditor.Controls
                 for (int i = 0; i < cells.Length; i++)
                     dgrEditor[_currentColumnIndex + i, dgrEditor.CurrentRow.Index].Value = cells[i];
             }
+            else if (e.KeyCode == Keys.F3)
+            {
+                if (e.Shift)
+                    GoToNextSearchMatch(true);
+                else
+                    GoToNextSearchMatch();
+
+                e.Handled = true;
+            }
         }
 
         private void btnAddColumn_Click(object sender, EventArgs e)
@@ -197,16 +206,34 @@ namespace GlueCsvEditor.Controls
             dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
         }
 
+        private void txtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Down)
+            {
+                GoToNextSearchMatch();
+                e.Handled = true;
+            }
+
+            else if (e.KeyCode == Keys.Up)
+            {
+                GoToNextSearchMatch(true);
+                e.Handled = true;
+            }
+
+            else if (e.KeyCode == Keys.F3)
+            {
+                if (e.Shift)
+                    GoToNextSearchMatch(true);
+                else
+                    GoToNextSearchMatch();
+
+                e.Handled = true;
+            }
+        }
+
         private void btnFindNext_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtSearch.Text))
-                return;
-
-            var cell = _data.FindNextValue(txtSearch.Text, _currentRowIndex, _currentColumnIndex, true);
-            if (cell == null)
-                return;
-
-            dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
+            GoToNextSearchMatch();
         }
 
         protected void LoadCsv()
@@ -249,6 +276,18 @@ namespace GlueCsvEditor.Controls
 
             _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, txtHeaderType.Text, chkIsRequired.Checked, chkIsList.Checked);
             _data.SaveCsv();
+        }
+
+        protected void GoToNextSearchMatch(bool reverse = false)
+        {
+            if (string.IsNullOrWhiteSpace(txtSearch.Text))
+                return;
+
+            var cell = _data.FindNextValue(txtSearch.Text, _currentRowIndex, _currentColumnIndex, true, reverse);
+            if (cell == null)
+                return;
+
+            dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
         }
     }
 }
