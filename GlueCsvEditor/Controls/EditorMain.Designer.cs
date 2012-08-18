@@ -38,6 +38,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderType = new System.Windows.Forms.TextBox();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
+            this.txtSearch = new System.Windows.Forms.TextBox();
+            this.btnFindNext = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -50,10 +52,10 @@
             this.dgrEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgrEditor.Location = new System.Drawing.Point(3, 3);
+            this.dgrEditor.Location = new System.Drawing.Point(3, 32);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(381, 483);
+            this.dgrEditor.Size = new System.Drawing.Size(378, 454);
             this.dgrEditor.TabIndex = 0;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);
@@ -75,6 +77,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnFindNext);
+            this.splitContainer1.Panel1.Controls.Add(this.txtSearch);
             this.splitContainer1.Panel1.Controls.Add(this.dgrEditor);
             // 
             // splitContainer1.Panel2
@@ -88,7 +92,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(581, 493);
-            this.splitContainer1.SplitterDistance = 391;
+            this.splitContainer1.SplitterDistance = 388;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -172,6 +176,25 @@
             this.txtHeaderName.TabIndex = 0;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
             // 
+            // txtSearch
+            // 
+            this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtSearch.Location = new System.Drawing.Point(3, 6);
+            this.txtSearch.Name = "txtSearch";
+            this.txtSearch.Size = new System.Drawing.Size(297, 20);
+            this.txtSearch.TabIndex = 1;
+            // 
+            // btnFindNext
+            // 
+            this.btnFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFindNext.Location = new System.Drawing.Point(306, 4);
+            this.btnFindNext.Name = "btnFindNext";
+            this.btnFindNext.Size = new System.Drawing.Size(75, 23);
+            this.btnFindNext.TabIndex = 2;
+            this.btnFindNext.Text = "Find Next";
+            this.btnFindNext.UseVisualStyleBackColor = true;
+            // 
             // EditorMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -183,6 +206,7 @@
             this.Load += new System.EventHandler(this.EditorMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -203,5 +227,7 @@
         private System.Windows.Forms.CheckBox chkIsList;
         private System.Windows.Forms.Button btnAddColumn;
         private System.Windows.Forms.Button btnRemove;
+        private System.Windows.Forms.Button btnFindNext;
+        private System.Windows.Forms.TextBox txtSearch;
     }
 }
