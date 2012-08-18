@@ -195,6 +195,7 @@
             this.btnFindNext.TabIndex = 2;
             this.btnFindNext.Text = "Find Next";
             this.btnFindNext.UseVisualStyleBackColor = true;
+            this.btnFindNext.Click += new System.EventHandler(this.btnFindNext_Click);
             // 
             // EditorMain
             // 

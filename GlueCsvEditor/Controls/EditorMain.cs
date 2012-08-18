@@ -197,6 +197,18 @@ namespace GlueCsvEditor.Controls
             dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
         }
 
+        private void btnFindNext_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtSearch.Text))
+                return;
+
+            var cell = _data.FindNextValue(txtSearch.Text, _currentRowIndex, _currentColumnIndex, true);
+            if (cell == null)
+                return;
+
+            dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
+        }
+
         protected void LoadCsv()
         {
             this.SuspendLayout();
