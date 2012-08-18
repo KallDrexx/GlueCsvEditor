@@ -70,6 +70,8 @@
       <DependentUpon>EditorMain.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvEditorPlugin.cs" />
+    <Compile Include="Data\CsvColumnHeader.cs" />
+    <Compile Include="Data\CsvData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

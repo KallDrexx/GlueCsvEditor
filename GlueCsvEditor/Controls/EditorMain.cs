@@ -11,6 +11,7 @@ using System.IO;
 using FlatRedBall.IO.Csv;
 using FlatRedBall.Glue.Plugins;
 using System.Diagnostics;
+using GlueCsvEditor.Data;
 
 namespace GlueCsvEditor.Controls
 {
@@ -18,27 +19,30 @@ namespace GlueCsvEditor.Controls
     {
         protected IGlueCommands _glueCommands;
         protected IGlueState _gluState;
-        protected string _csvPath;
         protected int _currentColumnIndex = -1;
         protected bool _dataLoading;
-        protected RuntimeCsvRepresentation _csv;
-        protected char _delimiter;
         protected bool _currentlyEditing;
+        protected bool _ignoreNextFileChange;
+        protected CsvData _data;
 
         public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath, char delimiter)
         {
             _glueCommands = glueCommands;
             _gluState = glueState;
-            _csvPath = csvPath;
-            _delimiter = delimiter;
 
             InitializeComponent();
             this.Dock = DockStyle.Fill;
+
+            // Load all the data
+            _data = new CsvData(csvPath, delimiter);
         }
 
         public void NotifyOfCsvUpdate()
         {
-            LoadCsv();
+            if (_ignoreNextFileChange)
+                _ignoreNextFileChange = false;
+            else
+                LoadCsv();
         }
 
         private void EditorMain_Load(object sender, EventArgs e)
@@ -68,20 +72,14 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
-            // Update the value of the specified record in the RCR
-            if (e.RowIndex >= _csv.Records.Count || e.RowIndex < 0)
-                throw new InvalidOperationException("Row index out of range");
-
-            if (e.ColumnIndex >= _csv.Records[e.RowIndex].Length || e.ColumnIndex < 0)
-                throw new InvalidOperationException("Column index out of range");
-
-            _csv.Records[e.RowIndex][e.ColumnIndex] = e.Value as string;
+            _data.UpdateValue(e.RowIndex, e.ColumnIndex, e.Value as string);
+            SaveCsv();
 
             // If this was an update to a value in the first column, update the header cell text
             if (e.ColumnIndex == 0)
                 dgrEditor.Rows[e.RowIndex].HeaderCell.Value = e.Value as string;
 
-            SaveCsv();
+            // Since this is set in BeginEdit we need to end it here
             _currentlyEditing = false;
         }
 
@@ -91,31 +89,10 @@ namespace GlueCsvEditor.Controls
             _dataLoading = true;
 
             // Update the selected header
-            txtHeaderName.Text = string.Empty;
-            txtHeaderType.Text = string.Empty;
-
-            var header = _csv.Headers[e.ColumnIndex];
-            string type = CsvHeader.GetClassNameFromHeader(header.OriginalText) ?? "string";
-
-            int typeDataIndex = header.Name.IndexOf("(");
-            if (typeDataIndex < 0)
-                typeDataIndex = header.Name.Length;
-
-            // Strip out the List<and > values
-            if (type.Contains("List<"))
-            {
-                chkIsList.Checked = true;
-                type = type.Replace("List<", "");
-                if (type.Contains(">"))
-                    type = type.Remove(type.LastIndexOf(">"), 1);
-            }
-            else
-            {
-                chkIsList.Checked = false;
-            }
-
-            txtHeaderName.Text = header.Name.Substring(0, typeDataIndex);
-            txtHeaderType.Text = type;
+            var header = _data.GetHeader(_currentColumnIndex);
+            txtHeaderName.Text = header.Name;
+            txtHeaderType.Text = header.Type;
+            chkIsList.Checked = header.IsList;
             chkIsRequired.Checked = header.IsRequired;
 
             _dataLoading = false;
@@ -131,7 +108,7 @@ namespace GlueCsvEditor.Controls
             if (_dataLoading)
                 return;
 
-            _csv.Records.Add(new string[dgrEditor.Columns.Count]);
+            _data.AddRow(e.RowIndex);
             SaveCsv();
         }
 
@@ -140,7 +117,7 @@ namespace GlueCsvEditor.Controls
             if (_dataLoading)
                 return;
 
-            _csv.Records.RemoveAt(e.RowIndex);
+            _data.RemoveRow(e.RowIndex);
             SaveCsv();
         }
 
@@ -149,24 +126,12 @@ namespace GlueCsvEditor.Controls
             if (_dataLoading)
                 return;
 
-            // Add this column to the RCR
-            var headers = new List<CsvHeader>(_csv.Headers);
-            headers.Insert(e.Column.Index, new CsvHeader { Name = string.Empty, OriginalText = string.Empty });
-            _csv.Headers = headers.ToArray();
-
-            // Add the column to all the records
-            for (int x = 0; x < _csv.Records.Count; x++)
-            {
-                var values = new List<string>(_csv.Records[x]);
-                values.Insert(e.Column.Index, string.Empty);
-                _csv.Records[x] = values.ToArray();
-            }
-
             // If the new column is the first column, blank out all the header cell values
             if (e.Column.Index == 0)
                 foreach (DataGridViewRow row in dgrEditor.Rows)
                     row.HeaderCell.Value = string.Empty;
 
+            _data.AddColumn(e.Column.Index);
             SaveCsv();
         }
 
@@ -175,38 +140,19 @@ namespace GlueCsvEditor.Controls
             if (_dataLoading)
                 return;
 
-            // Remove this column to the RCR
-            var headers = new List<CsvHeader>(_csv.Headers);
-            headers.RemoveAt(e.Column.Index);
-            _csv.Headers = headers.ToArray();
-
-            // Remove the column to all the records
-            for (int x = 0; x < _csv.Records.Count; x++)
-            {
-                var values = new List<string>(_csv.Records[x]);
-                values.RemoveAt(e.Column.Index);
-                _csv.Records[x] = values.ToArray();
-            }
+            _data.RemoveColumn(e.Column.Index);
+            SaveCsv();
 
             // If the first column was removed, update the header cell values
             if (e.Column.Index == 0)
-                if (_csv.Headers.Length > 0)
-                    for (int x = 0; x < _csv.Records.Count; x++)
-                        dgrEditor.Rows[x].HeaderCell.Value = _csv.Records[x][0];
-
-            SaveCsv();
+                if (_data.GetHeaders().Count > 0)
+                    for (int x = 0; x < _data.GetRecordCount(); x++)
+                        dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
         }
 
         private void dgrEditor_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
-            // Make sure the row/column is valid
-            if (e.RowIndex >= _csv.Records.Count)
-                return;
-
-            if (e.ColumnIndex >= _csv.Headers.Length)
-                return;
-
-            e.Value = _csv.Records[e.RowIndex][e.ColumnIndex];
+            e.Value = _data.GetValue(e.RowIndex, e.ColumnIndex);
         }
 
         private void dgrEditor_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
@@ -217,8 +163,6 @@ namespace GlueCsvEditor.Controls
                 string[] cells = data.Split('\t');
                 for (int i = 0; i < cells.Length; i++)
                     dgrEditor[_currentColumnIndex + i, dgrEditor.CurrentRow.Index].Value = cells[i];
-
-                
             }
         }
 
@@ -229,8 +173,7 @@ namespace GlueCsvEditor.Controls
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
-            string message = string.Format("Are you sure you want to remove the '{0}' column?",
-                _csv.Headers[_currentColumnIndex].OriginalText);
+            string message = string.Format("Are you sure you want to remove the '{0}' column?", _data.GetHeaders()[_currentColumnIndex]);
             var result = MessageBox.Show(message, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
             if (result != DialogResult.Yes)
                 return;
@@ -244,23 +187,23 @@ namespace GlueCsvEditor.Controls
             this.SuspendLayout();
             _dataLoading = true;
 
-            // Serialize the csv
-            CsvFileManager.Delimiter = _delimiter;
-            _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
-            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
+            // Reload the CSV
+            _data.Reload();
 
             // Add the CSV headers to the datagrid
+            var headers = _data.GetHeaders();
+
             dgrEditor.Columns.Clear();
-            for (int x = 0; x < _csv.Headers.Length; x++)
-                dgrEditor.Columns.Add(_csv.Headers[x].Name, _csv.Headers[x].OriginalText);
+            for (int x = 0; x < headers.Count; x++)
+                dgrEditor.Columns.Add(headers[x], headers[x]);
 
             // Add the records
-            dgrEditor.RowCount = _csv.Records.Count;
+            dgrEditor.RowCount = _data.GetRecordCount();
 
             // Add the first value of each record to the row text
-            if (_csv.Headers.Length > 0)
-                for (int x = 0; x < _csv.Records.Count; x++)
-                    dgrEditor.Rows[x].HeaderCell.Value = _csv.Records[x][0];
+            if (headers.Count > 0)
+                for (int x = 0; x < _data.GetRecordCount(); x++)
+                    dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
 
             this.ResumeLayout();
             _dataLoading = false;
@@ -268,13 +211,8 @@ namespace GlueCsvEditor.Controls
 
         protected void SaveCsv()
         {
-            CsvFileManager.Delimiter = _delimiter;
-            try { CsvFileManager.Serialize(_csv, _csvPath); }
-            catch (Exception ex)
-            {
-                string message = string.Format("Error saving CSV: {0} - {1}", ex.GetType(), ex.Message);
-                MessageBox.Show(message, "Error Saving CSV", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            _ignoreNextFileChange = true;
+            _data.SaveCsv();
         }
 
         protected void UpdateColumnDetails()
@@ -282,38 +220,8 @@ namespace GlueCsvEditor.Controls
             if (_dataLoading)
                 return;
 
-            if (dgrEditor.Columns.Count <= _currentColumnIndex || _currentColumnIndex < 0)
-                return; // column is out of bounds
-
-            // Form the new text value
-            var text = new StringBuilder();
-            text.Append(txtHeaderName.Text.Trim());
-            text.Append(" (");
-
-            if (chkIsList.Checked)
-                text.Append("List<");
-
-            text.Append(txtHeaderType.Text.Trim());
-
-            if (chkIsList.Checked)
-                text.Append(">");
-
-            if (chkIsRequired.Checked)
-                text.Append(", required");
-
-            text.Append(")");
-
-            // Update the header details
-            var header = _csv.Headers[_currentColumnIndex];
-            header.OriginalText = text.ToString();
-            header.Name = text.ToString();
-            header.IsRequired = chkIsRequired.Checked;
-
-            dgrEditor.Columns[_currentColumnIndex].HeaderText = text.ToString();
-            _csv.Headers[_currentColumnIndex] = header;
-
-            // Save after every change
-            SaveCsv();
+            _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, txtHeaderType.Text, chkIsRequired.Checked, chkIsList.Checked);
+            _data.SaveCsv();
         }
     }
 }
