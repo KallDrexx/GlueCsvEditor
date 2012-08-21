@@ -40,6 +40,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderType = new System.Windows.Forms.TextBox();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
+            this.btnAddRow = new System.Windows.Forms.Button();
+            this.btnDeleteRow = new System.Windows.Forms.Button();
+            this.btnPrependRow = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -49,13 +52,14 @@
             // 
             // dgrEditor
             // 
+            this.dgrEditor.AllowUserToAddRows = false;
             this.dgrEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgrEditor.Location = new System.Drawing.Point(3, 32);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(369, 454);
+            this.dgrEditor.Size = new System.Drawing.Size(369, 425);
             this.dgrEditor.TabIndex = 3;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);
@@ -64,8 +68,6 @@
             this.dgrEditor.CellValuePushed += new System.Windows.Forms.DataGridViewCellValueEventHandler(this.dgrEditor_CellValuePushed);
             this.dgrEditor.ColumnAdded += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgrEditor_ColumnAdded);
             this.dgrEditor.ColumnRemoved += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgrEditor_ColumnRemoved);
-            this.dgrEditor.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dgrEditor_RowsAdded);
-            this.dgrEditor.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.dgrEditor_RowsRemoved);
             this.dgrEditor.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgrEditor_KeyDown);
             // 
             // splitContainer1
@@ -78,6 +80,9 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnPrependRow);
+            this.splitContainer1.Panel1.Controls.Add(this.btnDeleteRow);
+            this.splitContainer1.Panel1.Controls.Add(this.btnAddRow);
             this.splitContainer1.Panel1.Controls.Add(this.btnFindNext);
             this.splitContainer1.Panel1.Controls.Add(this.txtSearch);
             this.splitContainer1.Panel1.Controls.Add(this.dgrEditor);
@@ -199,6 +204,39 @@
             this.txtHeaderName.TabIndex = 0;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
             // 
+            // btnAddRow
+            // 
+            this.btnAddRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAddRow.Location = new System.Drawing.Point(97, 463);
+            this.btnAddRow.Name = "btnAddRow";
+            this.btnAddRow.Size = new System.Drawing.Size(88, 23);
+            this.btnAddRow.TabIndex = 5;
+            this.btnAddRow.Text = "Append Row";
+            this.btnAddRow.UseVisualStyleBackColor = true;
+            this.btnAddRow.Click += new System.EventHandler(this.btnAddRow_Click);
+            // 
+            // btnDeleteRow
+            // 
+            this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDeleteRow.Location = new System.Drawing.Point(297, 463);
+            this.btnDeleteRow.Name = "btnDeleteRow";
+            this.btnDeleteRow.Size = new System.Drawing.Size(75, 23);
+            this.btnDeleteRow.TabIndex = 6;
+            this.btnDeleteRow.Text = "Delete Row";
+            this.btnDeleteRow.UseVisualStyleBackColor = true;
+            this.btnDeleteRow.Click += new System.EventHandler(this.btnDeleteRow_Click);
+            // 
+            // btnPrependRow
+            // 
+            this.btnPrependRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPrependRow.Location = new System.Drawing.Point(3, 463);
+            this.btnPrependRow.Name = "btnPrependRow";
+            this.btnPrependRow.Size = new System.Drawing.Size(88, 23);
+            this.btnPrependRow.TabIndex = 4;
+            this.btnPrependRow.Text = "Prepend Row";
+            this.btnPrependRow.UseVisualStyleBackColor = true;
+            this.btnPrependRow.Click += new System.EventHandler(this.btnPrependRow_Click);
+            // 
             // EditorMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -233,5 +271,8 @@
         private System.Windows.Forms.Button btnRemove;
         private System.Windows.Forms.Button btnFindNext;
         private System.Windows.Forms.TextBox txtSearch;
+        private System.Windows.Forms.Button btnDeleteRow;
+        private System.Windows.Forms.Button btnAddRow;
+        private System.Windows.Forms.Button btnPrependRow;
     }
 }

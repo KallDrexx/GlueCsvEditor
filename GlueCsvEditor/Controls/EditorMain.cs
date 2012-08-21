@@ -106,24 +106,6 @@ namespace GlueCsvEditor.Controls
             _currentlyEditing = true;
         }
 
-        private void dgrEditor_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
-        {
-            if (_dataLoading)
-                return;
-
-            _data.AddRow(e.RowIndex);
-            SaveCsv();
-        }
-
-        private void dgrEditor_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
-        {
-            if (_dataLoading)
-                return;
-
-            _data.RemoveRow(e.RowIndex);
-            SaveCsv();
-        }
-
         private void dgrEditor_ColumnAdded(object sender, DataGridViewColumnEventArgs e)
         {
             if (_dataLoading)
@@ -175,6 +157,67 @@ namespace GlueCsvEditor.Controls
                     GoToNextSearchMatch();
 
                 e.Handled = true;
+            }
+        }
+
+        private void btnAddRow_Click(object sender, EventArgs e)
+        {
+            if (_dataLoading)
+                return;
+
+            _data.AddRow(_currentRowIndex + 1);
+            SaveCsv();
+
+            dgrEditor.RowCount = _data.GetRecordCount();
+            RefreshRowHeaders();
+        }
+
+        private void btnPrependRow_Click(object sender, EventArgs e)
+        {
+            if (_dataLoading)
+                return;
+
+            _data.AddRow(_currentRowIndex);
+            SaveCsv();
+
+            dgrEditor.RowCount = _data.GetRecordCount();
+            RefreshRowHeaders();
+        }
+
+        private void btnDeleteRow_Click(object sender, EventArgs e)
+        {
+            string message;
+
+            // Find some identifying information for the row to present in
+            //   a confirmation box
+            var headers = Enumerable.Range(1, _data.GetHeaders().Count).Select(x => _data.GetHeader(x - 1)).ToList();
+            var values = Enumerable.Range(1, headers.Count).Select(x => _data.GetValue(_currentRowIndex, x - 1)).ToList();
+
+            // First check if all the values are empty
+            if (values.All(x => string.IsNullOrWhiteSpace(x)))
+            {
+                message = string.Format("Delete row #{0} (empty row)?", _currentRowIndex);
+            }
+            else if (headers.Any(x => x.IsRequired))
+            {
+                var requiredHeader = headers.FirstOrDefault(x => x.IsRequired);
+                message = string.Format("Delete row #{0} ({1})?", _currentRowIndex, values[headers.IndexOf(requiredHeader)]);
+            }
+            else
+            {
+                // Get the first non-empty value
+                var val = values.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+                message = string.Format("Delete row #{0} ({1})?", _currentRowIndex, val);
+            }
+
+            var result = MessageBox.Show(message, "Confirm Row Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            if (result == DialogResult.Yes)
+            {
+                _data.RemoveRow(_currentRowIndex);
+                SaveCsv();
+
+                dgrEditor.RowCount = _data.GetRecordCount();
+                RefreshRowHeaders();
             }
         }
 
@@ -254,10 +297,7 @@ namespace GlueCsvEditor.Controls
             // Add the records
             dgrEditor.RowCount = _data.GetRecordCount();
 
-            // Add the first value of each record to the row text
-            if (headers.Count > 0)
-                for (int x = 0; x < _data.GetRecordCount(); x++)
-                    dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
+            RefreshRowHeaders();
 
             this.ResumeLayout();
             _dataLoading = false;
@@ -267,6 +307,14 @@ namespace GlueCsvEditor.Controls
         {
             _ignoreNextFileChange = true;
             _data.SaveCsv();
+        }
+
+        protected void RefreshRowHeaders()
+        {
+            // Add the first value of each record to the row header text
+            if (_data.GetHeaders().Count > 0)
+                for (int x = 0; x < _data.GetRecordCount(); x++)
+                    dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
         }
 
         protected void UpdateColumnDetails()
