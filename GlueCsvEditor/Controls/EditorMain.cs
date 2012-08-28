@@ -92,7 +92,7 @@ namespace GlueCsvEditor.Controls
             _dataLoading = true;
 
             // Update the selected header
-            var header = _data.GetHeader(_currentColumnIndex);
+            var header = _data.GetHeaderDetails(_currentColumnIndex);
             txtHeaderName.Text = header.Name;
             txtHeaderType.Text = header.Type;
             chkIsList.Checked = header.IsList;
@@ -130,7 +130,7 @@ namespace GlueCsvEditor.Controls
 
             // If the first column was removed, update the header cell values
             if (e.Column.Index == 0)
-                if (_data.GetHeaders().Count > 0)
+                if (_data.GetHeaderText().Count > 0)
                     for (int x = 0; x < _data.GetRecordCount(); x++)
                         dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
         }
@@ -156,6 +156,13 @@ namespace GlueCsvEditor.Controls
                 else
                     GoToNextSearchMatch();
 
+                e.Handled = true;
+            }
+
+            else if (e.KeyCode == Keys.Delete)
+            {
+                // Clear the whole cell's value
+                dgrEditor[_currentColumnIndex, _currentRowIndex].Value = string.Empty;
                 e.Handled = true;
             }
         }
@@ -190,7 +197,7 @@ namespace GlueCsvEditor.Controls
 
             // Find some identifying information for the row to present in
             //   a confirmation box
-            var headers = Enumerable.Range(1, _data.GetHeaders().Count).Select(x => _data.GetHeader(x - 1)).ToList();
+            var headers = Enumerable.Range(1, _data.GetHeaderText().Count).Select(x => _data.GetHeaderDetails(x - 1)).ToList();
             var values = Enumerable.Range(1, headers.Count).Select(x => _data.GetValue(_currentRowIndex, x - 1)).ToList();
 
             // First check if all the values are empty
@@ -228,7 +235,7 @@ namespace GlueCsvEditor.Controls
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
-            string message = string.Format("Are you sure you want to remove the '{0}' column?", _data.GetHeaders()[_currentColumnIndex]);
+            string message = string.Format("Are you sure you want to remove the '{0}' column?", _data.GetHeaderText()[_currentColumnIndex]);
             var result = MessageBox.Show(message, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
             if (result != DialogResult.Yes)
                 return;
@@ -288,7 +295,7 @@ namespace GlueCsvEditor.Controls
             _data.Reload();
 
             // Add the CSV headers to the datagrid
-            var headers = _data.GetHeaders();
+            var headers = _data.GetHeaderText();
 
             dgrEditor.Columns.Clear();
             for (int x = 0; x < headers.Count; x++)
@@ -312,7 +319,7 @@ namespace GlueCsvEditor.Controls
         protected void RefreshRowHeaders()
         {
             // Add the first value of each record to the row header text
-            if (_data.GetHeaders().Count > 0)
+            if (_data.GetHeaderText().Count > 0)
                 for (int x = 0; x < _data.GetRecordCount(); x++)
                     dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
         }
@@ -323,7 +330,11 @@ namespace GlueCsvEditor.Controls
                 return;
 
             _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, txtHeaderType.Text, chkIsRequired.Checked, chkIsList.Checked);
-            _data.SaveCsv();
+            SaveCsv();
+
+            // Update the column header
+            var header = _data.GetHeaderText()[_currentColumnIndex];
+            dgrEditor.Columns[_currentColumnIndex].HeaderText = header;
         }
 
         protected void GoToNextSearchMatch(bool reverse = false)

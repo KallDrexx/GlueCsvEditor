@@ -128,7 +128,7 @@ namespace GlueCsvEditor.Data
         /// Retrieves a list of headers for the CSV
         /// </summary>
         /// <returns></returns>
-        public List<string> GetHeaders()
+        public List<string> GetHeaderText()
         {
             return _csv.Headers
                        .Select(x => x.OriginalText)
@@ -140,7 +140,7 @@ namespace GlueCsvEditor.Data
         /// </summary>
         /// <param name="column"></param>
         /// <returns></returns>
-        public CsvColumnHeader GetHeader(int column)
+        public CsvColumnHeader GetHeaderDetails(int column)
         {
             if (column >= _csv.Headers.Length)
                 throw new ArgumentOutOfRangeException("column");

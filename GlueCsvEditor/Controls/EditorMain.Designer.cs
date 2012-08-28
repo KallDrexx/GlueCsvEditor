@@ -30,6 +30,9 @@
         {
             this.dgrEditor = new System.Windows.Forms.DataGridView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnPrependRow = new System.Windows.Forms.Button();
+            this.btnDeleteRow = new System.Windows.Forms.Button();
+            this.btnAddRow = new System.Windows.Forms.Button();
             this.btnFindNext = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.btnAddColumn = new System.Windows.Forms.Button();
@@ -40,9 +43,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderType = new System.Windows.Forms.TextBox();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
-            this.btnAddRow = new System.Windows.Forms.Button();
-            this.btnDeleteRow = new System.Windows.Forms.Button();
-            this.btnPrependRow = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -53,13 +53,14 @@
             // dgrEditor
             // 
             this.dgrEditor.AllowUserToAddRows = false;
+            this.dgrEditor.AllowUserToDeleteRows = false;
             this.dgrEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgrEditor.Location = new System.Drawing.Point(3, 32);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(369, 425);
+            this.dgrEditor.Size = new System.Drawing.Size(366, 425);
             this.dgrEditor.TabIndex = 3;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);
@@ -98,14 +99,47 @@
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(581, 493);
-            this.splitContainer1.SplitterDistance = 379;
+            this.splitContainer1.SplitterDistance = 376;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 1;
+            // 
+            // btnPrependRow
+            // 
+            this.btnPrependRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPrependRow.Location = new System.Drawing.Point(3, 463);
+            this.btnPrependRow.Name = "btnPrependRow";
+            this.btnPrependRow.Size = new System.Drawing.Size(88, 23);
+            this.btnPrependRow.TabIndex = 4;
+            this.btnPrependRow.Text = "Prepend Row";
+            this.btnPrependRow.UseVisualStyleBackColor = true;
+            this.btnPrependRow.Click += new System.EventHandler(this.btnPrependRow_Click);
+            // 
+            // btnDeleteRow
+            // 
+            this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDeleteRow.Location = new System.Drawing.Point(294, 463);
+            this.btnDeleteRow.Name = "btnDeleteRow";
+            this.btnDeleteRow.Size = new System.Drawing.Size(75, 23);
+            this.btnDeleteRow.TabIndex = 6;
+            this.btnDeleteRow.Text = "Delete Row";
+            this.btnDeleteRow.UseVisualStyleBackColor = true;
+            this.btnDeleteRow.Click += new System.EventHandler(this.btnDeleteRow_Click);
+            // 
+            // btnAddRow
+            // 
+            this.btnAddRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAddRow.Location = new System.Drawing.Point(97, 463);
+            this.btnAddRow.Name = "btnAddRow";
+            this.btnAddRow.Size = new System.Drawing.Size(88, 23);
+            this.btnAddRow.TabIndex = 5;
+            this.btnAddRow.Text = "Append Row";
+            this.btnAddRow.UseVisualStyleBackColor = true;
+            this.btnAddRow.Click += new System.EventHandler(this.btnAddRow_Click);
             // 
             // btnFindNext
             // 
             this.btnFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFindNext.Location = new System.Drawing.Point(282, 4);
+            this.btnFindNext.Location = new System.Drawing.Point(279, 4);
             this.btnFindNext.Name = "btnFindNext";
             this.btnFindNext.Size = new System.Drawing.Size(90, 23);
             this.btnFindNext.TabIndex = 2;
@@ -119,7 +153,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearch.Location = new System.Drawing.Point(3, 6);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(273, 20);
+            this.txtSearch.Size = new System.Drawing.Size(270, 20);
             this.txtSearch.TabIndex = 1;
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
             this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
@@ -203,39 +237,6 @@
             this.txtHeaderName.Size = new System.Drawing.Size(135, 20);
             this.txtHeaderName.TabIndex = 0;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
-            // 
-            // btnAddRow
-            // 
-            this.btnAddRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAddRow.Location = new System.Drawing.Point(97, 463);
-            this.btnAddRow.Name = "btnAddRow";
-            this.btnAddRow.Size = new System.Drawing.Size(88, 23);
-            this.btnAddRow.TabIndex = 5;
-            this.btnAddRow.Text = "Append Row";
-            this.btnAddRow.UseVisualStyleBackColor = true;
-            this.btnAddRow.Click += new System.EventHandler(this.btnAddRow_Click);
-            // 
-            // btnDeleteRow
-            // 
-            this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDeleteRow.Location = new System.Drawing.Point(297, 463);
-            this.btnDeleteRow.Name = "btnDeleteRow";
-            this.btnDeleteRow.Size = new System.Drawing.Size(75, 23);
-            this.btnDeleteRow.TabIndex = 6;
-            this.btnDeleteRow.Text = "Delete Row";
-            this.btnDeleteRow.UseVisualStyleBackColor = true;
-            this.btnDeleteRow.Click += new System.EventHandler(this.btnDeleteRow_Click);
-            // 
-            // btnPrependRow
-            // 
-            this.btnPrependRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnPrependRow.Location = new System.Drawing.Point(3, 463);
-            this.btnPrependRow.Name = "btnPrependRow";
-            this.btnPrependRow.Size = new System.Drawing.Size(88, 23);
-            this.btnPrependRow.TabIndex = 4;
-            this.btnPrependRow.Text = "Prepend Row";
-            this.btnPrependRow.UseVisualStyleBackColor = true;
-            this.btnPrependRow.Click += new System.EventHandler(this.btnPrependRow_Click);
             // 
             // EditorMain
             // 
