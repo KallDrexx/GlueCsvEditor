@@ -231,6 +231,11 @@ namespace GlueCsvEditor.Controls
         private void btnAddColumn_Click(object sender, EventArgs e)
         {
             dgrEditor.Columns.Add(string.Empty, "");
+            txtHeaderName.Enabled = true;
+            txtHeaderType.Enabled = true;
+            chkIsList.Enabled = true;
+            chkIsRequired.Enabled = true;
+            btnRemove.Enabled = true;
         }
 
         private void btnRemove_Click(object sender, EventArgs e)
@@ -288,6 +293,12 @@ namespace GlueCsvEditor.Controls
 
         protected void LoadCsv()
         {
+            // Clear the right editor side
+            txtHeaderName.Text = string.Empty;
+            txtHeaderType.Text = string.Empty;
+            chkIsList.Checked = false;
+            chkIsList.Checked = false;
+
             this.SuspendLayout();
             _dataLoading = true;
 
@@ -305,8 +316,28 @@ namespace GlueCsvEditor.Controls
             dgrEditor.RowCount = _data.GetRecordCount();
 
             RefreshRowHeaders();
-
             this.ResumeLayout();
+
+            // Auto-focus on the first cell
+            if (headers.Count > 0)
+            {
+                txtHeaderName.Enabled = true;
+                txtHeaderType.Enabled = true;
+                chkIsList.Enabled = true;
+                chkIsRequired.Enabled = true;
+                btnRemove.Enabled = true;
+                dgrEditor.CurrentCell = dgrEditor[0, 0];
+            }
+            else
+            {
+                // Since we have no headers, disable all the right side controls
+                txtHeaderName.Enabled = false;
+                txtHeaderType.Enabled = false;
+                chkIsList.Enabled = false;
+                chkIsRequired.Enabled = false;
+                btnRemove.Enabled = false;
+            }
+
             _dataLoading = false;
         }
 
