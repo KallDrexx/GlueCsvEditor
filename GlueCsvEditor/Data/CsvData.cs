@@ -214,6 +214,7 @@ namespace GlueCsvEditor.Data
             header.IsRequired = isRequired;
 
             _csv.Headers[column] = header;
+            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
             return text.ToString();
         }
 
@@ -283,6 +284,7 @@ namespace GlueCsvEditor.Data
         {
             CsvFileManager.Delimiter = _delimiter;
             _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
+            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
         }
 
         /// <summary>
