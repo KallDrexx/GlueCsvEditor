@@ -296,5 +296,15 @@ namespace GlueCsvEditor.Data
             CsvFileManager.Delimiter = _delimiter;
             CsvFileManager.Serialize(_csv, _csvPath);
         }
+
+        /// <summary>
+        /// Retrieves any known values for the specified cell
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
+        public List<string> GetKnownValues(int column, int row)
+        {
+            return new List<string>() { "Value 1", "Value 2" };
+        }
     }
 }

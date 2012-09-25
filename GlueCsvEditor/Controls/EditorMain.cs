@@ -112,7 +112,13 @@ namespace GlueCsvEditor.Controls
             txtHeaderType.Text = header.Type;
             chkIsList.Checked = header.IsList;
             chkIsRequired.Checked = header.IsRequired;
+
+            // Setup the combobox
             cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+            cmbCelldata.Items.Clear();
+            var knownValues = _data.GetKnownValues(_currentColumnIndex, _currentRowIndex);
+            foreach (string value in knownValues)
+                cmbCelldata.Items.Add(value);
 
             _dataLoading = false;
         }
