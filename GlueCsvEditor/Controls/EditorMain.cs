@@ -17,6 +17,8 @@ namespace GlueCsvEditor.Controls
 {
     public partial class EditorMain : UserControl
     {
+        #region Member Variables
+
         protected IGlueCommands _glueCommands;
         protected IGlueState _gluState;
         protected int _currentColumnIndex = 0;
@@ -25,6 +27,10 @@ namespace GlueCsvEditor.Controls
         protected bool _currentlyEditing;
         protected bool _ignoreNextFileChange;
         protected CsvData _data;
+
+        #endregion
+
+        #region Public Methods
 
         public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath, char delimiter)
         {
@@ -45,6 +51,10 @@ namespace GlueCsvEditor.Controls
             else
                 LoadCsv();
         }
+
+        #endregion
+
+        #region Form Events
 
         private void EditorMain_Load(object sender, EventArgs e)
         {
@@ -73,7 +83,10 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
+            _dataLoading = true;
+
             _data.UpdateValue(e.RowIndex, e.ColumnIndex, e.Value as string);
+            cmbCelldata.Text = e.Value as string;
             SaveCsv();
 
             // If this was an update to a value in the first column, update the header cell text
@@ -82,6 +95,8 @@ namespace GlueCsvEditor.Controls
 
             // Since this is set in BeginEdit we need to end it here
             _currentlyEditing = false;
+
+            _dataLoading = false;
         }
 
         private void dgrEditor_CellEnter(object sender, DataGridViewCellEventArgs e)
@@ -97,6 +112,7 @@ namespace GlueCsvEditor.Controls
             txtHeaderType.Text = header.Type;
             chkIsList.Checked = header.IsList;
             chkIsRequired.Checked = header.IsRequired;
+            cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
 
             _dataLoading = false;
         }
@@ -291,6 +307,22 @@ namespace GlueCsvEditor.Controls
             GoToNextSearchMatch();
         }
 
+        private void cmbCelldata_TextChanged(object sender, EventArgs e)
+        {
+            if (_dataLoading)
+                return;
+
+            _data.UpdateValue(_currentRowIndex, _currentColumnIndex, cmbCelldata.Text);
+            SaveCsv();
+
+            // Update the value in the datagrid
+            dgrEditor.InvalidateCell(_currentColumnIndex, _currentRowIndex);
+        }
+
+        #endregion
+
+        #region Internal Methods
+
         protected void LoadCsv()
         {
             // Clear the right editor side
@@ -310,7 +342,13 @@ namespace GlueCsvEditor.Controls
 
             dgrEditor.Columns.Clear();
             for (int x = 0; x < headers.Count; x++)
+            {
+                //var column = new DataGridViewComboBoxColumn();
+                //column.HeaderText = headers[x];
+                //column.Name = headers[x];
+                //dgrEditor.Columns.Add(column);
                 dgrEditor.Columns.Add(headers[x], headers[x]);
+            }
 
             // Add the records
             dgrEditor.RowCount = _data.GetRecordCount();
@@ -379,5 +417,7 @@ namespace GlueCsvEditor.Controls
 
             dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
         }
+
+        #endregion
     }
 }

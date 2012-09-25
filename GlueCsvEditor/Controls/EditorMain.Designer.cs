@@ -35,6 +35,7 @@
             this.btnAddRow = new System.Windows.Forms.Button();
             this.btnFindNext = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
+            this.cmbCelldata = new System.Windows.Forms.ComboBox();
             this.btnAddColumn = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
             this.chkIsList = new System.Windows.Forms.CheckBox();
@@ -60,7 +61,7 @@
             this.dgrEditor.Location = new System.Drawing.Point(3, 32);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(366, 425);
+            this.dgrEditor.Size = new System.Drawing.Size(357, 425);
             this.dgrEditor.TabIndex = 3;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);
@@ -90,6 +91,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.cmbCelldata);
             this.splitContainer1.Panel2.Controls.Add(this.btnAddColumn);
             this.splitContainer1.Panel2.Controls.Add(this.btnRemove);
             this.splitContainer1.Panel2.Controls.Add(this.chkIsList);
@@ -99,7 +101,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(581, 493);
-            this.splitContainer1.SplitterDistance = 376;
+            this.splitContainer1.SplitterDistance = 367;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -117,7 +119,7 @@
             // btnDeleteRow
             // 
             this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDeleteRow.Location = new System.Drawing.Point(294, 463);
+            this.btnDeleteRow.Location = new System.Drawing.Point(285, 463);
             this.btnDeleteRow.Name = "btnDeleteRow";
             this.btnDeleteRow.Size = new System.Drawing.Size(75, 23);
             this.btnDeleteRow.TabIndex = 6;
@@ -139,7 +141,7 @@
             // btnFindNext
             // 
             this.btnFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFindNext.Location = new System.Drawing.Point(279, 4);
+            this.btnFindNext.Location = new System.Drawing.Point(270, 4);
             this.btnFindNext.Name = "btnFindNext";
             this.btnFindNext.Size = new System.Drawing.Size(90, 23);
             this.btnFindNext.TabIndex = 2;
@@ -153,10 +155,21 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearch.Location = new System.Drawing.Point(3, 6);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(270, 20);
+            this.txtSearch.Size = new System.Drawing.Size(261, 20);
             this.txtSearch.TabIndex = 1;
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
             this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
+            // 
+            // cmbCelldata
+            // 
+            this.cmbCelldata.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbCelldata.FormattingEnabled = true;
+            this.cmbCelldata.Location = new System.Drawing.Point(10, 264);
+            this.cmbCelldata.Name = "cmbCelldata";
+            this.cmbCelldata.Size = new System.Drawing.Size(190, 21);
+            this.cmbCelldata.TabIndex = 8;
+            this.cmbCelldata.TextChanged += new System.EventHandler(this.cmbCelldata_TextChanged);
             // 
             // btnAddColumn
             // 
@@ -275,5 +288,6 @@
         private System.Windows.Forms.Button btnDeleteRow;
         private System.Windows.Forms.Button btnAddRow;
         private System.Windows.Forms.Button btnPrependRow;
+        private System.Windows.Forms.ComboBox cmbCelldata;
     }
 }
