@@ -305,8 +305,10 @@ namespace GlueCsvEditor.Data
         /// <param name="row"></param>
         public IEnumerable<string> GetKnownValues(int column)
         {
+            // This list is prioritized.  The first retriever to get a value is the only one used
             var knownValueRetrievers = new List<IKnownValueRetriever>()
             {
+                new EnumReflectionValueRetriever(),
                 new UsedRcrColumnValueRetriever(_csv, column)
             };
 
