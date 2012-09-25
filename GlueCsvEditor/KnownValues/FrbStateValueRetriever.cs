@@ -38,10 +38,12 @@ namespace GlueCsvEditor.KnownValues
             if (stateTypeName == "VariableState")
             {
                 // Loop through the element's uncategorized state values
-                return element.States
-                              .Select(x => x.Name)
-                              .OrderBy(x => x)
-                              .ToList();
+                //  and loop through all states for categories that are marked as shared
+                var states = element.States.Select(x => x.Name);
+                foreach (var cat in element.StateCategoryList.Where(x => x.SharesVariablesWithOtherCategories))
+                    states = states.Union(cat.States.Select(x => x.Name));
+
+                return states.Distinct().OrderBy(x => x).ToList();
             }
 
             // Otherwise see if the state category with the same name exists
