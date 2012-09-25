@@ -74,6 +74,7 @@
     <Compile Include="Data\CsvData.cs" />
     <Compile Include="Data\FoundCell.cs" />
     <Compile Include="KnownValues\EnumReflectionValueRetriever.cs" />
+    <Compile Include="KnownValues\FrbStateValueRetriever.cs" />
     <Compile Include="KnownValues\IKnownValueRetriever.cs" />
     <Compile Include="KnownValues\UsedRcrColumnValueRetriever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

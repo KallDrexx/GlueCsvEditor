@@ -309,6 +309,7 @@ namespace GlueCsvEditor.Data
             var knownValueRetrievers = new List<IKnownValueRetriever>()
             {
                 new EnumReflectionValueRetriever(),
+                new FrbStateValueRetriever(),
                 new UsedRcrColumnValueRetriever(_csv, column)
             };
 
