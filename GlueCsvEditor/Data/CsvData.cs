@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using FlatRedBall.IO.Csv;
 using Microsoft.Xna.Framework;
+using GlueCsvEditor.KnownValues;
 
 namespace GlueCsvEditor.Data
 {
@@ -302,9 +303,24 @@ namespace GlueCsvEditor.Data
         /// </summary>
         /// <param name="column"></param>
         /// <param name="row"></param>
-        public List<string> GetKnownValues(int column, int row)
+        public IEnumerable<string> GetKnownValues(int column)
         {
-            return new List<string>() { "Value 1", "Value 2" };
+            var knownValueRetrievers = new List<IKnownValueRetriever>()
+            {
+                new UsedRcrColumnValueRetriever(_csv, column)
+            };
+
+            // Loop through the value retrievers until one returns a valid results
+            string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[column].OriginalText);
+            foreach (var retriever in knownValueRetrievers)
+            {
+                var values = retriever.GetKnownValues(type);
+                if (values.Count() > 0)
+                    return values;
+            }
+
+            // No values were found
+            return new string[0];
         }
     }
 }

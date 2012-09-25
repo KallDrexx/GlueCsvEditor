@@ -116,7 +116,7 @@ namespace GlueCsvEditor.Controls
             // Setup the combobox
             cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
             cmbCelldata.Items.Clear();
-            var knownValues = _data.GetKnownValues(_currentColumnIndex, _currentRowIndex);
+            var knownValues = _data.GetKnownValues(_currentColumnIndex);
             foreach (string value in knownValues)
                 cmbCelldata.Items.Add(value);
 
