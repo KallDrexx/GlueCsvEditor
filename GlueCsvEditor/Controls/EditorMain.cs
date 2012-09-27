@@ -12,6 +12,9 @@ using FlatRedBall.IO.Csv;
 using FlatRedBall.Glue.Plugins;
 using System.Diagnostics;
 using GlueCsvEditor.Data;
+using FlatRedBall.Glue.Elements;
+using FlatRedBall.Glue.SaveClasses;
+using FlatRedBall.Glue;
 
 namespace GlueCsvEditor.Controls
 {
@@ -452,7 +455,46 @@ namespace GlueCsvEditor.Controls
                                  .ToArray();
 
             types.AddRange(enums);
+
+            // Add all FRB states
+            var entityStates = ObjectFinder.Self.GlueProject.Entities.SelectMany(x => GetGlueStateNamespaces(x)).ToList();
+            var screenStates = ObjectFinder.Self.GlueProject.Screens.SelectMany(x => GetGlueStateNamespaces(x)).ToList();
+            types.AddRange(entityStates);
+            types.AddRange(screenStates);
+
             return types.Distinct().OrderBy(x => x).ToArray();
+        }
+
+        protected IEnumerable<string> GetGlueStateNamespaces(EntitySave entity)
+        {
+            string ns = string.Concat(ProjectManager.ProjectNamespace, 
+                                      ".Entities.",
+                                      entity.Name.Replace("\\", "."),
+                                      ".");
+
+            var states = new List<string>() { ns + "VariableState" };
+            states.AddRange(entity.StateCategoryList
+                                  .Where(x => !x.SharesVariablesWithOtherCategories)
+                                  .Select(x => ns + x.Name)
+                                  .ToArray());
+
+            return states;
+        }
+
+        protected IEnumerable<string> GetGlueStateNamespaces(ScreenSave entity)
+        {
+            string ns = string.Concat(ProjectManager.ProjectNamespace, 
+                                      ".Entities.",
+                                      entity.Name.Replace("\\", "."),
+                                      ".");
+
+            var states = new List<string>() { ns + "VariableState" };
+            states.AddRange(entity.StateCategoryList
+                                  .Where(x => !x.SharesVariablesWithOtherCategories)
+                                  .Select(x => ns + x.Name)
+                                  .ToArray());
+
+            return states;
         }
 
         #endregion
