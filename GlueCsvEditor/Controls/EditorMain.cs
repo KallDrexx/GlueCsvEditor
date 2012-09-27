@@ -30,6 +30,7 @@ namespace GlueCsvEditor.Controls
         protected bool _currentlyEditing;
         protected bool _ignoreNextFileChange;
         protected CsvData _data;
+        protected IEnumerable<string> _knownTypes;
 
         #endregion
 
@@ -71,8 +72,12 @@ namespace GlueCsvEditor.Controls
 
         private void cmbTypes_TextChanged(object sender, EventArgs e)
         {
+            if (_dataLoading)
+                return;
+
             UpdateColumnDetails();
             SetupCellKnownValuesComboBox();
+            FilterKnownTypes();
         }
 
         private void chkIsRequired_CheckedChanged(object sender, EventArgs e)
@@ -119,17 +124,9 @@ namespace GlueCsvEditor.Controls
 
             // Setup the combobox
             SetupCellKnownValuesComboBox();
+            FilterKnownTypes();
 
             _dataLoading = false;
-        }
-
-        private void SetupCellKnownValuesComboBox()
-        {
-            cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
-            cmbCelldata.Items.Clear();
-            var knownValues = _data.GetKnownValues(_currentColumnIndex);
-            foreach (string value in knownValues)
-                cmbCelldata.Items.Add(value);
         }
 
         private void dgrEditor_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
@@ -334,6 +331,18 @@ namespace GlueCsvEditor.Controls
             dgrEditor.InvalidateCell(_currentColumnIndex, _currentRowIndex);
         }
 
+        private void lstFilteredTypes_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (lstFilteredTypes.SelectedIndex != -1)
+            {
+                var rect = lstFilteredTypes.GetItemRectangle(lstFilteredTypes.SelectedIndex);
+                if (rect.Contains(e.Location))
+                {
+                    cmbTypes.Text = lstFilteredTypes.SelectedValue as string;
+                }
+            }
+        }
+
         #endregion
 
         #region Internal Methods
@@ -371,6 +380,11 @@ namespace GlueCsvEditor.Controls
             RefreshRowHeaders();
             this.ResumeLayout();
 
+            // Load all the known types
+            cmbTypes.Items.Clear();
+            cmbTypes.Items.AddRange(GetKnownTypes());
+            _knownTypes = GetKnownTypes();
+
             // Auto-focus on the first cell
             if (headers.Count > 0)
             {
@@ -390,10 +404,6 @@ namespace GlueCsvEditor.Controls
                 chkIsRequired.Enabled = false;
                 btnRemove.Enabled = false;
             }
-
-            // Load all the known types
-            cmbTypes.Items.Clear();
-            cmbTypes.Items.AddRange(GetKnownTypes());
 
             _dataLoading = false;
         }
@@ -495,6 +505,24 @@ namespace GlueCsvEditor.Controls
                                   .ToArray());
 
             return states;
+        }
+
+        private void SetupCellKnownValuesComboBox()
+        {
+            cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+            cmbCelldata.Items.Clear();
+            var knownValues = _data.GetKnownValues(_currentColumnIndex);
+            foreach (string value in knownValues)
+                cmbCelldata.Items.Add(value);
+        }
+
+        protected void FilterKnownTypes()
+        {
+            lstFilteredTypes.DataSource =
+                _knownTypes.Where(x => x.IndexOf(cmbTypes.Text.Trim(), StringComparison.OrdinalIgnoreCase) >= 0)
+                           .ToList();
+
+            lstFilteredTypes.ClearSelected();
         }
 
         #endregion

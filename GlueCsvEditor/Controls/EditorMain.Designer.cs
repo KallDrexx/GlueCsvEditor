@@ -36,6 +36,8 @@
             this.btnAddRow = new System.Windows.Forms.Button();
             this.btnFindNext = new System.Windows.Forms.Button();
             this.txtSearch = new System.Windows.Forms.TextBox();
+            this.lstFilteredTypes = new System.Windows.Forms.ListBox();
+            this.cmbTypes = new System.Windows.Forms.ComboBox();
             this.btnAddColumn = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
             this.chkIsList = new System.Windows.Forms.CheckBox();
@@ -43,7 +45,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
-            this.cmbTypes = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -61,7 +63,7 @@
             this.dgrEditor.Location = new System.Drawing.Point(3, 33);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(430, 424);
+            this.dgrEditor.Size = new System.Drawing.Size(427, 424);
             this.dgrEditor.TabIndex = 3;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);
@@ -92,6 +94,8 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.label2);
+            this.splitContainer1.Panel2.Controls.Add(this.lstFilteredTypes);
             this.splitContainer1.Panel2.Controls.Add(this.cmbTypes);
             this.splitContainer1.Panel2.Controls.Add(this.btnAddColumn);
             this.splitContainer1.Panel2.Controls.Add(this.btnRemove);
@@ -101,7 +105,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(660, 493);
-            this.splitContainer1.SplitterDistance = 440;
+            this.splitContainer1.SplitterDistance = 437;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -112,7 +116,7 @@
             this.cmbCelldata.FormattingEnabled = true;
             this.cmbCelldata.Location = new System.Drawing.Point(3, 6);
             this.cmbCelldata.Name = "cmbCelldata";
-            this.cmbCelldata.Size = new System.Drawing.Size(171, 21);
+            this.cmbCelldata.Size = new System.Drawing.Size(168, 21);
             this.cmbCelldata.TabIndex = 0;
             this.cmbCelldata.TextChanged += new System.EventHandler(this.cmbCelldata_TextChanged);
             // 
@@ -130,7 +134,7 @@
             // btnDeleteRow
             // 
             this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDeleteRow.Location = new System.Drawing.Point(358, 463);
+            this.btnDeleteRow.Location = new System.Drawing.Point(355, 463);
             this.btnDeleteRow.Name = "btnDeleteRow";
             this.btnDeleteRow.Size = new System.Drawing.Size(75, 23);
             this.btnDeleteRow.TabIndex = 6;
@@ -152,7 +156,7 @@
             // btnFindNext
             // 
             this.btnFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFindNext.Location = new System.Drawing.Point(343, 4);
+            this.btnFindNext.Location = new System.Drawing.Point(340, 4);
             this.btnFindNext.Name = "btnFindNext";
             this.btnFindNext.Size = new System.Drawing.Size(90, 23);
             this.btnFindNext.TabIndex = 2;
@@ -163,12 +167,35 @@
             // txtSearch
             // 
             this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSearch.Location = new System.Drawing.Point(180, 6);
+            this.txtSearch.Location = new System.Drawing.Point(177, 6);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(165, 20);
             this.txtSearch.TabIndex = 1;
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
             this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
+            // 
+            // lstFilteredTypes
+            // 
+            this.lstFilteredTypes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstFilteredTypes.FormattingEnabled = true;
+            this.lstFilteredTypes.Location = new System.Drawing.Point(12, 176);
+            this.lstFilteredTypes.Name = "lstFilteredTypes";
+            this.lstFilteredTypes.Size = new System.Drawing.Size(191, 121);
+            this.lstFilteredTypes.TabIndex = 8;
+            this.lstFilteredTypes.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lstFilteredTypes_MouseDoubleClick);
+            // 
+            // cmbTypes
+            // 
+            this.cmbTypes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbTypes.FormattingEnabled = true;
+            this.cmbTypes.Location = new System.Drawing.Point(12, 132);
+            this.cmbTypes.Name = "cmbTypes";
+            this.cmbTypes.Size = new System.Drawing.Size(191, 21);
+            this.cmbTypes.TabIndex = 2;
+            this.cmbTypes.SelectedIndexChanged += new System.EventHandler(this.cmbTypes_TextChanged);
+            this.cmbTypes.TextChanged += new System.EventHandler(this.cmbTypes_TextChanged);
             // 
             // btnAddColumn
             // 
@@ -193,7 +220,7 @@
             // chkIsList
             // 
             this.chkIsList.AutoSize = true;
-            this.chkIsList.Location = new System.Drawing.Point(12, 182);
+            this.chkIsList.Location = new System.Drawing.Point(12, 334);
             this.chkIsList.Name = "chkIsList";
             this.chkIsList.Size = new System.Drawing.Size(59, 17);
             this.chkIsList.TabIndex = 6;
@@ -204,7 +231,7 @@
             // chkIsRequired
             // 
             this.chkIsRequired.AutoSize = true;
-            this.chkIsRequired.Location = new System.Drawing.Point(12, 158);
+            this.chkIsRequired.Location = new System.Drawing.Point(12, 310);
             this.chkIsRequired.Name = "chkIsRequired";
             this.chkIsRequired.Size = new System.Drawing.Size(75, 17);
             this.chkIsRequired.TabIndex = 5;
@@ -240,16 +267,14 @@
             this.txtHeaderName.TabIndex = 0;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
             // 
-            // cmbTypes
+            // label2
             // 
-            this.cmbTypes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmbTypes.FormattingEnabled = true;
-            this.cmbTypes.Location = new System.Drawing.Point(12, 132);
-            this.cmbTypes.Name = "cmbTypes";
-            this.cmbTypes.Size = new System.Drawing.Size(191, 21);
-            this.cmbTypes.TabIndex = 2;
-            this.cmbTypes.SelectedIndexChanged += new System.EventHandler(this.cmbTypes_TextChanged);
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 160);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(167, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "(double click to select type below)";
             // 
             // EditorMain
             // 
@@ -289,5 +314,7 @@
         private System.Windows.Forms.Button btnPrependRow;
         private System.Windows.Forms.ComboBox cmbCelldata;
         private System.Windows.Forms.ComboBox cmbTypes;
+        private System.Windows.Forms.ListBox lstFilteredTypes;
+        private System.Windows.Forms.Label label2;
     }
 }
