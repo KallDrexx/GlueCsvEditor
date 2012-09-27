@@ -66,7 +66,7 @@ namespace GlueCsvEditor.Controls
             UpdateColumnDetails();
         }
 
-        private void txtHeaderType_TextChanged(object sender, EventArgs e)
+        private void cmbTypes_TextChanged(object sender, EventArgs e)
         {
             UpdateColumnDetails();
         }
@@ -109,7 +109,7 @@ namespace GlueCsvEditor.Controls
             // Update the selected header
             var header = _data.GetHeaderDetails(_currentColumnIndex);
             txtHeaderName.Text = header.Name;
-            txtHeaderType.Text = header.Type;
+            cmbTypes.Text = header.Type;
             chkIsList.Checked = header.IsList;
             chkIsRequired.Checked = header.IsRequired;
 
@@ -254,7 +254,7 @@ namespace GlueCsvEditor.Controls
         {
             dgrEditor.Columns.Add(string.Empty, "");
             txtHeaderName.Enabled = true;
-            txtHeaderType.Enabled = true;
+            cmbTypes.Enabled = true;
             chkIsList.Enabled = true;
             chkIsRequired.Enabled = true;
             btnRemove.Enabled = true;
@@ -333,7 +333,7 @@ namespace GlueCsvEditor.Controls
         {
             // Clear the right editor side
             txtHeaderName.Text = string.Empty;
-            txtHeaderType.Text = string.Empty;
+            cmbTypes.Text = string.Empty;
             chkIsList.Checked = false;
             chkIsList.Checked = false;
 
@@ -366,7 +366,7 @@ namespace GlueCsvEditor.Controls
             if (headers.Count > 0)
             {
                 txtHeaderName.Enabled = true;
-                txtHeaderType.Enabled = true;
+                cmbTypes.Enabled = true;
                 chkIsList.Enabled = true;
                 chkIsRequired.Enabled = true;
                 btnRemove.Enabled = true;
@@ -376,11 +376,15 @@ namespace GlueCsvEditor.Controls
             {
                 // Since we have no headers, disable all the right side controls
                 txtHeaderName.Enabled = false;
-                txtHeaderType.Enabled = false;
+                cmbTypes.Enabled = false;
                 chkIsList.Enabled = false;
                 chkIsRequired.Enabled = false;
                 btnRemove.Enabled = false;
             }
+
+            // Load all the known types
+            cmbTypes.Items.Clear();
+            cmbTypes.Items.AddRange(GetKnownTypes());
 
             _dataLoading = false;
         }
@@ -404,7 +408,7 @@ namespace GlueCsvEditor.Controls
             if (_dataLoading)
                 return;
 
-            _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, txtHeaderType.Text, chkIsRequired.Checked, chkIsList.Checked);
+            _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, cmbTypes.Text, chkIsRequired.Checked, chkIsList.Checked);
             SaveCsv();
 
             // Update the column header
@@ -422,6 +426,27 @@ namespace GlueCsvEditor.Controls
                 return;
 
             dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
+        }
+
+        protected string[] GetKnownTypes()
+        {
+            // Instantiate the types list with basic value types
+            var types = new List<string>()
+            {
+                "bool", "double", "float", "int", "Matrix", "string", "Texture2D", "Vector2", "Vector3",
+                "Vector4", "Color"
+            };
+
+            // Get all enumerations via reflection
+            var enums = AppDomain.CurrentDomain
+                                 .GetAssemblies()
+                                 .SelectMany(x => x.GetTypes())
+                                 .Where(x => x.IsEnum)
+                                 .Select(x => x.FullName)
+                                 .ToArray();
+
+            types.AddRange(enums);
+            return types.Distinct().OrderBy(x => x).ToArray();
         }
 
         #endregion
