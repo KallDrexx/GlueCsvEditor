@@ -69,6 +69,7 @@ namespace GlueCsvEditor.Controls
         private void cmbTypes_TextChanged(object sender, EventArgs e)
         {
             UpdateColumnDetails();
+            SetupCellKnownValuesComboBox();
         }
 
         private void chkIsRequired_CheckedChanged(object sender, EventArgs e)
@@ -114,13 +115,18 @@ namespace GlueCsvEditor.Controls
             chkIsRequired.Checked = header.IsRequired;
 
             // Setup the combobox
+            SetupCellKnownValuesComboBox();
+
+            _dataLoading = false;
+        }
+
+        private void SetupCellKnownValuesComboBox()
+        {
             cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
             cmbCelldata.Items.Clear();
             var knownValues = _data.GetKnownValues(_currentColumnIndex);
             foreach (string value in knownValues)
                 cmbCelldata.Items.Add(value);
-
-            _dataLoading = false;
         }
 
         private void dgrEditor_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
