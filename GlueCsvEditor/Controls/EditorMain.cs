@@ -468,7 +468,7 @@ namespace GlueCsvEditor.Controls
         protected IEnumerable<string> GetGlueStateNamespaces(EntitySave entity)
         {
             string ns = string.Concat(ProjectManager.ProjectNamespace, 
-                                      ".Entities.",
+                                      ".",
                                       entity.Name.Replace("\\", "."),
                                       ".");
 
@@ -483,8 +483,8 @@ namespace GlueCsvEditor.Controls
 
         protected IEnumerable<string> GetGlueStateNamespaces(ScreenSave entity)
         {
-            string ns = string.Concat(ProjectManager.ProjectNamespace, 
-                                      ".Entities.",
+            string ns = string.Concat(ProjectManager.ProjectNamespace,
+                                      ".",
                                       entity.Name.Replace("\\", "."),
                                       ".");
 

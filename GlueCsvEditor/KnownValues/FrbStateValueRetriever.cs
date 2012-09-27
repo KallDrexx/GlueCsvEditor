@@ -23,12 +23,8 @@ namespace GlueCsvEditor.KnownValues
             if (!elementName.Contains("Entities") && !elementName.Contains("Screens"))
                 return new string[0];
 
-            bool isEntity = elementName.Contains("Entities");
-            elementName = elementName.Substring(elementName.LastIndexOf('.') + 1);
-            if (isEntity)
-                elementName = "Entities/" + elementName;
-            else
-                elementName = "Screens/" + elementName;
+            elementName = elementName.Substring(elementName.IndexOf(".") + 1)
+                                     .Replace(".", "/");
 
             var element = ObjectFinder.Self.GetIElement(elementName);
             if (element == null)
