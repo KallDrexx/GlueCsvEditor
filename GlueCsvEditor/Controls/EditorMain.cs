@@ -70,7 +70,7 @@ namespace GlueCsvEditor.Controls
             UpdateColumnDetails();
         }
 
-        private void cmbTypes_TextChanged(object sender, EventArgs e)
+        private void txtHeaderType_TextChanged(object sender, EventArgs e)
         {
             if (_dataLoading)
                 return;
@@ -118,7 +118,7 @@ namespace GlueCsvEditor.Controls
             // Update the selected header
             var header = _data.GetHeaderDetails(_currentColumnIndex);
             txtHeaderName.Text = header.Name;
-            cmbTypes.Text = header.Type;
+            txtHeaderType.Text = header.Type;
             chkIsList.Checked = header.IsList;
             chkIsRequired.Checked = header.IsRequired;
 
@@ -260,7 +260,7 @@ namespace GlueCsvEditor.Controls
         {
             dgrEditor.Columns.Add(string.Empty, "");
             txtHeaderName.Enabled = true;
-            cmbTypes.Enabled = true;
+            txtHeaderType.Enabled = true;
             chkIsList.Enabled = true;
             chkIsRequired.Enabled = true;
             btnRemove.Enabled = true;
@@ -338,7 +338,7 @@ namespace GlueCsvEditor.Controls
                 var rect = lstFilteredTypes.GetItemRectangle(lstFilteredTypes.SelectedIndex);
                 if (rect.Contains(e.Location))
                 {
-                    cmbTypes.Text = lstFilteredTypes.SelectedValue as string;
+                    txtHeaderType.Text = lstFilteredTypes.SelectedValue as string;
                 }
             }
         }
@@ -351,7 +351,7 @@ namespace GlueCsvEditor.Controls
         {
             // Clear the right editor side
             txtHeaderName.Text = string.Empty;
-            cmbTypes.Text = string.Empty;
+            txtHeaderType.Text = string.Empty;
             chkIsList.Checked = false;
             chkIsList.Checked = false;
 
@@ -381,15 +381,13 @@ namespace GlueCsvEditor.Controls
             this.ResumeLayout();
 
             // Load all the known types
-            cmbTypes.Items.Clear();
-            cmbTypes.Items.AddRange(GetKnownTypes());
             _knownTypes = GetKnownTypes();
 
             // Auto-focus on the first cell
             if (headers.Count > 0)
             {
                 txtHeaderName.Enabled = true;
-                cmbTypes.Enabled = true;
+                txtHeaderType.Enabled = true;
                 chkIsList.Enabled = true;
                 chkIsRequired.Enabled = true;
                 btnRemove.Enabled = true;
@@ -399,7 +397,7 @@ namespace GlueCsvEditor.Controls
             {
                 // Since we have no headers, disable all the right side controls
                 txtHeaderName.Enabled = false;
-                cmbTypes.Enabled = false;
+                txtHeaderType.Enabled = false;
                 chkIsList.Enabled = false;
                 chkIsRequired.Enabled = false;
                 btnRemove.Enabled = false;
@@ -427,7 +425,7 @@ namespace GlueCsvEditor.Controls
             if (_dataLoading)
                 return;
 
-            _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, cmbTypes.Text, chkIsRequired.Checked, chkIsList.Checked);
+            _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, txtHeaderType.Text, chkIsRequired.Checked, chkIsList.Checked);
             SaveCsv();
 
             // Update the column header
@@ -519,7 +517,7 @@ namespace GlueCsvEditor.Controls
         protected void FilterKnownTypes()
         {
             lstFilteredTypes.DataSource =
-                _knownTypes.Where(x => x.IndexOf(cmbTypes.Text.Trim(), StringComparison.OrdinalIgnoreCase) >= 0)
+                _knownTypes.Where(x => x.IndexOf(txtHeaderType.Text.Trim(), StringComparison.OrdinalIgnoreCase) >= 0)
                            .ToList();
 
             lstFilteredTypes.ClearSelected();
