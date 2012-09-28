@@ -123,7 +123,7 @@ namespace GlueCsvEditor.Controls
             chkIsRequired.Checked = header.IsRequired;
 
             // Setup the combobox
-            SetupCellKnownValuesComboBox();
+            cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
             FilterKnownTypes();
 
             _dataLoading = false;
@@ -331,6 +331,11 @@ namespace GlueCsvEditor.Controls
             dgrEditor.InvalidateCell(_currentColumnIndex, _currentRowIndex);
         }
 
+        private void cmbCelldata_DropDown(object sender, EventArgs e)
+        {
+            SetupCellKnownValuesComboBox();
+        }
+
         private void lstFilteredTypes_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (lstFilteredTypes.SelectedIndex != -1)
@@ -507,7 +512,6 @@ namespace GlueCsvEditor.Controls
 
         private void SetupCellKnownValuesComboBox()
         {
-            cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
             cmbCelldata.Items.Clear();
             var knownValues = _data.GetKnownValues(_currentColumnIndex);
             foreach (string value in knownValues)

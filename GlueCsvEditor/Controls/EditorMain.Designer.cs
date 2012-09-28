@@ -118,6 +118,7 @@
             this.cmbCelldata.Name = "cmbCelldata";
             this.cmbCelldata.Size = new System.Drawing.Size(165, 21);
             this.cmbCelldata.TabIndex = 0;
+            this.cmbCelldata.DropDown += new System.EventHandler(this.cmbCelldata_DropDown);
             this.cmbCelldata.TextChanged += new System.EventHandler(this.cmbCelldata_TextChanged);
             // 
             // btnPrependRow
