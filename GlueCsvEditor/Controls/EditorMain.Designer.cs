@@ -202,7 +202,7 @@
             this.lstFilteredTypes.Location = new System.Drawing.Point(12, 176);
             this.lstFilteredTypes.Name = "lstFilteredTypes";
             this.lstFilteredTypes.Size = new System.Drawing.Size(191, 121);
-            this.lstFilteredTypes.TabIndex = 8;
+            this.lstFilteredTypes.TabIndex = 11;
             this.lstFilteredTypes.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lstFilteredTypes_MouseDoubleClick);
             // 
             // btnAddColumn
@@ -220,7 +220,7 @@
             this.btnRemove.Location = new System.Drawing.Point(10, 32);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(102, 23);
-            this.btnRemove.TabIndex = 7;
+            this.btnRemove.TabIndex = 8;
             this.btnRemove.Text = "Remove Column";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
@@ -231,7 +231,7 @@
             this.chkIsList.Location = new System.Drawing.Point(12, 334);
             this.chkIsList.Name = "chkIsList";
             this.chkIsList.Size = new System.Drawing.Size(59, 17);
-            this.chkIsList.TabIndex = 6;
+            this.chkIsList.TabIndex = 13;
             this.chkIsList.Text = "Is List?";
             this.chkIsList.UseVisualStyleBackColor = true;
             this.chkIsList.CheckedChanged += new System.EventHandler(this.chkIsList_CheckedChanged);
@@ -242,7 +242,7 @@
             this.chkIsRequired.Location = new System.Drawing.Point(12, 310);
             this.chkIsRequired.Name = "chkIsRequired";
             this.chkIsRequired.Size = new System.Drawing.Size(75, 17);
-            this.chkIsRequired.TabIndex = 5;
+            this.chkIsRequired.TabIndex = 12;
             this.chkIsRequired.Text = "Required?";
             this.chkIsRequired.UseVisualStyleBackColor = true;
             this.chkIsRequired.CheckedChanged += new System.EventHandler(this.chkIsRequired_CheckedChanged);
@@ -272,7 +272,7 @@
             this.txtHeaderName.Location = new System.Drawing.Point(12, 77);
             this.txtHeaderName.Name = "txtHeaderName";
             this.txtHeaderName.Size = new System.Drawing.Size(191, 20);
-            this.txtHeaderName.TabIndex = 0;
+            this.txtHeaderName.TabIndex = 9;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
             // 
             // EditorMain
