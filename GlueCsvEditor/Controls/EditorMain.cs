@@ -15,6 +15,8 @@ using GlueCsvEditor.Data;
 using FlatRedBall.Glue.Elements;
 using FlatRedBall.Glue.SaveClasses;
 using FlatRedBall.Glue;
+using FlatRedBall.Glue.Parsing;
+using Microsoft.Build.BuildEngine;
 
 namespace GlueCsvEditor.Controls
 {
@@ -475,6 +477,10 @@ namespace GlueCsvEditor.Controls
             types.AddRange(entityStates);
             types.AddRange(screenStates);
 
+            // Get project types
+            var projectTypes = GetProjectTypes();
+            types.AddRange(projectTypes);
+
             return types.Distinct().OrderBy(x => x).ToArray();
         }
 
@@ -508,6 +514,30 @@ namespace GlueCsvEditor.Controls
                                   .ToArray());
 
             return states;
+        }
+
+        protected IEnumerable<string> GetProjectTypes()
+        {
+            var results = new List<string>();
+            var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
+            string baseDirectory = ProjectManager.ProjectBase.Directory;
+
+            foreach (var item in items)
+            {
+                var file = new ParsedFile(baseDirectory + item.Include);
+                foreach (var ns in file.Namespaces)
+                {
+                    // Add all the classes in the namespace
+                    foreach (var cls in ns.Classes)
+                        results.Add(string.Concat(cls.Namespace, ".", cls.Name));
+
+                    // Add enums
+                    foreach (var enm in ns.Enums)
+                        results.Add(string.Concat(enm.Namespace, ".", enm.Name));
+                }
+            }
+
+            return results;
         }
 
         private void SetupCellKnownValuesComboBox()
