@@ -310,6 +310,7 @@ namespace GlueCsvEditor.Data
             {
                 new EnumReflectionValueRetriever(),
                 new FrbStateValueRetriever(),
+                new ParsedEnumValueRetriever(),
                 new UsedRcrColumnValueRetriever(_csv, column)
             };
 

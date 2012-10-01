@@ -77,6 +77,7 @@
     <Compile Include="KnownValues\EnumReflectionValueRetriever.cs" />
     <Compile Include="KnownValues\FrbStateValueRetriever.cs" />
     <Compile Include="KnownValues\IKnownValueRetriever.cs" />
+    <Compile Include="KnownValues\ParsedEnumValueRetriever.cs" />
     <Compile Include="KnownValues\UsedRcrColumnValueRetriever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
