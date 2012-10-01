@@ -16,7 +16,10 @@ namespace GlueCsvEditor.Data
         protected string _csvPath;
         protected char _delimiter;
         protected RuntimeCsvRepresentation _csv;
+
+        // Cached values
         protected List<BuildItem> _buildItemsWithEnums;
+        protected List<BuildItem> _buildItemsWithInterfaceInheritedClasses;
 
         public CsvData(string csvPath, char delimiter = ',')
         {
@@ -316,7 +319,7 @@ namespace GlueCsvEditor.Data
                 new EnumReflectionValueRetriever(),
                 new FrbStateValueRetriever(),
                 new ParsedEnumValueRetriever(_buildItemsWithEnums),
-                new InterfaceImplementationsValueRetriever(),
+                new InterfaceImplementationsValueRetriever(_buildItemsWithInterfaceInheritedClasses),
                 new UsedRcrColumnValueRetriever(_csv, column)
             };
 
@@ -335,10 +338,11 @@ namespace GlueCsvEditor.Data
 
         protected void LoadCachedData()
         {
-            var results = new List<string>();
+            _buildItemsWithEnums = new List<BuildItem>();
+            _buildItemsWithInterfaceInheritedClasses = new List<BuildItem>();
+
             var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
             string baseDirectory = ProjectManager.ProjectBase.Directory;
-            _buildItemsWithEnums = new List<BuildItem>();
 
             foreach (var item in items)
             {
@@ -347,6 +351,9 @@ namespace GlueCsvEditor.Data
                 {
                     if (ns.Enums.Count > 0)
                         _buildItemsWithEnums.Add(item);
+
+                    if (ns.Classes.Any(x => x.ParentClassesAndInterfaces.Any(y => y.IsInterface)))
+                        _buildItemsWithInterfaceInheritedClasses.Add(item);
                 }
             }
         }

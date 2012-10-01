@@ -4,20 +4,27 @@ using System.Linq;
 using System.Text;
 using FlatRedBall.Glue;
 using FlatRedBall.Glue.Parsing;
+using Microsoft.Build.BuildEngine;
 
 namespace GlueCsvEditor.KnownValues
 {
     public class InterfaceImplementationsValueRetriever : IKnownValueRetriever
     {
+        protected IEnumerable<BuildItem> _cachedBuildItems;
+
+        public InterfaceImplementationsValueRetriever(IEnumerable<BuildItem> cachedBuildItems)
+        {
+            _cachedBuildItems = cachedBuildItems ?? new BuildItem[0];
+        }
+
         public IEnumerable<string> GetKnownValues(string fullTypeName)
         {
             // Parse all custom code and find all classes that are implementations of an interface
             var results = new List<string>();
-            var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
             string baseDirectory = ProjectManager.ProjectBase.Directory;
             string typeName = fullTypeName.Substring(fullTypeName.LastIndexOf(".") + 1);
 
-            foreach (var item in items)
+            foreach (var item in _cachedBuildItems)
             {
                 var file = new ParsedFile(baseDirectory + item.Include);
                 foreach (var ns in file.Namespaces)
