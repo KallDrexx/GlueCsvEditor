@@ -4,18 +4,26 @@ using System.Linq;
 using System.Text;
 using FlatRedBall.Glue;
 using FlatRedBall.Glue.Parsing;
+using Microsoft.Build.BuildEngine;
 
 namespace GlueCsvEditor.KnownValues
 {
     public class ParsedEnumValueRetriever : IKnownValueRetriever
     {
+        protected IEnumerable<BuildItem> _buildItemsWithEnums;
+
+        public ParsedEnumValueRetriever(IEnumerable<BuildItem> buildItemsWithEnums)
+        {
+            _buildItemsWithEnums = buildItemsWithEnums ?? new BuildItem[0];
+        }
+
         public IEnumerable<string> GetKnownValues(string fullTypeName)
         {
             // Parse all custom code and find the matching enumeration
-            var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
             string baseDirectory = ProjectManager.ProjectBase.Directory;
 
-            foreach (var item in items)
+            // Only search through build items known to have enumerations
+            foreach (var item in _buildItemsWithEnums)
             {
                 var file = new ParsedFile(baseDirectory + item.Include);
                 foreach (var ns in file.Namespaces)

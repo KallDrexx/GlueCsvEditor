@@ -540,7 +540,7 @@ namespace GlueCsvEditor.Controls
             return results;
         }
 
-        private void SetupCellKnownValuesComboBox()
+        protected void SetupCellKnownValuesComboBox()
         {
             cmbCelldata.Items.Clear();
             var knownValues = _data.GetKnownValues(_currentColumnIndex);
