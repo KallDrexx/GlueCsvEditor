@@ -5,6 +5,9 @@ using System.Text;
 using FlatRedBall.IO.Csv;
 using Microsoft.Xna.Framework;
 using GlueCsvEditor.KnownValues;
+using Microsoft.Build.BuildEngine;
+using FlatRedBall.Glue;
+using FlatRedBall.Glue.Parsing;
 
 namespace GlueCsvEditor.Data
 {
@@ -14,11 +17,16 @@ namespace GlueCsvEditor.Data
         protected char _delimiter;
         protected RuntimeCsvRepresentation _csv;
 
+        // Cached values
+        protected List<ParsedEnum> _parsedEnums;
+        protected List<ParsedClass> _parsedClasses;
+
         public CsvData(string csvPath, char delimiter = ',')
         {
             _csvPath = csvPath;
             _delimiter = delimiter;
             Reload();
+            LoadCachedData();
         }
 
         /// <summary>
@@ -310,6 +318,8 @@ namespace GlueCsvEditor.Data
             {
                 new EnumReflectionValueRetriever(),
                 new FrbStateValueRetriever(),
+                new ParsedEnumValueRetriever(_parsedEnums),
+                new InterfaceImplementationsValueRetriever(_parsedClasses),
                 new UsedRcrColumnValueRetriever(_csv, column)
             };
 
@@ -324,6 +334,25 @@ namespace GlueCsvEditor.Data
 
             // No values were found
             return new string[0];
+        }
+
+        protected void LoadCachedData()
+        {
+            _parsedClasses = new List<ParsedClass>();
+            _parsedEnums = new List<ParsedEnum>();
+
+            var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
+            string baseDirectory = ProjectManager.ProjectBase.Directory;
+
+            foreach (var item in items)
+            {
+                var file = new ParsedFile(baseDirectory + item.Include);
+                foreach (var ns in file.Namespaces)
+                {
+                    _parsedEnums.AddRange(ns.Enums);
+                    _parsedClasses.AddRange(ns.Classes);
+                }
+            }
         }
     }
 }

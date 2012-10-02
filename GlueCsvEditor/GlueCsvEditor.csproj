@@ -49,6 +49,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\XnaPc\GlueSaveClasses.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -76,6 +77,8 @@
     <Compile Include="KnownValues\EnumReflectionValueRetriever.cs" />
     <Compile Include="KnownValues\FrbStateValueRetriever.cs" />
     <Compile Include="KnownValues\IKnownValueRetriever.cs" />
+    <Compile Include="KnownValues\InterfaceImplementationsValueRetriever.cs" />
+    <Compile Include="KnownValues\ParsedEnumValueRetriever.cs" />
     <Compile Include="KnownValues\UsedRcrColumnValueRetriever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
