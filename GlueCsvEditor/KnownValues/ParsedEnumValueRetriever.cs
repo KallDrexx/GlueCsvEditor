@@ -10,34 +10,23 @@ namespace GlueCsvEditor.KnownValues
 {
     public class ParsedEnumValueRetriever : IKnownValueRetriever
     {
-        protected IEnumerable<BuildItem> _buildItemsWithEnums;
+        protected IEnumerable<ParsedEnum> _parsedEnums;
 
-        public ParsedEnumValueRetriever(IEnumerable<BuildItem> buildItemsWithEnums)
+        public ParsedEnumValueRetriever(IEnumerable<ParsedEnum> parsedEnums)
         {
-            _buildItemsWithEnums = buildItemsWithEnums ?? new BuildItem[0];
+            _parsedEnums = parsedEnums ?? new ParsedEnum[0];
         }
 
         public IEnumerable<string> GetKnownValues(string fullTypeName)
         {
-            // Parse all custom code and find the matching enumeration
-            string baseDirectory = ProjectManager.ProjectBase.Directory;
-
-            // Only search through build items known to have enumerations
-            foreach (var item in _buildItemsWithEnums)
+            foreach (var enm in _parsedEnums)
             {
-                var file = new ParsedFile(baseDirectory + item.Include);
-                foreach (var ns in file.Namespaces)
-                {
-                    foreach (var enm in ns.Enums)
-                    {
-                        var enumFullType = string.Concat(enm.Namespace, ".", enm.Name);
-                        if (!enumFullType.Equals(fullTypeName, StringComparison.OrdinalIgnoreCase))
-                            continue;
+                var enumFullType = string.Concat(enm.Namespace, ".", enm.Name);
+                if (!enumFullType.Equals(fullTypeName, StringComparison.OrdinalIgnoreCase))
+                    continue;
 
-                        // return all the values for the enum
-                        return enm.Values;
-                    }
-                }
+                // return all the values for the enum
+                return enm.Values;
             }
 
             return new string[0];

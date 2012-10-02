@@ -18,8 +18,8 @@ namespace GlueCsvEditor.Data
         protected RuntimeCsvRepresentation _csv;
 
         // Cached values
-        protected List<BuildItem> _buildItemsWithEnums;
-        protected List<BuildItem> _buildItemsWithInterfaceInheritedClasses;
+        protected List<ParsedEnum> _parsedEnums;
+        protected List<ParsedClass> _parsedClasses;
 
         public CsvData(string csvPath, char delimiter = ',')
         {
@@ -318,8 +318,8 @@ namespace GlueCsvEditor.Data
             {
                 new EnumReflectionValueRetriever(),
                 new FrbStateValueRetriever(),
-                new ParsedEnumValueRetriever(_buildItemsWithEnums),
-                new InterfaceImplementationsValueRetriever(_buildItemsWithInterfaceInheritedClasses),
+                new ParsedEnumValueRetriever(_parsedEnums),
+                new InterfaceImplementationsValueRetriever(_parsedClasses),
                 new UsedRcrColumnValueRetriever(_csv, column)
             };
 
@@ -338,8 +338,8 @@ namespace GlueCsvEditor.Data
 
         protected void LoadCachedData()
         {
-            _buildItemsWithEnums = new List<BuildItem>();
-            _buildItemsWithInterfaceInheritedClasses = new List<BuildItem>();
+            _parsedClasses = new List<ParsedClass>();
+            _parsedEnums = new List<ParsedEnum>();
 
             var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
             string baseDirectory = ProjectManager.ProjectBase.Directory;
@@ -349,11 +349,8 @@ namespace GlueCsvEditor.Data
                 var file = new ParsedFile(baseDirectory + item.Include);
                 foreach (var ns in file.Namespaces)
                 {
-                    if (ns.Enums.Count > 0)
-                        _buildItemsWithEnums.Add(item);
-
-                    if (ns.Classes.Any(x => x.ParentClassesAndInterfaces.Any(y => y.IsInterface)))
-                        _buildItemsWithInterfaceInheritedClasses.Add(item);
+                    _parsedEnums.AddRange(ns.Enums);
+                    _parsedClasses.AddRange(ns.Classes);
                 }
             }
         }
