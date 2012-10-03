@@ -71,6 +71,7 @@
       <DependentUpon>EditorMain.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvEditorPlugin.cs" />
+    <Compile Include="Data\ComplexTypeParser.cs" />
     <Compile Include="Data\CsvColumnHeader.cs" />
     <Compile Include="Data\CsvData.cs" />
     <Compile Include="Data\FoundCell.cs" />
