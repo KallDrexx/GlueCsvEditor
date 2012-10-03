@@ -27,6 +27,8 @@ namespace GlueCsvEditor.Data
             _delimiter = delimiter;
             Reload();
             LoadCachedData();
+
+            var test = ComplexTypeParser.ParseValue("new My.Namespace.MyType(\"constructor value\")");
         }
 
         /// <summary>
