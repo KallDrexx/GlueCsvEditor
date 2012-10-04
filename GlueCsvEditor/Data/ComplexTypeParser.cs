@@ -11,11 +11,11 @@ namespace GlueCsvEditor.Data
         public string TypeName { get; protected set; }
         public string Namespace { get; protected set; }
         public string ConstructorValues { get; protected set; }
-        public PropertyCollection Properties { get; protected set; }
+        public Dictionary<string, string> Properties { get; protected set; }
 
         protected ComplexTypeParser()
         {
-            Properties = new PropertyCollection();
+            Properties = new Dictionary<string, string>();
         }
 
         public static ComplexTypeParser ParseValue(string value)
@@ -46,13 +46,15 @@ namespace GlueCsvEditor.Data
 
             // Figure out where the type string ends
             int typeStringEndIndex;
-            if ((openParen >= 0 && openParen > secondSpace))
+            if ((openParen >= 0 && secondSpace >= 0 && openParen > secondSpace))
                 typeStringEndIndex = secondSpace;
-            else if (openBrace >= 0 && openParen == -1 && openBrace > secondSpace)
+
+            else if (openBrace >= 0 && secondSpace >= 0 && openParen == -1 && openBrace > secondSpace)
                 typeStringEndIndex = secondSpace;
 
             else if (openParen >= 0)
                 typeStringEndIndex = openParen;
+
             else
                 typeStringEndIndex = openBrace;
 
