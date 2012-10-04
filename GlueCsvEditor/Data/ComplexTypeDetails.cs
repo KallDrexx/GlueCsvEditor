@@ -88,6 +88,10 @@ namespace GlueCsvEditor.Data
                     if (pair.Length != 2)
                         continue; // not a valid property definition
 
+                    // If this is the last property, it will probably have a brace pulled in with it
+                    //   it should be removed
+                    pair[1] = pair[1].Replace("}", "");
+
                     result.Properties.Add(pair[0].Trim(), pair[1].Trim());
                 }
             }
