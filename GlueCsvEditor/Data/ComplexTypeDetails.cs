@@ -62,8 +62,8 @@ namespace GlueCsvEditor.Data
             string isolatedTypeString = value.Substring(3, typeStringEndIndex - 3);
             if (isolatedTypeString.Contains("."))
             {
-                result.Namespace = isolatedTypeString.Remove(isolatedTypeString.LastIndexOf("."));
-                result.TypeName = isolatedTypeString.Substring(isolatedTypeString.LastIndexOf(".") + 1);
+                result.Namespace = isolatedTypeString.Remove(isolatedTypeString.LastIndexOf(".")).Trim();
+                result.TypeName = isolatedTypeString.Substring(isolatedTypeString.LastIndexOf(".") + 1).Trim();
             }
             else
             {
