@@ -125,8 +125,11 @@ namespace GlueCsvEditor.Controls
             chkIsRequired.Checked = header.IsRequired;
 
             // Setup the combobox
-            cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+            string value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+            cmbCelldata.Text = value;
             FilterKnownTypes();
+
+            UpdatePropertiesDisplay(value);
 
             _dataLoading = false;
         }
@@ -560,6 +563,29 @@ namespace GlueCsvEditor.Controls
                            .ToList();
 
             lstFilteredTypes.ClearSelected();
+        }
+
+        protected void UpdatePropertiesDisplay(string value)
+        {
+            var knownProperties = _data.GetKnownProperties(_currentColumnIndex);
+            var complexType = ComplexTypeParser.ParseValue(value);
+
+            if (knownProperties.Count() == 0 && complexType == null)
+            {
+                lblTest.Text = "None complex type";
+                return;
+            }
+
+            // Create a list of all known properties
+            var allProperties = knownProperties.ToList();
+            if (complexType != null)
+                allProperties.AddRange(complexType.Properties.Keys.Select(x => x));
+
+            string output = "Properties: " + Environment.NewLine;
+            foreach (string prop in allProperties)
+                output = string.Concat(output, Environment.NewLine, prop);
+
+            lblTest.Text = output;
         }
 
         #endregion

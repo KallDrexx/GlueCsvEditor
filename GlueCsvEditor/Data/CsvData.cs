@@ -27,8 +27,6 @@ namespace GlueCsvEditor.Data
             _delimiter = delimiter;
             Reload();
             LoadCachedData();
-
-            var test = ComplexTypeParser.ParseValue("new My.Namespace.MyType(\"constructor value\")");
         }
 
         /// <summary>
@@ -337,6 +335,24 @@ namespace GlueCsvEditor.Data
             }
 
             // No values were found
+            return new string[0];
+        }
+
+        public IEnumerable<string> GetKnownProperties(int columnIndex)
+        {
+            string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[columnIndex].OriginalText);
+
+            // Check if the type matches a ParsedClass
+            var parsedClass =
+                _parsedClasses.FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(type, StringComparison.OrdinalIgnoreCase));
+
+            if (parsedClass != null)
+            {
+                return parsedClass.ParsedProperties
+                                  .Select(x => x.Name)
+                                  .ToArray();
+            }
+
             return new string[0];
         }
 
