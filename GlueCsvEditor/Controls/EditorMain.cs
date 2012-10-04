@@ -129,7 +129,7 @@ namespace GlueCsvEditor.Controls
             cmbCelldata.Text = value;
             FilterKnownTypes();
 
-            UpdatePropertiesDisplay(value);
+            UpdatePropertiesDisplay(header.Type, value);
 
             _dataLoading = false;
         }
@@ -560,27 +560,42 @@ namespace GlueCsvEditor.Controls
             lstFilteredTypes.ClearSelected();
         }
 
-        protected void UpdatePropertiesDisplay(string value)
+        protected void UpdatePropertiesDisplay(string type, string value)
         {
+            if (string.IsNullOrWhiteSpace(type))
+                return;
+
+            string ns = string.Empty;
+            if (type.Contains(".") && type.Last() != '.')
+            {
+                ns = type.Remove(type.LastIndexOf('.'));
+                type = type.Substring(type.LastIndexOf('.') + 1);
+            }
+
+            // Get property information for the type
             var knownProperties = _data.GetKnownProperties(_currentColumnIndex);
-            var complexType = ComplexTypeParser.ParseValue(value);
+            var complexType = ComplexTypeDetails.ParseValue(value);
+            pgrPropertyEditor.Visible = true;
 
             if (knownProperties.Count() == 0 && complexType == null)
             {
-                lblTest.Text = "None complex type";
+                pgrPropertyEditor.Visible = false;
                 return;
             }
 
-            // Create a list of all known properties
-            var allProperties = knownProperties.ToList();
-            if (complexType != null)
-                allProperties.AddRange(complexType.Properties.Keys.Select(x => x));
+            // If the complex type coudln't be parsed from the current value, create one manually
+            if (complexType == null)
+                complexType = new ComplexTypeDetails { TypeName = type };
 
-            string output = "Properties: " + Environment.NewLine;
-            foreach (string prop in allProperties)
-                output = string.Concat(output, Environment.NewLine, prop);
+            // Go through all the properties and add any "known ones" that weren't part of the parsed set
+            foreach (var prop in knownProperties)
+                if (!complexType.Properties.ContainsKey(prop))
+                    complexType.Properties.Add(prop, string.Empty);
 
-            lblTest.Text = output;
+            // Setup pgrid displayer
+            var displayer = new ComplexTypePropertyGridDisplayer();
+            displayer.Instance = complexType;
+            displayer.PropertyGrid = pgrPropertyEditor;
         }
 
         #endregion

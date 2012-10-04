@@ -46,7 +46,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
-            this.lblTest = new System.Windows.Forms.Label();
+            this.pgrPropertyEditor = new System.Windows.Forms.PropertyGrid();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -85,6 +85,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.pgrPropertyEditor);
             this.splitContainer1.Panel1.Controls.Add(this.cmbCelldata);
             this.splitContainer1.Panel1.Controls.Add(this.btnPrependRow);
             this.splitContainer1.Panel1.Controls.Add(this.btnDeleteRow);
@@ -95,7 +96,6 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.lblTest);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
             this.splitContainer1.Panel2.Controls.Add(this.label2);
             this.splitContainer1.Panel2.Controls.Add(this.lstFilteredTypes);
@@ -277,14 +277,15 @@
             this.txtHeaderName.TabIndex = 9;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
             // 
-            // lblTest
+            // pgrPropertyEditor
             // 
-            this.lblTest.AutoSize = true;
-            this.lblTest.Location = new System.Drawing.Point(5, 374);
-            this.lblTest.Name = "lblTest";
-            this.lblTest.Size = new System.Drawing.Size(35, 13);
-            this.lblTest.TabIndex = 14;
-            this.lblTest.Text = "label4";
+            this.pgrPropertyEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgrPropertyEditor.Location = new System.Drawing.Point(26, 167);
+            this.pgrPropertyEditor.Name = "pgrPropertyEditor";
+            this.pgrPropertyEditor.Size = new System.Drawing.Size(361, 290);
+            this.pgrPropertyEditor.TabIndex = 14;
             // 
             // EditorMain
             // 
@@ -326,6 +327,6 @@
         private System.Windows.Forms.ListBox lstFilteredTypes;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtHeaderType;
-        private System.Windows.Forms.Label lblTest;
+        private System.Windows.Forms.PropertyGrid pgrPropertyEditor;
     }
 }

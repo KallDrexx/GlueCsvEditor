@@ -6,21 +6,21 @@ using FlatRedBall.Instructions.Reflection;
 
 namespace GlueCsvEditor.Data
 {
-    public class ComplexTypeParser
+    public class ComplexTypeDetails
     {
-        public string TypeName { get; protected set; }
-        public string Namespace { get; protected set; }
-        public string ConstructorValues { get; protected set; }
+        public string TypeName { get; set; }
+        public string Namespace { get; set; }
+        public string ConstructorValues { get; set; }
         public Dictionary<string, string> Properties { get; protected set; }
 
-        protected ComplexTypeParser()
+        public ComplexTypeDetails()
         {
             Properties = new Dictionary<string, string>();
         }
 
-        public static ComplexTypeParser ParseValue(string value)
+        public static ComplexTypeDetails ParseValue(string value)
         {
-            var result = new ComplexTypeParser();
+            var result = new ComplexTypeDetails();
 
             // Figure out if the type is in the format of 
             //   new Namespace.Type() or 
