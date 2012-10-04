@@ -22,6 +22,8 @@ namespace GlueCsvEditor.Data
             }
         }
 
+        public ComplexTypeUpdatedDelegate ComplexTypeUpdatedHandler { get; set; }
+
         protected void UpdateDisplayedFields(ComplexTypeDetails complexTypeDetails)
         {
             if (complexTypeDetails == null)
@@ -40,10 +42,18 @@ namespace GlueCsvEditor.Data
                 string propertyName = complexTypeDetails.Properties.Keys.ElementAt(x);
                 
                 // Setup events
-                MemberChangeEventHandler setter = (sender, args) => { complexTypeDetails.Properties[propertyName] = args.Value as string; };
+                MemberChangeEventHandler setter = (sender, args) => 
+                { 
+                    complexTypeDetails.Properties[propertyName] = args.Value as string;
+                    if (ComplexTypeUpdatedHandler != null)
+                        ComplexTypeUpdatedHandler((mInstance as ComplexTypeDetails).ToString());
+                };
+
                 Func<object> getter = () => { return complexTypeDetails.Properties[propertyName]; };
                 IncludeMember(propertyName, typeof(string), setter, getter);
             }
         }
+
+        public delegate void ComplexTypeUpdatedDelegate(string complexTypeString);
     }
 }
