@@ -594,8 +594,14 @@ namespace GlueCsvEditor.Controls
 
             // Setup pgrid displayer
             var displayer = new ComplexTypePropertyGridDisplayer();
+            displayer.ComplexTypeUpdatedHandler = ComplexTypeUpdated;
             displayer.Instance = complexType;
             displayer.PropertyGrid = pgrPropertyEditor;
+        }
+
+        protected void ComplexTypeUpdated(string complexTypeString)
+        {
+            dgrEditor[_currentColumnIndex, _currentRowIndex].Value = complexTypeString;
         }
 
         #endregion

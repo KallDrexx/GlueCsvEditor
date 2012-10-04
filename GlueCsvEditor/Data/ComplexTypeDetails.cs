@@ -98,5 +98,56 @@ namespace GlueCsvEditor.Data
 
             return result;
         }
+
+        public override string ToString()
+        {
+            var output = new StringBuilder("new ");
+
+            if (!string.IsNullOrWhiteSpace(Namespace))
+            {
+                output.Append(Namespace);
+                output.Append(".");
+            }
+
+            output.Append(TypeName);
+
+            // Get a list of all properties that do not hav empty values
+            var filledProperties = Properties.Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                                             .ToList();
+
+            // Add contructor values
+            if (!string.IsNullOrWhiteSpace(ConstructorValues))
+            {
+                output.Append("(");
+                output.Append(ConstructorValues);
+                output.Append(")");
+            }
+            else if (filledProperties.Count == 0)
+            {
+                // If there are no properties either, append a ()
+                output.Append("()");
+            }
+
+            // Add defined properties
+            if (filledProperties.Count > 0)
+            {
+                output.Append(" {");
+                for (int x = 0; x < filledProperties.Count; x++)
+                {
+                    var prop = filledProperties[x];
+
+                    if (x > 0)
+                        output.Append(", ");
+
+                    output.Append(prop.Key);
+                    output.Append(" = ");
+                    output.Append(prop.Value);
+                }
+
+                output.Append(" }");
+            }
+
+            return output.ToString();
+        }
     }
 }
