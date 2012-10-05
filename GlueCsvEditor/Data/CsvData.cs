@@ -336,7 +336,7 @@ namespace GlueCsvEditor.Data
             return new string[0];
         }
 
-        public IEnumerable<string> GetKnownProperties(int columnIndex)
+        public IEnumerable<ComplexTypeProperty> GetKnownProperties(int columnIndex)
         {
             string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[columnIndex].OriginalText);
 
@@ -347,11 +347,15 @@ namespace GlueCsvEditor.Data
             if (parsedClass != null)
             {
                 return parsedClass.ParsedProperties
-                                  .Select(x => x.Name)
+                                  .Select(x => new ComplexTypeProperty
+                                  {
+                                      Name = x.Name,
+                                      Type = x.Type.Name
+                                  })
                                   .ToArray();
             }
 
-            return new string[0];
+            return new ComplexTypeProperty[0];
         }
 
         protected void LoadCachedData()

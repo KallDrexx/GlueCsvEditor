@@ -11,11 +11,11 @@ namespace GlueCsvEditor.Data
         public string TypeName { get; set; }
         public string Namespace { get; set; }
         public string ConstructorValues { get; set; }
-        public Dictionary<string, string> Properties { get; protected set; }
+        public List<ComplexTypeProperty> Properties { get; protected set; }
 
         public ComplexTypeDetails()
         {
-            Properties = new Dictionary<string, string>();
+            Properties = new List<ComplexTypeProperty>();
         }
 
         public static ComplexTypeDetails ParseValue(string value)
@@ -92,7 +92,11 @@ namespace GlueCsvEditor.Data
                     //   it should be removed
                     pair[1] = pair[1].Replace("}", "");
 
-                    result.Properties.Add(pair[0].Trim(), pair[1].Trim());
+                    result.Properties.Add(new ComplexTypeProperty
+                    {
+                        Name = pair[0].Trim(),
+                        Value = pair[1].Trim()
+                    });
                 }
             }
 
@@ -139,7 +143,7 @@ namespace GlueCsvEditor.Data
                     if (x > 0)
                         output.Append(", ");
 
-                    output.Append(prop.Key);
+                    output.Append(prop.Name);
                     output.Append(" = ");
                     output.Append(prop.Value);
                 }

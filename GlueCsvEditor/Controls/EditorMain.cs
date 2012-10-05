@@ -601,8 +601,18 @@ namespace GlueCsvEditor.Controls
 
             // Go through all the properties and add any "known ones" that weren't part of the parsed set
             foreach (var prop in knownProperties)
-                if (!complexType.Properties.ContainsKey(prop))
-                    complexType.Properties.Add(prop, string.Empty);
+            {
+                var tp = complexType.Properties
+                                    .Where(x => x.Name.Equals(prop.Name, StringComparison.OrdinalIgnoreCase))
+                                    .FirstOrDefault();
+
+                if (tp == null)
+                    complexType.Properties.Add(new ComplexTypeProperty { Name = prop.Name, Type = prop.Type });
+
+                // Otherwise if the property exists then update the type
+                else
+                    tp.Type = prop.Type;
+            }
 
             // Setup pgrid displayer
             var displayer = new ComplexTypePropertyGridDisplayer();
