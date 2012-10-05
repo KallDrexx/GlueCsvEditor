@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FlatRedBall.Instructions.Reflection;
+using System.ComponentModel;
 
 namespace GlueCsvEditor.Data
 {
     public class ComplexTypeDetails
     {
+        [Category("General Information")]
         public string TypeName { get; set; }
+
+        [Category("General Information")]
         public string Namespace { get; set; }
+
+        [Category("General Information")]
         public string ConstructorValues { get; set; }
+
         public List<ComplexTypeProperty> Properties { get; protected set; }
 
         public ComplexTypeDetails()

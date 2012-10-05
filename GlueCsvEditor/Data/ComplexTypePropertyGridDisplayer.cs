@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FlatRedBall.Glue.GuiDisplay;
+using System.ComponentModel;
 
 namespace GlueCsvEditor.Data
 {
@@ -35,6 +36,8 @@ namespace GlueCsvEditor.Data
             ExcludeMember("ConstructorValues");
             ExcludeMember("Properties");
 
+            var propertyCategory = new CategoryAttribute("Properties");
+
             // Add properties
             for (int x = 0; x < complexTypeDetails.Properties.Count; x++)
             {
@@ -52,7 +55,7 @@ namespace GlueCsvEditor.Data
                 };
 
                 Func<object> getter = () => { return complexTypeDetails.Properties[count].Value; };
-                IncludeMember(propertyName, typeof(string), setter, getter);
+                IncludeMember(propertyName, typeof(string), setter, getter, null, new Attribute[] { propertyCategory });
             }
         }
 
