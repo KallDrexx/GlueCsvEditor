@@ -358,6 +358,18 @@ namespace GlueCsvEditor.Controls
             }
         }
 
+        private void btnShowComplexProperties_Click(object sender, EventArgs e)
+        {
+            pgrPropertyEditor.Visible = !pgrPropertyEditor.Visible;
+            if (pgrPropertyEditor.Visible)
+                pgrPropertyEditor.Focus();
+        }
+
+        private void pgrPropertyEditor_Leave(object sender, EventArgs e)
+        {
+            pgrPropertyEditor.Visible = false;
+        }
+
         #endregion
 
         #region Internal Methods
@@ -580,11 +592,11 @@ namespace GlueCsvEditor.Controls
             // Get property information for the type
             var knownProperties = _data.GetKnownProperties(_currentColumnIndex);
             var complexType = ComplexTypeDetails.ParseValue(value);
-            pgrPropertyEditor.Visible = true;
+            btnShowComplexProperties.Visible = true;
 
             if (knownProperties.Count() == 0 && complexType == null)
             {
-                pgrPropertyEditor.Visible = false;
+                btnShowComplexProperties.Visible = false;
                 return;
             }
 
