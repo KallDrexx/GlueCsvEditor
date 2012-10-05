@@ -30,6 +30,8 @@
         {
             this.dgrEditor = new System.Windows.Forms.DataGridView();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.btnShowComplexProperties = new System.Windows.Forms.Button();
+            this.pgrPropertyEditor = new System.Windows.Forms.PropertyGrid();
             this.cmbCelldata = new System.Windows.Forms.ComboBox();
             this.btnPrependRow = new System.Windows.Forms.Button();
             this.btnDeleteRow = new System.Windows.Forms.Button();
@@ -46,7 +48,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
-            this.pgrPropertyEditor = new System.Windows.Forms.PropertyGrid();
             ((System.ComponentModel.ISupportInitialize)(this.dgrEditor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -64,8 +65,8 @@
             this.dgrEditor.Location = new System.Drawing.Point(3, 33);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(421, 424);
-            this.dgrEditor.TabIndex = 3;
+            this.dgrEditor.Size = new System.Drawing.Size(412, 424);
+            this.dgrEditor.TabIndex = 4;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);
             this.dgrEditor.CellEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgrEditor_CellEnter);
@@ -85,6 +86,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.btnShowComplexProperties);
             this.splitContainer1.Panel1.Controls.Add(this.pgrPropertyEditor);
             this.splitContainer1.Panel1.Controls.Add(this.cmbCelldata);
             this.splitContainer1.Panel1.Controls.Add(this.btnPrependRow);
@@ -107,19 +109,43 @@
             this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(660, 493);
-            this.splitContainer1.SplitterDistance = 431;
+            this.splitContainer1.SplitterDistance = 422;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 1;
+            // 
+            // btnShowComplexProperties
+            // 
+            this.btnShowComplexProperties.Location = new System.Drawing.Point(3, 5);
+            this.btnShowComplexProperties.Name = "btnShowComplexProperties";
+            this.btnShowComplexProperties.Size = new System.Drawing.Size(25, 23);
+            this.btnShowComplexProperties.TabIndex = 0;
+            this.btnShowComplexProperties.Text = "...";
+            this.btnShowComplexProperties.UseVisualStyleBackColor = true;
+            this.btnShowComplexProperties.Click += new System.EventHandler(this.btnShowComplexProperties_Click);
+            // 
+            // pgrPropertyEditor
+            // 
+            this.pgrPropertyEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgrPropertyEditor.HelpVisible = false;
+            this.pgrPropertyEditor.Location = new System.Drawing.Point(3, 32);
+            this.pgrPropertyEditor.Name = "pgrPropertyEditor";
+            this.pgrPropertyEditor.Size = new System.Drawing.Size(296, 290);
+            this.pgrPropertyEditor.TabIndex = 14;
+            this.pgrPropertyEditor.ToolbarVisible = false;
+            this.pgrPropertyEditor.Visible = false;
+            this.pgrPropertyEditor.Leave += new System.EventHandler(this.pgrPropertyEditor_Leave);
             // 
             // cmbCelldata
             // 
             this.cmbCelldata.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbCelldata.FormattingEnabled = true;
-            this.cmbCelldata.Location = new System.Drawing.Point(3, 6);
+            this.cmbCelldata.Location = new System.Drawing.Point(34, 5);
             this.cmbCelldata.Name = "cmbCelldata";
-            this.cmbCelldata.Size = new System.Drawing.Size(162, 21);
-            this.cmbCelldata.TabIndex = 0;
+            this.cmbCelldata.Size = new System.Drawing.Size(117, 21);
+            this.cmbCelldata.TabIndex = 1;
             this.cmbCelldata.DropDown += new System.EventHandler(this.cmbCelldata_DropDown);
             this.cmbCelldata.TextChanged += new System.EventHandler(this.cmbCelldata_TextChanged);
             // 
@@ -129,7 +155,7 @@
             this.btnPrependRow.Location = new System.Drawing.Point(3, 463);
             this.btnPrependRow.Name = "btnPrependRow";
             this.btnPrependRow.Size = new System.Drawing.Size(88, 23);
-            this.btnPrependRow.TabIndex = 4;
+            this.btnPrependRow.TabIndex = 5;
             this.btnPrependRow.Text = "Prepend Row";
             this.btnPrependRow.UseVisualStyleBackColor = true;
             this.btnPrependRow.Click += new System.EventHandler(this.btnPrependRow_Click);
@@ -137,10 +163,10 @@
             // btnDeleteRow
             // 
             this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDeleteRow.Location = new System.Drawing.Point(349, 463);
+            this.btnDeleteRow.Location = new System.Drawing.Point(340, 463);
             this.btnDeleteRow.Name = "btnDeleteRow";
             this.btnDeleteRow.Size = new System.Drawing.Size(75, 23);
-            this.btnDeleteRow.TabIndex = 6;
+            this.btnDeleteRow.TabIndex = 7;
             this.btnDeleteRow.Text = "Delete Row";
             this.btnDeleteRow.UseVisualStyleBackColor = true;
             this.btnDeleteRow.Click += new System.EventHandler(this.btnDeleteRow_Click);
@@ -151,7 +177,7 @@
             this.btnAddRow.Location = new System.Drawing.Point(97, 463);
             this.btnAddRow.Name = "btnAddRow";
             this.btnAddRow.Size = new System.Drawing.Size(88, 23);
-            this.btnAddRow.TabIndex = 5;
+            this.btnAddRow.TabIndex = 6;
             this.btnAddRow.Text = "Append Row";
             this.btnAddRow.UseVisualStyleBackColor = true;
             this.btnAddRow.Click += new System.EventHandler(this.btnAddRow_Click);
@@ -159,10 +185,10 @@
             // btnFindNext
             // 
             this.btnFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFindNext.Location = new System.Drawing.Point(334, 4);
+            this.btnFindNext.Location = new System.Drawing.Point(325, 4);
             this.btnFindNext.Name = "btnFindNext";
             this.btnFindNext.Size = new System.Drawing.Size(90, 23);
-            this.btnFindNext.TabIndex = 2;
+            this.btnFindNext.TabIndex = 3;
             this.btnFindNext.Text = "Find Next (F3)";
             this.btnFindNext.UseVisualStyleBackColor = true;
             this.btnFindNext.Click += new System.EventHandler(this.btnFindNext_Click);
@@ -170,10 +196,10 @@
             // txtSearch
             // 
             this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSearch.Location = new System.Drawing.Point(171, 6);
+            this.txtSearch.Location = new System.Drawing.Point(157, 6);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(165, 20);
-            this.txtSearch.TabIndex = 1;
+            this.txtSearch.Size = new System.Drawing.Size(170, 20);
+            this.txtSearch.TabIndex = 2;
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
             this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
             // 
@@ -184,7 +210,7 @@
             this.txtHeaderType.Location = new System.Drawing.Point(12, 133);
             this.txtHeaderType.Name = "txtHeaderType";
             this.txtHeaderType.Size = new System.Drawing.Size(191, 20);
-            this.txtHeaderType.TabIndex = 10;
+            this.txtHeaderType.TabIndex = 11;
             this.txtHeaderType.TextChanged += new System.EventHandler(this.txtHeaderType_TextChanged);
             // 
             // label2
@@ -204,7 +230,7 @@
             this.lstFilteredTypes.Location = new System.Drawing.Point(12, 176);
             this.lstFilteredTypes.Name = "lstFilteredTypes";
             this.lstFilteredTypes.Size = new System.Drawing.Size(191, 121);
-            this.lstFilteredTypes.TabIndex = 11;
+            this.lstFilteredTypes.TabIndex = 12;
             this.lstFilteredTypes.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lstFilteredTypes_MouseDoubleClick);
             // 
             // btnAddColumn
@@ -212,7 +238,7 @@
             this.btnAddColumn.Location = new System.Drawing.Point(10, 3);
             this.btnAddColumn.Name = "btnAddColumn";
             this.btnAddColumn.Size = new System.Drawing.Size(75, 23);
-            this.btnAddColumn.TabIndex = 7;
+            this.btnAddColumn.TabIndex = 8;
             this.btnAddColumn.Text = "Add Column";
             this.btnAddColumn.UseVisualStyleBackColor = true;
             this.btnAddColumn.Click += new System.EventHandler(this.btnAddColumn_Click);
@@ -222,7 +248,7 @@
             this.btnRemove.Location = new System.Drawing.Point(10, 32);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(102, 23);
-            this.btnRemove.TabIndex = 8;
+            this.btnRemove.TabIndex = 9;
             this.btnRemove.Text = "Remove Column";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
@@ -233,7 +259,7 @@
             this.chkIsList.Location = new System.Drawing.Point(12, 334);
             this.chkIsList.Name = "chkIsList";
             this.chkIsList.Size = new System.Drawing.Size(59, 17);
-            this.chkIsList.TabIndex = 13;
+            this.chkIsList.TabIndex = 14;
             this.chkIsList.Text = "Is List?";
             this.chkIsList.UseVisualStyleBackColor = true;
             this.chkIsList.CheckedChanged += new System.EventHandler(this.chkIsList_CheckedChanged);
@@ -244,7 +270,7 @@
             this.chkIsRequired.Location = new System.Drawing.Point(12, 310);
             this.chkIsRequired.Name = "chkIsRequired";
             this.chkIsRequired.Size = new System.Drawing.Size(75, 17);
-            this.chkIsRequired.TabIndex = 12;
+            this.chkIsRequired.TabIndex = 13;
             this.chkIsRequired.Text = "Required?";
             this.chkIsRequired.UseVisualStyleBackColor = true;
             this.chkIsRequired.CheckedChanged += new System.EventHandler(this.chkIsRequired_CheckedChanged);
@@ -274,18 +300,8 @@
             this.txtHeaderName.Location = new System.Drawing.Point(12, 77);
             this.txtHeaderName.Name = "txtHeaderName";
             this.txtHeaderName.Size = new System.Drawing.Size(191, 20);
-            this.txtHeaderName.TabIndex = 9;
+            this.txtHeaderName.TabIndex = 10;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
-            // 
-            // pgrPropertyEditor
-            // 
-            this.pgrPropertyEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pgrPropertyEditor.Location = new System.Drawing.Point(26, 167);
-            this.pgrPropertyEditor.Name = "pgrPropertyEditor";
-            this.pgrPropertyEditor.Size = new System.Drawing.Size(361, 290);
-            this.pgrPropertyEditor.TabIndex = 14;
             // 
             // EditorMain
             // 
@@ -328,5 +344,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtHeaderType;
         private System.Windows.Forms.PropertyGrid pgrPropertyEditor;
+        private System.Windows.Forms.Button btnShowComplexProperties;
     }
 }
