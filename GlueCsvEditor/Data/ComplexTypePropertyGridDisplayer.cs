@@ -39,20 +39,24 @@ namespace GlueCsvEditor.Data
             for (int x = 0; x < complexTypeDetails.Properties.Count; x++)
             {
                 int count = x; // Required for delegates to evaluate properly
-                string propertyName = complexTypeDetails.Properties.Keys.ElementAt(x);
+                string propertyName = complexTypeDetails.Properties[x].Name;
+                if (!string.IsNullOrWhiteSpace(complexTypeDetails.Properties[x].Type))
+                    propertyName = string.Concat(propertyName, " (", complexTypeDetails.Properties[x].Type, ")");
                 
                 // Setup events
                 MemberChangeEventHandler setter = (sender, args) => 
-                { 
-                    complexTypeDetails.Properties[propertyName] = args.Value as string;
+                {
+                    complexTypeDetails.Properties[count].Value = args.Value as string;
                     if (ComplexTypeUpdatedHandler != null)
                         ComplexTypeUpdatedHandler((mInstance as ComplexTypeDetails).ToString());
                 };
 
-                Func<object> getter = () => { return complexTypeDetails.Properties[propertyName]; };
+                Func<object> getter = () => { return complexTypeDetails.Properties[count].Value; };
                 IncludeMember(propertyName, typeof(string), setter, getter);
             }
         }
+
+
 
         public delegate void ComplexTypeUpdatedDelegate(string complexTypeString);
     }

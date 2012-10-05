@@ -125,13 +125,10 @@
             // 
             // pgrPropertyEditor
             // 
-            this.pgrPropertyEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.pgrPropertyEditor.HelpVisible = false;
             this.pgrPropertyEditor.Location = new System.Drawing.Point(3, 32);
             this.pgrPropertyEditor.Name = "pgrPropertyEditor";
-            this.pgrPropertyEditor.Size = new System.Drawing.Size(296, 290);
+            this.pgrPropertyEditor.Size = new System.Drawing.Size(412, 290);
             this.pgrPropertyEditor.TabIndex = 14;
             this.pgrPropertyEditor.ToolbarVisible = false;
             this.pgrPropertyEditor.Visible = false;
