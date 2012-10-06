@@ -19,6 +19,9 @@ namespace GlueCsvEditor.KnownValues
 
         public IEnumerable<string> GetKnownValues(string fullTypeName)
         {
+            if (string.IsNullOrWhiteSpace(fullTypeName))
+                return new string[0];
+
             string typeName = fullTypeName.Substring(fullTypeName.LastIndexOf(".") + 1);
 
             // Parse all custom code and find all classes that are implementations of an interface

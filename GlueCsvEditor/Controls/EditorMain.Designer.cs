@@ -125,6 +125,8 @@
             // 
             // pgrPropertyEditor
             // 
+            this.pgrPropertyEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pgrPropertyEditor.HelpVisible = false;
             this.pgrPropertyEditor.Location = new System.Drawing.Point(3, 32);
             this.pgrPropertyEditor.Name = "pgrPropertyEditor";

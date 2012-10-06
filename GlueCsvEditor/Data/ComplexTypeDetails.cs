@@ -142,7 +142,7 @@ namespace GlueCsvEditor.Data
             // Add defined properties
             if (filledProperties.Count > 0)
             {
-                output.Append(" {");
+                output.Append(" { ");
                 for (int x = 0; x < filledProperties.Count; x++)
                 {
                     var prop = filledProperties[x];

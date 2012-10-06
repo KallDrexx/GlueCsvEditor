@@ -10,6 +10,9 @@ namespace GlueCsvEditor.KnownValues
     {
         public IEnumerable<string> GetKnownValues(string fullTypeName)
         {
+            if (string.IsNullOrWhiteSpace(fullTypeName))
+                return new string[0];
+
             // Try and get the FRB IElement for the fully qualified type name
             if (fullTypeName.IndexOf('.') < 0)
                 return new string[0];

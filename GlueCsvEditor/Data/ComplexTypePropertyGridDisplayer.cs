@@ -9,6 +9,8 @@ namespace GlueCsvEditor.Data
 {
     public class ComplexTypePropertyGridDisplayer : PropertyGridDisplayer
     {
+        protected CsvData _csvData;
+
         public override object Instance
         {
             get
@@ -24,6 +26,11 @@ namespace GlueCsvEditor.Data
         }
 
         public ComplexTypeUpdatedDelegate ComplexTypeUpdatedHandler { get; set; }
+
+        public ComplexTypePropertyGridDisplayer(CsvData csvData)
+        {
+            _csvData = csvData;
+        }
 
         protected void UpdateDisplayedFields(ComplexTypeDetails complexTypeDetails)
         {
@@ -47,6 +54,7 @@ namespace GlueCsvEditor.Data
                     propertyName = string.Concat(propertyName, " (", complexTypeDetails.Properties[x].Type, ")");
                 
                 // Setup events
+                Func<object> getter = () => { return complexTypeDetails.Properties[count].Value; };
                 MemberChangeEventHandler setter = (sender, args) => 
                 {
                     complexTypeDetails.Properties[count].Value = args.Value as string;
@@ -54,12 +62,15 @@ namespace GlueCsvEditor.Data
                         ComplexTypeUpdatedHandler((mInstance as ComplexTypeDetails).ToString());
                 };
 
-                Func<object> getter = () => { return complexTypeDetails.Properties[count].Value; };
-                IncludeMember(propertyName, typeof(string), setter, getter, null, new Attribute[] { propertyCategory });
+                // Setup type converter
+                var knownValues = _csvData.GetKnownValuesForType(complexTypeDetails.Properties[x].Type);
+                TypeConverter converter = null;
+                if (knownValues.Count() > 0)
+                    converter = new AvailableKnownValuesTypeConverter(knownValues);
+
+                IncludeMember(propertyName, typeof(string), setter, getter, converter, new Attribute[] { propertyCategory });
             }
         }
-
-
 
         public delegate void ComplexTypeUpdatedDelegate(string complexTypeString);
     }

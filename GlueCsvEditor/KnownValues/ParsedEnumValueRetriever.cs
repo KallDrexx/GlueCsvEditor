@@ -22,7 +22,7 @@ namespace GlueCsvEditor.KnownValues
             foreach (var enm in _parsedEnums)
             {
                 var enumFullType = string.Concat(enm.Namespace, ".", enm.Name);
-                if (!enumFullType.Equals(fullTypeName, StringComparison.OrdinalIgnoreCase))
+                if (!enumFullType.EndsWith(fullTypeName, StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 // return all the values for the enum
