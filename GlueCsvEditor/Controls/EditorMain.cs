@@ -602,7 +602,7 @@ namespace GlueCsvEditor.Controls
 
             // If the complex type coudln't be parsed from the current value, create one manually
             if (complexType == null)
-                complexType = new ComplexTypeDetails { TypeName = type };
+                complexType = new ComplexTypeDetails { Namespace = ns, TypeName = type };
 
             // Go through all the properties and add any "known ones" that weren't part of the parsed set
             foreach (var prop in knownProperties)
@@ -620,7 +620,7 @@ namespace GlueCsvEditor.Controls
             }
 
             // Setup pgrid displayer
-            var displayer = new ComplexTypePropertyGridDisplayer();
+            var displayer = new ComplexTypePropertyGridDisplayer(_data);
             displayer.ComplexTypeUpdatedHandler = ComplexTypeUpdated;
             displayer.Instance = complexType;
             displayer.PropertyGrid = pgrPropertyEditor;
