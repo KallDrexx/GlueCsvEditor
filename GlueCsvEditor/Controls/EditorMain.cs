@@ -544,7 +544,7 @@ namespace GlueCsvEditor.Controls
         {
             cmbCelldata.Items.Clear();
             var knownValues = _data.GetKnownValues(_currentColumnIndex);
-            foreach (string value in knownValues)
+            foreach (string value in knownValues.Where(x => !string.IsNullOrWhiteSpace(x)))
                 cmbCelldata.Items.Add(value);
         }
 
