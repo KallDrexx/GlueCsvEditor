@@ -141,13 +141,18 @@ namespace GlueCsvEditor.Controls
             if (_dataLoading)
                 return;
 
+            _data.AddColumn(e.Column.Index);
+            SaveCsv();
+
             // If the new column is the first column, blank out all the header cell values
             if (e.Column.Index == 0)
                 foreach (DataGridViewRow row in dgrEditor.Rows)
                     row.HeaderCell.Value = string.Empty;
 
-            _data.AddColumn(e.Column.Index);
-            SaveCsv();
+            // Update the header text for the new column
+            // Update the column header
+            var header = _data.GetHeaderText()[e.Column.Index];
+            dgrEditor.Columns[e.Column.Index].HeaderText = header;
         }
 
         private void dgrEditor_ColumnRemoved(object sender, DataGridViewColumnEventArgs e)

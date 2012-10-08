@@ -56,9 +56,11 @@ namespace GlueCsvEditor.Data
         /// <param name="index"></param>
         public void AddColumn(int index)
         {
+            string headerName = "NewColumn" + index;
+
             // Add this column to the RCR
             var headers = new List<CsvHeader>(_csv.Headers);
-            headers.Insert(index, new CsvHeader { Name = string.Empty, OriginalText = string.Empty });
+            headers.Insert(index, new CsvHeader { Name = headerName, OriginalText = headerName + " (string)" });
             _csv.Headers = headers.ToArray();
 
             // Add the column to all the records
