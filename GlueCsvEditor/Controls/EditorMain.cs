@@ -33,6 +33,8 @@ namespace GlueCsvEditor.Controls
         protected bool _ignoreNextFileChange;
         protected CsvData _data;
         protected IEnumerable<string> _knownTypes;
+        protected int _originalGridTop;
+        protected int _originalHeight;
 
         #endregion
 
@@ -357,12 +359,23 @@ namespace GlueCsvEditor.Controls
         {
             pgrPropertyEditor.Visible = !pgrPropertyEditor.Visible;
             if (pgrPropertyEditor.Visible)
+            {
+                // Resize the data grid
+                _originalGridTop = dgrEditor.Top;
+                _originalHeight = dgrEditor.Height;
+                dgrEditor.Height = dgrEditor.Bottom - pgrPropertyEditor.Bottom;
+                dgrEditor.Top = pgrPropertyEditor.Bottom;
                 pgrPropertyEditor.Focus();
+            }
         }
 
         private void pgrPropertyEditor_Leave(object sender, EventArgs e)
         {
             pgrPropertyEditor.Visible = false;
+
+            // Reset the property grid sizing
+            dgrEditor.Top = _originalGridTop;
+            dgrEditor.Height = _originalHeight;
         }
 
         #endregion
