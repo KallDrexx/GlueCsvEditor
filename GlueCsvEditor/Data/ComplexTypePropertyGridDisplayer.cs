@@ -20,7 +20,7 @@ namespace GlueCsvEditor.Data
             set
             {
                 mInstance = value;
-                UpdateDisplayedFields(value as ComplexTypeDetails);
+                UpdateDisplayedFields(value as ComplexCsvTypeDetails);
                 base.Instance = value;
             }
         }
@@ -32,7 +32,7 @@ namespace GlueCsvEditor.Data
             _csvData = csvData;
         }
 
-        protected void UpdateDisplayedFields(ComplexTypeDetails complexTypeDetails)
+        protected void UpdateDisplayedFields(ComplexCsvTypeDetails complexTypeDetails)
         {
             if (complexTypeDetails == null)
                 return;
@@ -59,7 +59,7 @@ namespace GlueCsvEditor.Data
                 {
                     complexTypeDetails.Properties[count].Value = args.Value as string;
                     if (ComplexTypeUpdatedHandler != null)
-                        ComplexTypeUpdatedHandler((mInstance as ComplexTypeDetails).ToString());
+                        ComplexTypeUpdatedHandler((mInstance as ComplexCsvTypeDetails).ToString());
                 };
 
                 // Setup type converter

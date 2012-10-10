@@ -75,7 +75,7 @@
     </Compile>
     <Compile Include="CsvEditorPlugin.cs" />
     <Compile Include="Data\AvailableKnownValuesTypeConverter.cs" />
-    <Compile Include="Data\ComplexTypeDetails.cs" />
+    <Compile Include="Data\ComplexCsvTypeDetails.cs" />
     <Compile Include="Data\ComplexTypeProperty.cs" />
     <Compile Include="Data\ComplexTypePropertyGridDisplayer.cs" />
     <Compile Include="Data\CsvColumnHeader.cs" />
