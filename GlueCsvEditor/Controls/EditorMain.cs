@@ -17,6 +17,7 @@ using FlatRedBall.Glue.SaveClasses;
 using FlatRedBall.Glue;
 using FlatRedBall.Glue.Parsing;
 using Microsoft.Build.BuildEngine;
+using System.Reflection;
 
 namespace GlueCsvEditor.Controls
 {
@@ -66,6 +67,7 @@ namespace GlueCsvEditor.Controls
 
         private void EditorMain_Load(object sender, EventArgs e)
         {
+            SetDoubleBuffered(true);
             LoadCsv();
         }
 
@@ -117,23 +119,7 @@ namespace GlueCsvEditor.Controls
             _currentColumnIndex = e.ColumnIndex;
             _currentRowIndex = e.RowIndex;
 
-            _dataLoading = true;
-
-            // Update the selected header
-            var header = _data.GetHeaderDetails(_currentColumnIndex);
-            txtHeaderName.Text = header.Name;
-            txtHeaderType.Text = header.Type;
-            chkIsList.Checked = header.IsList;
-            chkIsRequired.Checked = header.IsRequired;
-
-            // Setup the combobox
-            string value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
-            cmbCelldata.Text = value;
-            FilterKnownTypes();
-
-            UpdatePropertiesDisplay(header.Type, value);
-
-            _dataLoading = false;
+            UpdateCellDisplays();
         }
 
         private void dgrEditor_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
@@ -642,6 +628,34 @@ namespace GlueCsvEditor.Controls
         protected void ComplexTypeUpdated(string complexTypeString)
         {
             dgrEditor[_currentColumnIndex, _currentRowIndex].Value = complexTypeString;
+        }
+
+        protected void UpdateCellDisplays()
+        {
+            _dataLoading = true;
+
+            // Update the selected header information
+            var header = _data.GetHeaderDetails(_currentColumnIndex);
+            txtHeaderName.Text = header.Name;
+            txtHeaderType.Text = header.Type;
+            chkIsList.Checked = header.IsList;
+            chkIsRequired.Checked = header.IsRequired;
+            FilterKnownTypes();
+
+            // Setup the combobox
+            string value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+            cmbCelldata.Text = value;
+
+            UpdatePropertiesDisplay(header.Type, value);
+
+            _dataLoading = false;
+        }
+
+        protected void SetDoubleBuffered(bool setting)
+        {
+            Type dgvType = dgrEditor.GetType();
+            var pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
+            pi.SetValue(dgrEditor, setting, null);
         }
 
         #endregion
