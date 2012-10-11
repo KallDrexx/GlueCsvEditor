@@ -27,6 +27,8 @@ namespace GlueCsvEditor.Controls
 
         protected IGlueCommands _glueCommands;
         protected IGlueState _gluState;
+        protected int _lastColumnIndex = -1;
+        protected int _lastRowIndex = -1;
         protected int _currentColumnIndex = 0;
         protected int _currentRowIndex = 0;
         protected bool _dataLoading;
@@ -36,6 +38,7 @@ namespace GlueCsvEditor.Controls
         protected IEnumerable<string> _knownTypes;
         protected int _originalGridTop;
         protected int _originalHeight;
+        protected List<Keys> _downArrowKeys;
 
         #endregion
 
@@ -51,6 +54,7 @@ namespace GlueCsvEditor.Controls
 
             // Load all the data
             _data = new CsvData(csvPath, delimiter);
+            _downArrowKeys = new List<Keys>();
         }
 
         public void NotifyOfCsvUpdate()
@@ -116,10 +120,14 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
+            _lastColumnIndex = _currentColumnIndex;
+            _lastRowIndex = _currentRowIndex;
             _currentColumnIndex = e.ColumnIndex;
             _currentRowIndex = e.RowIndex;
 
-            UpdateCellDisplays();
+            // If no arrow keys are currently being pressed, update the cell displays
+            if (_downArrowKeys.Count == 0)
+                UpdateCellDisplays();
         }
 
         private void dgrEditor_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
@@ -168,6 +176,8 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
+            var arrowKeys = new Keys[] { Keys.Down, Keys.Up, Keys.Left, Keys.Right };
+
             if (e.KeyCode == System.Windows.Forms.Keys.V && e.Control)
             {
                 string data = Clipboard.GetData(DataFormats.Text).ToString();
@@ -191,6 +201,32 @@ namespace GlueCsvEditor.Controls
                 dgrEditor[_currentColumnIndex, _currentRowIndex].Value = string.Empty;
                 e.Handled = true;
             }
+
+            // If an arrow key is pushed, note it down
+            else if (arrowKeys.Contains(e.KeyCode))
+            {
+                if (!_downArrowKeys.Contains(e.KeyCode))
+                    _downArrowKeys.Add(e.KeyCode);
+            }
+        }
+
+        private void dgrEditor_KeyUp(object sender, KeyEventArgs e)
+        {
+            var arrowKeys = new Keys[] { Keys.Down, Keys.Up, Keys.Left, Keys.Right };
+            if (arrowKeys.Contains(e.KeyCode))
+            {
+                if (_downArrowKeys.Contains(e.KeyCode))
+                    _downArrowKeys.Remove(e.KeyCode);
+
+                if (_downArrowKeys.Count == 0)
+                    UpdateCellDisplays();
+            }
+        }
+
+        private void dgrEditor_Leave(object sender, EventArgs e)
+        {
+            // Clear out all the known pressed keys
+            _downArrowKeys.Clear();
         }
 
         private void btnAddRow_Click(object sender, EventArgs e)
@@ -636,11 +672,16 @@ namespace GlueCsvEditor.Controls
 
             // Update the selected header information
             var header = _data.GetHeaderDetails(_currentColumnIndex);
-            txtHeaderName.Text = header.Name;
-            txtHeaderType.Text = header.Type;
-            chkIsList.Checked = header.IsList;
-            chkIsRequired.Checked = header.IsRequired;
-            FilterKnownTypes();
+
+            // Only update the header details if we changed columns
+            if (_lastColumnIndex != _currentColumnIndex)
+            {
+                txtHeaderName.Text = header.Name;
+                txtHeaderType.Text = header.Type;
+                chkIsList.Checked = header.IsList;
+                chkIsRequired.Checked = header.IsRequired;
+                FilterKnownTypes();
+            }
 
             // Setup the combobox
             string value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
