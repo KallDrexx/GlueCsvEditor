@@ -33,6 +33,8 @@ namespace GlueCsvEditor.Controls
         protected bool _ignoreNextFileChange;
         protected CsvData _data;
         protected IEnumerable<string> _knownTypes;
+        protected int _originalGridTop;
+        protected int _originalHeight;
 
         #endregion
 
@@ -125,8 +127,11 @@ namespace GlueCsvEditor.Controls
             chkIsRequired.Checked = header.IsRequired;
 
             // Setup the combobox
-            cmbCelldata.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+            string value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+            cmbCelldata.Text = value;
             FilterKnownTypes();
+
+            UpdatePropertiesDisplay(header.Type, value);
 
             _dataLoading = false;
         }
@@ -355,6 +360,29 @@ namespace GlueCsvEditor.Controls
             }
         }
 
+        private void btnShowComplexProperties_Click(object sender, EventArgs e)
+        {
+            pgrPropertyEditor.Visible = !pgrPropertyEditor.Visible;
+            if (pgrPropertyEditor.Visible)
+            {
+                // Resize the data grid
+                _originalGridTop = dgrEditor.Top;
+                _originalHeight = dgrEditor.Height;
+                dgrEditor.Height = dgrEditor.Bottom - pgrPropertyEditor.Bottom;
+                dgrEditor.Top = pgrPropertyEditor.Bottom;
+                pgrPropertyEditor.Focus();
+            }
+        }
+
+        private void pgrPropertyEditor_Leave(object sender, EventArgs e)
+        {
+            pgrPropertyEditor.Visible = false;
+
+            // Reset the property grid sizing
+            dgrEditor.Top = _originalGridTop;
+            dgrEditor.Height = _originalHeight;
+        }
+
         #endregion
 
         #region Internal Methods
@@ -560,6 +588,60 @@ namespace GlueCsvEditor.Controls
                            .ToList();
 
             lstFilteredTypes.ClearSelected();
+        }
+
+        protected void UpdatePropertiesDisplay(string type, string value)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+                return;
+
+            string ns = string.Empty;
+            if (type.Contains(".") && type.Last() != '.')
+            {
+                ns = type.Remove(type.LastIndexOf('.'));
+                type = type.Substring(type.LastIndexOf('.') + 1);
+            }
+
+            // Get property information for the type
+            var knownProperties = _data.GetKnownProperties(_currentColumnIndex);
+            var complexType = ComplexCsvTypeDetails.ParseValue(value);
+            btnShowComplexProperties.Visible = true;
+
+            if (knownProperties.Count() == 0 && complexType == null)
+            {
+                btnShowComplexProperties.Visible = false;
+                return;
+            }
+
+            // If the complex type coudln't be parsed from the current value, create one manually
+            if (complexType == null)
+                complexType = new ComplexCsvTypeDetails { Namespace = ns, TypeName = type };
+
+            // Go through all the properties and add any "known ones" that weren't part of the parsed set
+            foreach (var prop in knownProperties)
+            {
+                var tp = complexType.Properties
+                                    .Where(x => x.Name.Equals(prop.Name, StringComparison.OrdinalIgnoreCase))
+                                    .FirstOrDefault();
+
+                if (tp == null)
+                    complexType.Properties.Add(new ComplexTypeProperty { Name = prop.Name, Type = prop.Type });
+
+                // Otherwise if the property exists then update the type
+                else
+                    tp.Type = prop.Type;
+            }
+
+            // Setup pgrid displayer
+            var displayer = new ComplexTypePropertyGridDisplayer(_data);
+            displayer.ComplexTypeUpdatedHandler = ComplexTypeUpdated;
+            displayer.Instance = complexType;
+            displayer.PropertyGrid = pgrPropertyEditor;
+        }
+
+        protected void ComplexTypeUpdated(string complexTypeString)
+        {
+            dgrEditor[_currentColumnIndex, _currentRowIndex].Value = complexTypeString;
         }
 
         #endregion

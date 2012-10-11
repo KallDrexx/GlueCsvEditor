@@ -315,18 +315,33 @@ namespace GlueCsvEditor.Data
         /// <param name="row"></param>
         public IEnumerable<string> GetKnownValues(int column)
         {
+            string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[column].OriginalText);
+
+            // Remove the List<> if exists
+            type = type.Replace("List<", "").Replace(">", "");
+
+            var foundTypes = GetKnownValuesForType(type);
+            if (foundTypes.Count() == 0)
+                return new UsedRcrColumnValueRetriever(_csv, column).GetKnownValues(type);
+
+            return foundTypes;
+        }
+
+        public IEnumerable<string> GetKnownValuesForType(string type)
+        {
+            // Remove the List<> if exists
+            type = type.Replace("List<", "").Replace(">", "");
+
             // This list is prioritized.  The first retriever to get a value is the only one used
             var knownValueRetrievers = new List<IKnownValueRetriever>()
             {
                 new EnumReflectionValueRetriever(),
                 new FrbStateValueRetriever(),
                 new ParsedEnumValueRetriever(_parsedEnums),
-                new InterfaceImplementationsValueRetriever(_parsedClasses),
-                new UsedRcrColumnValueRetriever(_csv, column)
+                new InterfaceImplementationsValueRetriever(_parsedClasses)
             };
 
             // Loop through the value retrievers until one returns a valid results
-            string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[column].OriginalText);
             foreach (var retriever in knownValueRetrievers)
             {
                 var values = retriever.GetKnownValues(type);
@@ -336,6 +351,31 @@ namespace GlueCsvEditor.Data
 
             // No values were found
             return new string[0];
+        }
+
+        public IEnumerable<ComplexTypeProperty> GetKnownProperties(int columnIndex)
+        {
+            string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[columnIndex].OriginalText);
+
+            // Remove the List<> if exists
+            type = type.Replace("List<", "").Replace(">", "");
+
+            // Check if the type matches a ParsedClass
+            var parsedClass =
+                _parsedClasses.FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(type, StringComparison.OrdinalIgnoreCase));
+
+            if (parsedClass != null)
+            {
+                return parsedClass.ParsedProperties
+                                  .Select(x => new ComplexTypeProperty
+                                  {
+                                      Name = x.Name,
+                                      Type = x.Type.Name
+                                  })
+                                  .ToArray();
+            }
+
+            return new ComplexTypeProperty[0];
         }
 
         protected void LoadCachedData()

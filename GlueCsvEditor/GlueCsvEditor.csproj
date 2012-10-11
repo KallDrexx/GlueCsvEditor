@@ -40,6 +40,9 @@
       <HintPath>Libraries\XnaPc\FlatRedBall.dll</HintPath>
     </Reference>
     <Reference Include="FlatRedBall.Plugin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="FlatRedBall.PropertyGrid">
+      <HintPath>Libraries\XnaPc\FlatRedBall.PropertyGrid.dll</HintPath>
+    </Reference>
     <Reference Include="Glue, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <ExecutableExtension>.exe</ExecutableExtension>
@@ -71,6 +74,10 @@
       <DependentUpon>EditorMain.cs</DependentUpon>
     </Compile>
     <Compile Include="CsvEditorPlugin.cs" />
+    <Compile Include="Data\AvailableKnownValuesTypeConverter.cs" />
+    <Compile Include="Data\ComplexCsvTypeDetails.cs" />
+    <Compile Include="Data\ComplexTypeProperty.cs" />
+    <Compile Include="Data\ComplexTypePropertyGridDisplayer.cs" />
     <Compile Include="Data\CsvColumnHeader.cs" />
     <Compile Include="Data\CsvData.cs" />
     <Compile Include="Data\FoundCell.cs" />
