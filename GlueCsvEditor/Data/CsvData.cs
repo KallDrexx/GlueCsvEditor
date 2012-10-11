@@ -356,23 +356,25 @@ namespace GlueCsvEditor.Data
         public IEnumerable<ComplexTypeProperty> GetKnownProperties(int columnIndex)
         {
             string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[columnIndex].OriginalText);
-
-            // Remove the List<> if exists
-            type = type.Replace("List<", "").Replace(">", "");
-
-            // Check if the type matches a ParsedClass
-            var parsedClass =
-                _parsedClasses.FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(type, StringComparison.OrdinalIgnoreCase));
-
-            if (parsedClass != null)
+            if (!string.IsNullOrWhiteSpace(type))
             {
-                return parsedClass.ParsedProperties
-                                  .Select(x => new ComplexTypeProperty
-                                  {
-                                      Name = x.Name,
-                                      Type = x.Type.Name
-                                  })
-                                  .ToArray();
+                // Remove the List<> if exists
+                type = type.Replace("List<", "").Replace(">", "");
+
+                // Check if the type matches a ParsedClass
+                var parsedClass =
+                    _parsedClasses.FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(type, StringComparison.OrdinalIgnoreCase));
+
+                if (parsedClass != null)
+                {
+                    return parsedClass.ParsedProperties
+                                      .Select(x => new ComplexTypeProperty
+                                      {
+                                          Name = x.Name,
+                                          Type = x.Type.Name
+                                      })
+                                      .ToArray();
+                }
             }
 
             return new ComplexTypeProperty[0];
