@@ -290,6 +290,7 @@ namespace GlueCsvEditor.Controls
                 SaveCsv();
 
                 dgrEditor.RowCount = _data.GetRecordCount();
+                dgrEditor.Invalidate();
                 RefreshRowHeaders();
             }
         }
