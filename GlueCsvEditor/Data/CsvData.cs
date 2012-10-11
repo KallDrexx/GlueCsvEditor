@@ -329,11 +329,13 @@ namespace GlueCsvEditor.Data
 
         public IEnumerable<string> GetKnownValuesForType(string type)
         {
-            // Remove the List<> if exists
-            type = type.Replace("List<", "").Replace(">", "");
+            if (type != null)
+            {
+                // Remove the List<> if exists
+                type = type.Replace("List<", "").Replace(">", "");
 
-            // This list is prioritized.  The first retriever to get a value is the only one used
-            var knownValueRetrievers = new List<IKnownValueRetriever>()
+                // This list is prioritized.  The first retriever to get a value is the only one used
+                var knownValueRetrievers = new List<IKnownValueRetriever>()
             {
                 new EnumReflectionValueRetriever(),
                 new FrbStateValueRetriever(),
@@ -341,12 +343,13 @@ namespace GlueCsvEditor.Data
                 new InterfaceImplementationsValueRetriever(_parsedClasses)
             };
 
-            // Loop through the value retrievers until one returns a valid results
-            foreach (var retriever in knownValueRetrievers)
-            {
-                var values = retriever.GetKnownValues(type);
-                if (values.Count() > 0)
-                    return values;
+                // Loop through the value retrievers until one returns a valid results
+                foreach (var retriever in knownValueRetrievers)
+                {
+                    var values = retriever.GetKnownValues(type);
+                    if (values.Count() > 0)
+                        return values;
+                }
             }
 
             // No values were found
