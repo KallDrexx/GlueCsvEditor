@@ -316,6 +316,7 @@ namespace GlueCsvEditor.Data
         public IEnumerable<string> GetKnownValues(int column)
         {
             string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[column].OriginalText);
+            type = type ?? string.Empty;
 
             // Remove the List<> if exists
             type = type.Replace("List<", "").Replace(">", "");

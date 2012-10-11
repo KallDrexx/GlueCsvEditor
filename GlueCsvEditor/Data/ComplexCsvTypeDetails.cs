@@ -43,7 +43,7 @@ namespace GlueCsvEditor.Data
                 return null; // Invalid format
 
             // Isolate the type string
-            string isolatedTypeString = value.Substring(3, start - 1 - 3);
+            string isolatedTypeString = value.Substring(3, start - 3);
             if (isolatedTypeString.Contains("."))
             {
                 result.Namespace = isolatedTypeString.Remove(isolatedTypeString.LastIndexOf(".")).Trim();
