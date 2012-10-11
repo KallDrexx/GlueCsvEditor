@@ -115,6 +115,9 @@ namespace GlueCsvEditor.Controls
             // Since this is set in BeginEdit we need to end it here
             _currentlyEditing = false;
 
+            // Update the display
+            UpdateCellDisplays(true);
+
             _dataLoading = false;
         }
 
@@ -251,6 +254,7 @@ namespace GlueCsvEditor.Controls
 
             dgrEditor.RowCount = _data.GetRecordCount();
             RefreshRowHeaders();
+            UpdateCellDisplays(true);
         }
 
         private void btnDeleteRow_Click(object sender, EventArgs e)
@@ -666,7 +670,7 @@ namespace GlueCsvEditor.Controls
             dgrEditor[_currentColumnIndex, _currentRowIndex].Value = complexTypeString;
         }
 
-        protected void UpdateCellDisplays()
+        protected void UpdateCellDisplays(bool forceUpdate = false)
         {
             _dataLoading = true;
 
@@ -674,7 +678,7 @@ namespace GlueCsvEditor.Controls
             var header = _data.GetHeaderDetails(_currentColumnIndex);
 
             // Only update the header details if we changed columns
-            if (_lastColumnIndex != _currentColumnIndex)
+            if (_lastColumnIndex != _currentColumnIndex || forceUpdate)
             {
                 txtHeaderName.Text = header.Name;
                 txtHeaderType.Text = header.Type;
