@@ -73,6 +73,18 @@
     <Compile Include="Controls\EditorMain.Designer.cs">
       <DependentUpon>EditorMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\EntityDesigner.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\EntityDesigner.Designer.cs">
+      <DependentUpon>EntityDesigner.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GridView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\GridView.Designer.cs">
+      <DependentUpon>GridView.cs</DependentUpon>
+    </Compile>
     <Compile Include="CsvEditorPlugin.cs" />
     <Compile Include="Data\AvailableKnownValuesTypeConverter.cs" />
     <Compile Include="Data\ComplexCsvTypeDetails.cs" />
@@ -92,6 +104,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Controls\EditorMain.resx">
       <DependentUpon>EditorMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\EntityDesigner.resx">
+      <DependentUpon>EntityDesigner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GridView.resx">
+      <DependentUpon>GridView.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
