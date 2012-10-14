@@ -587,6 +587,11 @@ namespace GlueCsvEditor.Controls
             return results;
         }
 
+        protected void AddProjectTypesToKnownTypes()
+        {
+
+        }
+
         protected void SetupCellKnownValuesComboBox()
         {
             cmbCelldata.Items.Clear();

@@ -25,6 +25,7 @@ namespace GlueCsvEditor.Controls
     {
         protected CsvData _csvData;
         protected GridView _gridView;
+        protected CachedTypes _cachedTypes;
 
         public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath, char delimiter)
         {
@@ -32,7 +33,8 @@ namespace GlueCsvEditor.Controls
             this.Dock = DockStyle.Fill;
 
             // Load all the data
-            _csvData = new CsvData(csvPath, delimiter);
+            _cachedTypes = new CachedTypes();
+            _csvData = new CsvData(csvPath, _cachedTypes, delimiter);
         }
 
         public void NotifyOfCsvUpdate()
