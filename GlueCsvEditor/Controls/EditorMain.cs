@@ -33,7 +33,7 @@ namespace GlueCsvEditor.Controls
             this.Dock = DockStyle.Fill;
 
             // Load all the data
-            _cachedTypes = new CachedTypes();
+            _cachedTypes = new CachedTypes(CachedTypesReadyHandler);
             _csvData = new CsvData(csvPath, _cachedTypes, delimiter);
         }
 
@@ -56,6 +56,11 @@ namespace GlueCsvEditor.Controls
         {
             _csvData.Reload();
             _gridView.ReloadCsvDisplay();
+        }
+
+        protected void CachedTypesReadyHandler()
+        {
+            _gridView.CachedTypesReady();
         }
     }
 }

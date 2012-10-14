@@ -23,6 +23,13 @@ namespace GlueCsvEditor.Data
         protected List<ScreenSave> _screens;
         protected List<Type> _assemblyEnums;
 
+        public delegate void CachedTypesReadyHandler();
+
+        public CachedTypes(CachedTypesReadyHandler typesReadyHandler = null)
+        {
+            StartCacheTask(typesReadyHandler);
+        }
+
         public bool IsCacheReady
         {
             get
@@ -119,12 +126,7 @@ namespace GlueCsvEditor.Data
             }
         }
 
-        public CachedTypes()
-        {
-            StartCacheTask();
-        }
-
-        protected void StartCacheTask()
+        protected void StartCacheTask(CachedTypesReadyHandler typesReadyHandler)
         {
             new Task(() =>
             {
@@ -184,6 +186,10 @@ namespace GlueCsvEditor.Data
                 }
 
                 PluginManager.ReceiveOutput("Caching of project types completed");
+
+                // Run the CachedTypesHandler delegate
+                if (typesReadyHandler != null)
+                    typesReadyHandler();
 
             }).Start();
         }

@@ -47,6 +47,7 @@ namespace GlueCsvEditor.Controls
             _data = data;
             _cachedTypes = cachedTypes;
             _downArrowKeys = new List<Keys>();
+            _knownTypes = new string[0];
 
             InitializeComponent();
         }
@@ -81,9 +82,6 @@ namespace GlueCsvEditor.Controls
             RefreshRowHeaders();
             this.ResumeLayout();
 
-            // Load all the known types
-            _knownTypes = _cachedTypes.KnownTypes;
-
             // Reset the current column count so we are sure the CellEnter event
             //  so we can guarantee that the cell displays are updated
             _currentColumnIndex = -1; 
@@ -112,6 +110,22 @@ namespace GlueCsvEditor.Controls
             _dataLoading = false;
         }
 
+        public void CachedTypesReady()
+        {
+            // Make sure this call is done in the control's thread
+            this.Invoke((MethodInvoker)delegate
+            {
+                lstFilteredTypes.Enabled = true;
+                cmbCelldata.Enabled = true;
+                btnShowComplexProperties.Enabled = true;
+
+                // Load all the known types
+                _knownTypes = _cachedTypes.KnownTypes;
+                FilterKnownTypes();
+                UpdateCellDisplays(true);
+            });
+        }
+
         #endregion
 
         #region Form Events
@@ -121,6 +135,11 @@ namespace GlueCsvEditor.Controls
             Dock = DockStyle.Fill;
             SetDoubleBuffered(true);
             ReloadCsvDisplay();
+
+            // Disable any controls that rely on the cached types
+            btnShowComplexProperties.Enabled = false;
+            lstFilteredTypes.Enabled = false;
+            cmbCelldata.Enabled = false;
         }
 
         private void txtHeaderName_TextChanged(object sender, EventArgs e)
