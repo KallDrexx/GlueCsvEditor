@@ -30,6 +30,7 @@ namespace GlueCsvEditor.Controls
         protected int _originalGridTop;
         protected int _originalHeight;
         protected List<Keys> _downArrowKeys;
+        protected CachedTypes _cachedTypes;
 
         #endregion 
 
@@ -41,9 +42,10 @@ namespace GlueCsvEditor.Controls
 
         #region Public Methods
 
-        public GridView(CsvData data)
+        public GridView(CsvData data, CachedTypes cachedTypes)
         {
             _data = data;
+            _cachedTypes = cachedTypes;
             _downArrowKeys = new List<Keys>();
 
             InitializeComponent();
@@ -80,7 +82,7 @@ namespace GlueCsvEditor.Controls
             this.ResumeLayout();
 
             // Load all the known types
-            _knownTypes = GetKnownTypes();
+            _knownTypes = _cachedTypes.KnownTypes;
 
             // Reset the current column count so we are sure the CellEnter event
             //  so we can guarantee that the cell displays are updated
@@ -497,99 +499,6 @@ namespace GlueCsvEditor.Controls
                 return;
 
             dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
-        }
-
-        protected string[] GetKnownTypes()
-        {
-            // Instantiate the types list with basic value types
-            var types = new List<string>()
-            {
-                "bool", "double", "float", "int", "Matrix", "string", "Texture2D", "Vector2", "Vector3",
-                "Vector4", "Color"
-            };
-
-            // Get all enumerations via reflection
-            var enums = AppDomain.CurrentDomain
-                                 .GetAssemblies()
-                                 .SelectMany(x => x.GetTypes())
-                                 .Where(x => x.IsEnum)
-                                 .Select(x => x.FullName)
-                                 .ToArray();
-
-            types.AddRange(enums);
-
-            // Add all FRB states
-            var entityStates = ObjectFinder.Self.GlueProject.Entities.SelectMany(x => GetGlueStateNamespaces(x)).ToList();
-            var screenStates = ObjectFinder.Self.GlueProject.Screens.SelectMany(x => GetGlueStateNamespaces(x)).ToList();
-            types.AddRange(entityStates);
-            types.AddRange(screenStates);
-
-            // Get project types
-            var projectTypes = GetProjectTypes();
-            types.AddRange(projectTypes);
-
-            return types.Distinct().OrderBy(x => x).ToArray();
-        }
-
-        protected IEnumerable<string> GetGlueStateNamespaces(EntitySave entity)
-        {
-            string ns = string.Concat(ProjectManager.ProjectNamespace,
-                                      ".",
-                                      entity.Name.Replace("\\", "."),
-                                      ".");
-
-            var states = new List<string>() { ns + "VariableState" };
-            states.AddRange(entity.StateCategoryList
-                                  .Where(x => !x.SharesVariablesWithOtherCategories)
-                                  .Select(x => ns + x.Name)
-                                  .ToArray());
-
-            return states;
-        }
-
-        protected IEnumerable<string> GetGlueStateNamespaces(ScreenSave entity)
-        {
-            string ns = string.Concat(ProjectManager.ProjectNamespace,
-                                      ".",
-                                      entity.Name.Replace("\\", "."),
-                                      ".");
-
-            var states = new List<string>() { ns + "VariableState" };
-            states.AddRange(entity.StateCategoryList
-                                  .Where(x => !x.SharesVariablesWithOtherCategories)
-                                  .Select(x => ns + x.Name)
-                                  .ToArray());
-
-            return states;
-        }
-
-        protected IEnumerable<string> GetProjectTypes()
-        {
-            var results = new List<string>();
-            var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
-            string baseDirectory = ProjectManager.ProjectBase.Directory;
-
-            foreach (var item in items)
-            {
-                var file = new ParsedFile(baseDirectory + item.Include);
-                foreach (var ns in file.Namespaces)
-                {
-                    // Add all the classes in the namespace
-                    foreach (var cls in ns.Classes)
-                        results.Add(string.Concat(cls.Namespace, ".", cls.Name));
-
-                    // Add enums
-                    foreach (var enm in ns.Enums)
-                        results.Add(string.Concat(enm.Namespace, ".", enm.Name));
-                }
-            }
-
-            return results;
-        }
-
-        protected void AddProjectTypesToKnownTypes()
-        {
-
         }
 
         protected void SetupCellKnownValuesComboBox()

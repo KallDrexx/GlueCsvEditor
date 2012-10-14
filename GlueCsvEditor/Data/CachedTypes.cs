@@ -21,6 +21,7 @@ namespace GlueCsvEditor.Data
         protected List<ParsedClass> _parsedPrjectClasses;
         protected List<EntitySave> _entities;
         protected List<ScreenSave> _screens;
+        protected List<Type> _assemblyEnums;
 
         public bool IsCacheReady
         {
@@ -33,25 +34,88 @@ namespace GlueCsvEditor.Data
             }
         }
 
-        public List<ParsedEnum> ProjectEnums 
+        public IEnumerable<ParsedEnum> ProjectEnums
         { 
             get 
             {
                 if (!IsCacheReady)
-                    return new List<ParsedEnum>();
+                    return new ParsedEnum[0];
 
                 return _parsedProjectEnums; 
             } 
         }
 
-        public List<ParsedClass> ProjectClasses
+        public IEnumerable<ParsedClass> ProjectClasses
         {
             get
             {
                 if (!IsCacheReady)
-                    return new List<ParsedClass>();
+                    return new ParsedClass[0];
 
                 return _parsedPrjectClasses;
+            }
+        }
+
+        public IEnumerable<EntitySave> ProjectEntities
+        {
+            get
+            {
+                if (!IsCacheReady)
+                    return new EntitySave[0];
+
+                return _entities;
+            }
+        }
+
+        public IEnumerable<ScreenSave> ProjectScreens
+        {
+            get
+            {
+                if (!IsCacheReady)
+                    return new ScreenSave[0];
+
+                return _screens;
+            }
+        }
+
+        public IEnumerable<string> BaseTypes
+        {
+            get
+            {
+                if (!IsCacheReady)
+                    return new string[0];
+
+                return new string[]
+                {
+                    "bool", "double", "float", "int", "Matrix", "string", "Texture2D", "Vector2", "Vector3",
+                    "Vector4", "Color"
+                };
+            }
+        }
+
+        public IEnumerable<Type> AssemblyEnums
+        {
+            get
+            {
+                if (!IsCacheReady)
+                    return new Type[0];
+
+                return _assemblyEnums;
+            }
+        }
+
+        public IEnumerable<string> KnownTypes
+        {
+            get
+            {
+                if (!IsCacheReady)
+                    return new string[0];
+
+                return BaseTypes.Union(_assemblyEnums.Select(x => x.FullName))
+                                .Union(_entities.SelectMany(x => GetGlueStateNamespaces(x)))
+                                .Union(_screens.SelectMany(x => GetGlueStateNamespaces(x)))
+                                .Union(_parsedPrjectClasses.Select(x => string.Concat(x.Namespace, ".", x.Name)))
+                                .Union(_parsedProjectEnums.Select(x => string.Concat(x.Namespace, ".", x.Name)));
             }
         }
 
@@ -71,6 +135,9 @@ namespace GlueCsvEditor.Data
 
                 try
                 {
+                    PluginManager.ReceiveOutput("Caching of project types for CSV editor has begun.  " +
+                                                "Some functionality will not be available until this is complete");
+
                     // Save all the entity screens and 
                     _entities = ObjectFinder.Self.GlueProject.Entities;
                     _screens = ObjectFinder.Self.GlueProject.Screens;
@@ -91,6 +158,13 @@ namespace GlueCsvEditor.Data
                             _parsedPrjectClasses.AddRange(ns.Classes);
                         }
                     }
+
+                    // Get a list of all enums via reflection
+                    _assemblyEnums = AppDomain.CurrentDomain
+                                              .GetAssemblies()
+                                              .SelectMany(x => x.GetTypes())
+                                              .Where(x => x.IsEnum)
+                                              .ToList();
                 }
                 catch (Exception ex)
                 {
@@ -109,7 +183,41 @@ namespace GlueCsvEditor.Data
                     _cacheReady = true;
                 }
 
+                PluginManager.ReceiveOutput("Caching of project types completed");
+
             }).Start();
+        }
+
+        protected IEnumerable<string> GetGlueStateNamespaces(EntitySave entity)
+        {
+            string ns = string.Concat(ProjectManager.ProjectNamespace,
+                                      ".",
+                                      entity.Name.Replace("\\", "."),
+                                      ".");
+
+            var states = new List<string>() { ns + "VariableState" };
+            states.AddRange(entity.StateCategoryList
+                                  .Where(x => !x.SharesVariablesWithOtherCategories)
+                                  .Select(x => ns + x.Name)
+                                  .ToArray());
+
+            return states;
+        }
+
+        protected IEnumerable<string> GetGlueStateNamespaces(ScreenSave entity)
+        {
+            string ns = string.Concat(ProjectManager.ProjectNamespace,
+                                      ".",
+                                      entity.Name.Replace("\\", "."),
+                                      ".");
+
+            var states = new List<string>() { ns + "VariableState" };
+            states.AddRange(entity.StateCategoryList
+                                  .Where(x => !x.SharesVariablesWithOtherCategories)
+                                  .Select(x => ns + x.Name)
+                                  .ToArray());
+
+            return states;
         }
     }
 }

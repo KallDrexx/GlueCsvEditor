@@ -47,7 +47,7 @@ namespace GlueCsvEditor.Controls
 
         private void EditorMain_Load(object sender, EventArgs e)
         {
-            _gridView = new GridView(_csvData);
+            _gridView = new GridView(_csvData, _cachedTypes);
             Controls.Add(_gridView);
             ReloadCsv();
         }
