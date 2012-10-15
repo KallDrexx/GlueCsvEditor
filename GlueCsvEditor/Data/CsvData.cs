@@ -15,18 +15,15 @@ namespace GlueCsvEditor.Data
     {
         protected string _csvPath;
         protected char _delimiter;
+        protected CachedTypes _cachedTypes;
         protected RuntimeCsvRepresentation _csv;
 
-        // Cached values
-        protected List<ParsedEnum> _parsedEnums;
-        protected List<ParsedClass> _parsedClasses;
-
-        public CsvData(string csvPath, char delimiter = ',')
+        public CsvData(string csvPath, CachedTypes cachedTypes, char delimiter = ',')
         {
             _csvPath = csvPath;
             _delimiter = delimiter;
+            _cachedTypes = cachedTypes;
             Reload();
-            LoadCachedData();
         }
 
         /// <summary>
@@ -330,6 +327,9 @@ namespace GlueCsvEditor.Data
 
         public IEnumerable<string> GetKnownValuesForType(string type)
         {
+            if (!_cachedTypes.IsCacheReady)
+                return new string[0];
+
             if (type != null)
             {
                 // Remove the List<> if exists
@@ -337,12 +337,12 @@ namespace GlueCsvEditor.Data
 
                 // This list is prioritized.  The first retriever to get a value is the only one used
                 var knownValueRetrievers = new List<IKnownValueRetriever>()
-            {
-                new EnumReflectionValueRetriever(),
-                new FrbStateValueRetriever(),
-                new ParsedEnumValueRetriever(_parsedEnums),
-                new InterfaceImplementationsValueRetriever(_parsedClasses)
-            };
+                {
+                    new EnumReflectionValueRetriever(),
+                    new FrbStateValueRetriever(),
+                    new ParsedEnumValueRetriever(_cachedTypes.ProjectEnums),
+                    new InterfaceImplementationsValueRetriever(_cachedTypes.ProjectClasses)
+                };
 
                 // Loop through the value retrievers until one returns a valid results
                 foreach (var retriever in knownValueRetrievers)
@@ -359,6 +359,9 @@ namespace GlueCsvEditor.Data
 
         public IEnumerable<ComplexTypeProperty> GetKnownProperties(int columnIndex)
         {
+            if (!_cachedTypes.IsCacheReady)
+                return new ComplexTypeProperty[0];
+
             string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[columnIndex].OriginalText);
             if (!string.IsNullOrWhiteSpace(type))
             {
@@ -366,8 +369,8 @@ namespace GlueCsvEditor.Data
                 type = type.Replace("List<", "").Replace(">", "");
 
                 // Check if the type matches a ParsedClass
-                var parsedClass =
-                    _parsedClasses.FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(type, StringComparison.OrdinalIgnoreCase));
+                var parsedClass = _cachedTypes.ProjectClasses
+                                              .FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(type, StringComparison.OrdinalIgnoreCase));
 
                 if (parsedClass != null)
                 {
@@ -382,25 +385,6 @@ namespace GlueCsvEditor.Data
             }
 
             return new ComplexTypeProperty[0];
-        }
-
-        protected void LoadCachedData()
-        {
-            _parsedClasses = new List<ParsedClass>();
-            _parsedEnums = new List<ParsedEnum>();
-
-            var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
-            string baseDirectory = ProjectManager.ProjectBase.Directory;
-
-            foreach (var item in items)
-            {
-                var file = new ParsedFile(baseDirectory + item.Include);
-                foreach (var ns in file.Namespaces)
-                {
-                    _parsedEnums.AddRange(ns.Enums);
-                    _parsedClasses.AddRange(ns.Classes);
-                }
-            }
         }
     }
 }
