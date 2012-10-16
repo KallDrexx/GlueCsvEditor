@@ -48,8 +48,14 @@ namespace GlueCsvEditor.Controls
         private void EditorMain_Load(object sender, EventArgs e)
         {
             _gridView = new GridView(_csvData, _cachedTypes);
-            Controls.Add(_gridView);
+            tabGridView.Controls.Add(_gridView);
             ReloadCsv();
+        }
+
+        private void tbcViews_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tbcViews.SelectedTab == tabGridView)
+                _gridView.ReloadCsvDisplay();
         }
 
         protected void ReloadCsv()

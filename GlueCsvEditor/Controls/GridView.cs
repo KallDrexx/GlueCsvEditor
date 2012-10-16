@@ -54,25 +54,21 @@ namespace GlueCsvEditor.Controls
 
         public void ReloadCsvDisplay()
         {
+            this.SuspendLayout();
+            _dataLoading = true;
+
             // Clear the right editor side
             txtHeaderName.Text = string.Empty;
             txtHeaderType.Text = string.Empty;
             chkIsList.Checked = false;
             chkIsList.Checked = false;
-
-            this.SuspendLayout();
-            _dataLoading = true;
-
+            
             // Add the CSV headers to the datagrid
             var headers = _data.GetHeaderText();
 
             dgrEditor.Columns.Clear();
             for (int x = 0; x < headers.Count; x++)
             {
-                //var column = new DataGridViewComboBoxColumn();
-                //column.HeaderText = headers[x];
-                //column.Name = headers[x];
-                //dgrEditor.Columns.Add(column);
                 dgrEditor.Columns.Add(headers[x], headers[x]);
             }
 
@@ -80,7 +76,6 @@ namespace GlueCsvEditor.Controls
             dgrEditor.RowCount = _data.GetRecordCount();
 
             RefreshRowHeaders();
-            this.ResumeLayout();
 
             // Reset the current column count so we are sure the CellEnter event
             //  so we can guarantee that the cell displays are updated
@@ -108,6 +103,7 @@ namespace GlueCsvEditor.Controls
             }
 
             _dataLoading = false;
+            this.ResumeLayout();
         }
 
         public void CachedTypesReady()
