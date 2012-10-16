@@ -25,6 +25,7 @@ namespace GlueCsvEditor.Controls
     {
         protected CsvData _csvData;
         protected GridView _gridView;
+        protected EntityDesigner _entityView;
         protected CachedTypes _cachedTypes;
 
         public EditorMain(IGlueCommands glueCommands, IGlueState glueState, string csvPath, char delimiter)
@@ -40,28 +41,37 @@ namespace GlueCsvEditor.Controls
         public void NotifyOfCsvUpdate()
         {
             if (_gridView.IgnoreNextFileChange)
+            {
                 _gridView.IgnoreNextFileChange = false;
+            }
             else
+            {
                 ReloadCsv();
+            }
         }
 
         private void EditorMain_Load(object sender, EventArgs e)
         {
             _gridView = new GridView(_csvData, _cachedTypes);
+            _entityView = new EntityDesigner();
+
             tabGridView.Controls.Add(_gridView);
+            tabEntityView.Controls.Add(_entityView);
+
             ReloadCsv();
         }
 
         private void tbcViews_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (tbcViews.SelectedTab == tabGridView)
-                _gridView.ReloadCsvDisplay();
+            ReloadCsv();
         }
 
         protected void ReloadCsv()
         {
             _csvData.Reload();
-            _gridView.ReloadCsvDisplay();
+
+            if (tbcViews.SelectedTab == tabGridView)
+                _gridView.ReloadCsvDisplay();
         }
 
         protected void CachedTypesReadyHandler()
