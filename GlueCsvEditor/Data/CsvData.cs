@@ -17,6 +17,8 @@ namespace GlueCsvEditor.Data
         protected char _delimiter;
         protected CachedTypes _cachedTypes;
         protected RuntimeCsvRepresentation _csv;
+        protected int? _requiredColumnIndex;
+        protected List<KeyValuePair<string, int>> _recordIdentifiers;
 
         public CsvData(string csvPath, CachedTypes cachedTypes, char delimiter = ',')
         {
@@ -25,6 +27,8 @@ namespace GlueCsvEditor.Data
             _cachedTypes = cachedTypes;
             Reload();
         }
+
+        public List<KeyValuePair<string, int>> RecordIdentifiers { get { return _recordIdentifiers; } }
 
         /// <summary>
         /// Adds a new row at the specified index
@@ -130,6 +134,10 @@ namespace GlueCsvEditor.Data
                 throw new ArgumentOutOfRangeException("column");
 
             _csv.Records[row][column] = value;
+
+            // If the one required column was changed, recache the record identifiers
+            if (column == _requiredColumnIndex)
+                CacheRecordIdentifiers();
         }
 
         /// <summary>
@@ -293,6 +301,7 @@ namespace GlueCsvEditor.Data
             CsvFileManager.Delimiter = _delimiter;
             _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
             _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
+            CacheRecordIdentifiers();
         }
 
         /// <summary>
@@ -385,6 +394,28 @@ namespace GlueCsvEditor.Data
             }
 
             return new ComplexTypeProperty[0];
+        }
+
+        protected void CacheRecordIdentifiers()
+        {
+            _recordIdentifiers = null;
+            _requiredColumnIndex = null;
+
+            // Make sure only one column exists with a required value
+            int requiredCount = _csv.Headers.Where(x => x.IsRequired).Count();
+            if (requiredCount == 0 || requiredCount > 1)
+                return;
+
+            _requiredColumnIndex =  _csv.Headers
+                                        .Where(x => x.IsRequired)
+                                        .Select((x, i) => i)
+                                        .First();
+
+            _recordIdentifiers = _csv.Records
+                                     .Select((x, i) => new KeyValuePair<string, int>(x[_requiredColumnIndex.Value], i))
+                                     .Where(x => !string.IsNullOrWhiteSpace(x.Key))
+                                     .OrderBy(x => x.Value)
+                                     .ToList();
         }
     }
 }

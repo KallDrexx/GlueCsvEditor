@@ -53,7 +53,7 @@ namespace GlueCsvEditor.Controls
         private void EditorMain_Load(object sender, EventArgs e)
         {
             _gridView = new GridView(_csvData, _cachedTypes);
-            _entityView = new EntityDesigner();
+            _entityView = new EntityDesigner(_csvData);
 
             tabGridView.Controls.Add(_gridView);
             tabEntityView.Controls.Add(_entityView);
@@ -72,6 +72,8 @@ namespace GlueCsvEditor.Controls
 
             if (tbcViews.SelectedTab == tabGridView)
                 _gridView.ReloadCsvDisplay();
+            else
+                _entityView.Reload();
         }
 
         protected void CachedTypesReadyHandler()
