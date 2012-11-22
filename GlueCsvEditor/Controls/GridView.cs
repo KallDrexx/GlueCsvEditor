@@ -23,7 +23,6 @@ namespace GlueCsvEditor.Controls
         protected int _lastRowIndex = -1;
         protected int _currentColumnIndex = 0;
         protected int _currentRowIndex = 0;
-        protected bool _dataLoading;
         protected bool _currentlyEditing;
         protected CsvData _data;
         protected IEnumerable<string> _knownTypes;
@@ -31,8 +30,29 @@ namespace GlueCsvEditor.Controls
         protected int _originalHeight;
         protected List<Keys> _downArrowKeys;
         protected CachedTypes _cachedTypes;
-
+        int mDataLoadingCount = 0;
         #endregion 
+
+
+        protected int DataLoadingCount
+        {
+            get 
+            { 
+                return mDataLoadingCount; 
+            }
+            set 
+            {
+                mDataLoadingCount = value; 
+            }
+        }
+
+        protected bool DataLoading
+        {
+            get
+            {
+                return DataLoadingCount != 0;
+            }
+        }
 
         #region Public Properties
 
@@ -61,7 +81,7 @@ namespace GlueCsvEditor.Controls
             chkIsList.Checked = false;
 
             this.SuspendLayout();
-            _dataLoading = true;
+            DataLoadingCount++;
 
             // Add the CSV headers to the datagrid
             var headers = _data.GetHeaderText();
@@ -107,7 +127,7 @@ namespace GlueCsvEditor.Controls
                 btnRemove.Enabled = false;
             }
 
-            _dataLoading = false;
+            DataLoadingCount--;
         }
 
         public void CachedTypesReady()
@@ -149,7 +169,7 @@ namespace GlueCsvEditor.Controls
 
         private void txtHeaderType_TextChanged(object sender, EventArgs e)
         {
-            if (_dataLoading)
+            if (DataLoading)
                 return;
 
             UpdateColumnDetails();
@@ -169,7 +189,7 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
-            _dataLoading = true;
+            DataLoadingCount++;
 
             _data.UpdateValue(e.RowIndex, e.ColumnIndex, e.Value as string);
             cmbCelldata.Text = e.Value as string;
@@ -185,7 +205,7 @@ namespace GlueCsvEditor.Controls
             // Update the display
             UpdateCellDisplays(true);
 
-            _dataLoading = false;
+            DataLoadingCount--;
         }
 
         private void dgrEditor_CellEnter(object sender, DataGridViewCellEventArgs e)
@@ -207,7 +227,7 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_ColumnAdded(object sender, DataGridViewColumnEventArgs e)
         {
-            if (_dataLoading)
+            if (DataLoading)
                 return;
 
             _data.AddColumn(e.Column.Index);
@@ -226,7 +246,7 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_ColumnRemoved(object sender, DataGridViewColumnEventArgs e)
         {
-            if (_dataLoading)
+            if (DataLoading)
                 return;
 
             _data.RemoveColumn(e.Column.Index);
@@ -312,7 +332,7 @@ namespace GlueCsvEditor.Controls
 
         private void btnPrependRow_Click(object sender, EventArgs e)
         {
-            if (_dataLoading)
+            if (DataLoading)
                 return;
 
             _data.AddRow(_currentRowIndex);
@@ -427,7 +447,7 @@ namespace GlueCsvEditor.Controls
 
         private void cmbCelldata_TextChanged(object sender, EventArgs e)
         {
-            if (_dataLoading)
+            if (DataLoading)
                 return;
 
             _data.UpdateValue(_currentRowIndex, _currentColumnIndex, cmbCelldata.Text);
@@ -497,15 +517,18 @@ namespace GlueCsvEditor.Controls
 
         protected void UpdateColumnDetails()
         {
-            if (_dataLoading)
+            if (DataLoading)
                 return;
 
-            _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, txtHeaderType.Text, chkIsRequired.Checked, chkIsList.Checked);
-            SaveCsv();
+            if (_currentColumnIndex != -1)
+            {
+                _data.SetHeader(_currentColumnIndex, txtHeaderName.Text, txtHeaderType.Text, chkIsRequired.Checked, chkIsList.Checked);
+                SaveCsv();
 
-            // Update the column header
-            var header = _data.GetHeaderText()[_currentColumnIndex];
-            dgrEditor.Columns[_currentColumnIndex].HeaderText = header;
+                // Update the column header
+                var header = _data.GetHeaderText()[_currentColumnIndex];
+                dgrEditor.Columns[_currentColumnIndex].HeaderText = header;
+            }
         }
 
         protected void GoToNextSearchMatch(bool reverse = false)
@@ -523,9 +546,12 @@ namespace GlueCsvEditor.Controls
         protected void SetupCellKnownValuesComboBox()
         {
             cmbCelldata.Items.Clear();
-            var knownValues = _data.GetKnownValues(_currentColumnIndex);
-            foreach (string value in knownValues.Where(x => !string.IsNullOrWhiteSpace(x)))
-                cmbCelldata.Items.Add(value);
+            if (_currentColumnIndex != -1)
+            {
+                var knownValues = _data.GetKnownValues(_currentColumnIndex);
+                foreach (string value in knownValues.Where(x => !string.IsNullOrWhiteSpace(x)))
+                    cmbCelldata.Items.Add(value);
+            }
         }
 
         protected void FilterKnownTypes()
@@ -593,7 +619,7 @@ namespace GlueCsvEditor.Controls
 
         protected void UpdateCellDisplays(bool forceUpdate = false)
         {
-            _dataLoading = true;
+            DataLoadingCount++;
             if (_currentColumnIndex != -1)
             {
                 // Update the selected header information
@@ -615,7 +641,7 @@ namespace GlueCsvEditor.Controls
 
                 UpdatePropertiesDisplay(header.Type, value);
             }
-            _dataLoading = false;
+            DataLoadingCount--;
         }
 
         protected void SetDoubleBuffered(bool setting)

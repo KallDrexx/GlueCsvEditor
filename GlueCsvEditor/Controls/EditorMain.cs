@@ -61,8 +61,11 @@ namespace GlueCsvEditor.Controls
 
         protected void ReloadCsv()
         {
-            _csvData.Reload();
-            _gridView.ReloadCsvDisplay();
+            lock (this)
+            {
+                _csvData.Reload();
+                _gridView.ReloadCsvDisplay();
+            }
         }
 
         protected void CachedTypesReadyHandler()
