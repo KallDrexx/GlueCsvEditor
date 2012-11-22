@@ -47,9 +47,16 @@ namespace GlueCsvEditor.Controls
 
         private void EditorMain_Load(object sender, EventArgs e)
         {
+
             _gridView = new GridView(_csvData, _cachedTypes);
             Controls.Add(_gridView);
-            ReloadCsv();
+
+            // Victor Chelaru November 22, 2012
+            // I don't think we need this because
+            // it causes a double-load of the CSV.
+            // This makes the CSV plugin a little slower
+            // and makes debugging more difficult.
+            //ReloadCsv();
         }
 
         protected void ReloadCsv()

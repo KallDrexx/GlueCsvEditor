@@ -594,26 +594,27 @@ namespace GlueCsvEditor.Controls
         protected void UpdateCellDisplays(bool forceUpdate = false)
         {
             _dataLoading = true;
-
-            // Update the selected header information
-            var header = _data.GetHeaderDetails(_currentColumnIndex);
-
-            // Only update the header details if we changed columns
-            if (_lastColumnIndex != _currentColumnIndex || forceUpdate)
+            if (_currentColumnIndex != -1)
             {
-                txtHeaderName.Text = header.Name;
-                txtHeaderType.Text = header.Type;
-                chkIsList.Checked = header.IsList;
-                chkIsRequired.Checked = header.IsRequired;
-                FilterKnownTypes();
+                // Update the selected header information
+                var header = _data.GetHeaderDetails(_currentColumnIndex);
+
+                // Only update the header details if we changed columns
+                if (_lastColumnIndex != _currentColumnIndex || forceUpdate)
+                {
+                    txtHeaderName.Text = header.Name;
+                    txtHeaderType.Text = header.Type;
+                    chkIsList.Checked = header.IsList;
+                    chkIsRequired.Checked = header.IsRequired;
+                    FilterKnownTypes();
+                }
+
+                // Setup the combobox
+                string value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+                cmbCelldata.Text = value;
+
+                UpdatePropertiesDisplay(header.Type, value);
             }
-
-            // Setup the combobox
-            string value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
-            cmbCelldata.Text = value;
-
-            UpdatePropertiesDisplay(header.Type, value);
-
             _dataLoading = false;
         }
 
