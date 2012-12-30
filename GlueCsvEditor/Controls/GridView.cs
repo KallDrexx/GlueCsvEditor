@@ -30,21 +30,10 @@ namespace GlueCsvEditor.Controls
         protected int _originalHeight;
         protected List<Keys> _downArrowKeys;
         protected CachedTypes _cachedTypes;
-        int mDataLoadingCount = 0;
-        #endregion 
 
+        #endregion
 
-        protected int DataLoadingCount
-        {
-            get 
-            { 
-                return mDataLoadingCount; 
-            }
-            set 
-            {
-                mDataLoadingCount = value; 
-            }
-        }
+        protected int DataLoadingCount { get; set; }
 
         protected bool DataLoading
         {
@@ -64,6 +53,7 @@ namespace GlueCsvEditor.Controls
 
         public GridView(CsvData data, CachedTypes cachedTypes)
         {
+            DataLoadingCount = 0;
             _data = data;
             _cachedTypes = cachedTypes;
             _downArrowKeys = new List<Keys>();
@@ -80,35 +70,29 @@ namespace GlueCsvEditor.Controls
             chkIsList.Checked = false;
             chkIsList.Checked = false;
 
-            this.SuspendLayout();
+            SuspendLayout();
             DataLoadingCount++;
+
+            // Reset the current column count so we are sure the CellEnter event
+            //  so we can guarantee that the cell displays are updated
+            _currentColumnIndex = -1;
+            _currentRowIndex = -1;
 
             // Add the CSV headers to the datagrid
             var headers = _data.GetHeaderText();
 
             dgrEditor.Columns.Clear();
-            for (int x = 0; x < headers.Count; x++)
-            {
-                //var column = new DataGridViewComboBoxColumn();
-                //column.HeaderText = headers[x];
-                //column.Name = headers[x];
-                //dgrEditor.Columns.Add(column);
-                dgrEditor.Columns.Add(headers[x], headers[x]);
-            }
+            foreach (var header in headers)
+                dgrEditor.Columns.Add(header, header);
 
             // Add the records
             dgrEditor.RowCount = _data.GetRecordCount();
 
             RefreshRowHeaders();
-            this.ResumeLayout();
-
-            // Reset the current column count so we are sure the CellEnter event
-            //  so we can guarantee that the cell displays are updated
-            _currentColumnIndex = -1; 
-            _currentRowIndex = -1;
+            ResumeLayout();
 
             // Auto-focus on the first cell
-            if (headers.Count > 0)
+            if (headers.Count > 0 && dgrEditor.Rows.Count > 0)
             {
                 txtHeaderName.Enabled = true;
                 txtHeaderType.Enabled = true;
@@ -116,9 +100,7 @@ namespace GlueCsvEditor.Controls
                 chkIsRequired.Enabled = true;
                 btnRemove.Enabled = true;
 
-                // Make sure at least one row exists
-                if (dgrEditor.Rows.Count > 0)
-                    dgrEditor.CurrentCell = dgrEditor[0, 0];
+                dgrEditor.CurrentCell = dgrEditor[0, 0];
             }
             else
             {
