@@ -32,6 +32,10 @@ namespace GlueCsvEditor.Data
         /// <returns></returns>
         public void AddRow(int index)
         {
+            // If index is less than 0, set it to be zero as the minimum
+            if (index < 0)
+                index = 0;
+
             _csv.Records.Insert(index, new string[_csv.Headers.Length]);
         }
 
