@@ -115,7 +115,10 @@ namespace GlueCsvEditor.Controls
                 chkIsList.Enabled = true;
                 chkIsRequired.Enabled = true;
                 btnRemove.Enabled = true;
-                dgrEditor.CurrentCell = dgrEditor[0, 0];
+
+                // Make sure at least one row exists
+                if (dgrEditor.Rows.Count > 0)
+                    dgrEditor.CurrentCell = dgrEditor[0, 0];
             }
             else
             {
