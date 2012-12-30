@@ -253,12 +253,20 @@ namespace GlueCsvEditor.Controls
         {
             var arrowKeys = new Keys[] { Keys.Down, Keys.Up, Keys.Left, Keys.Right };
 
-            if (e.KeyCode == System.Windows.Forms.Keys.V && e.Control)
+            if (e.KeyCode == Keys.V && e.Control)
             {
                 string data = Clipboard.GetData(DataFormats.Text).ToString();
                 string[] cells = data.Split('\t');
                 for (int i = 0; i < cells.Length; i++)
                     dgrEditor[_currentColumnIndex + i, dgrEditor.CurrentRow.Index].Value = cells[i];
+            }
+            else if (e.KeyCode == Keys.X && e.Control)
+            {
+                if (dgrEditor.CurrentCell != null)
+                {
+                    Clipboard.SetText(dgrEditor.CurrentCell.Value.ToString());
+                    dgrEditor.CurrentCell.Value = string.Empty;
+                }
             }
             else if (e.KeyCode == Keys.F3)
             {
