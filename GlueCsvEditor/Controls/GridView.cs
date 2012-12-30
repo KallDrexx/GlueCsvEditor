@@ -465,15 +465,15 @@ namespace GlueCsvEditor.Controls
         private void btnShowComplexProperties_Click(object sender, EventArgs e)
         {
             pgrPropertyEditor.Visible = !pgrPropertyEditor.Visible;
-            if (pgrPropertyEditor.Visible)
-            {
-                // Resize the data grid
-                _originalGridTop = dgrEditor.Top;
-                _originalHeight = dgrEditor.Height;
-                dgrEditor.Height = dgrEditor.Bottom - pgrPropertyEditor.Bottom;
-                dgrEditor.Top = pgrPropertyEditor.Bottom;
-                pgrPropertyEditor.Focus();
-            }
+            if (!pgrPropertyEditor.Visible) 
+                return;
+
+            // Resize the data grid
+            _originalGridTop = dgrEditor.Top;
+            _originalHeight = dgrEditor.Height;
+            dgrEditor.Height = dgrEditor.Bottom - pgrPropertyEditor.Bottom;
+            dgrEditor.Top = pgrPropertyEditor.Bottom;
+            pgrPropertyEditor.Focus();
         }
 
         private void pgrPropertyEditor_Leave(object sender, EventArgs e)
@@ -591,6 +591,19 @@ namespace GlueCsvEditor.Controls
                 else
                     tp.Type = prop.Type;
             }
+            
+            // Setup pgrid displayer
+            // Note: While the displayer variable is never used, this cannot be deleted.
+            //   The propertygrid property assignment triggers the property grid to show the complex properties
+            //   correctly.  Without this code, the property grid will be empty
+#pragma warning disable 168
+            var displayer = new ComplexTypePropertyGridDisplayer(_data)
+            {
+                ComplexTypeUpdatedHandler = ComplexTypeUpdated,
+                Instance = complexType,
+                PropertyGrid = pgrPropertyEditor
+            };
+#pragma warning restore 168
         }
 
         protected void ComplexTypeUpdated(string complexTypeString)

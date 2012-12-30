@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FlatRedBall.Glue.GuiDisplay;
 using System.ComponentModel;
 
@@ -54,19 +52,24 @@ namespace GlueCsvEditor.Data
                     propertyName = string.Concat(propertyName, " (", complexTypeDetails.Properties[x].Type, ")");
                 
                 // Setup events
-                Func<object> getter = () => { return complexTypeDetails.Properties[count].Value; };
+                Func<object> getter = () => complexTypeDetails.Properties[count].Value;
                 MemberChangeEventHandler setter = (sender, args) => 
                 {
                     complexTypeDetails.Properties[count].Value = args.Value as string;
                     if (ComplexTypeUpdatedHandler != null)
-                        ComplexTypeUpdatedHandler((mInstance as ComplexCsvTypeDetails).ToString());
+                    {
+                        var complexCsvTypeDetails = mInstance as ComplexCsvTypeDetails;
+                        if (complexCsvTypeDetails != null)
+                            ComplexTypeUpdatedHandler(complexCsvTypeDetails.ToString());
+                    }
                 };
 
                 // Setup type converter
                 var knownValues = _csvData.GetKnownValuesForType(complexTypeDetails.Properties[x].Type);
                 TypeConverter converter = null;
-                if (knownValues.Count() > 0)
-                    converter = new AvailableKnownValuesTypeConverter(knownValues);
+                var enumerable = knownValues as string[] ?? knownValues.ToArray();
+                if (enumerable.Any())
+                    converter = new AvailableKnownValuesTypeConverter(enumerable);
 
                 IncludeMember(propertyName, typeof(string), setter, getter, converter, new Attribute[] { propertyCategory });
             }
