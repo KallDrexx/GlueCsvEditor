@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using GlueCsvEditor.Data;
-using FlatRedBall.Glue.SaveClasses;
-using FlatRedBall.Glue;
-using FlatRedBall.Glue.Parsing;
-using FlatRedBall.Glue.Elements;
 using System.Reflection;
 
 namespace GlueCsvEditor.Controls
@@ -118,7 +110,7 @@ namespace GlueCsvEditor.Controls
         public void CachedTypesReady()
         {
             // Make sure this call is done in the control's thread
-            this.Invoke((MethodInvoker)delegate
+            Invoke((MethodInvoker)delegate
             {
                 lstFilteredTypes.Enabled = true;
                 cmbCelldata.Enabled = true;
@@ -249,17 +241,19 @@ namespace GlueCsvEditor.Controls
             e.Value = _data.GetValue(e.RowIndex, e.ColumnIndex);
         }
 
-        private void dgrEditor_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        private void dgrEditor_KeyDown(object sender, KeyEventArgs e)
         {
-            var arrowKeys = new Keys[] { Keys.Down, Keys.Up, Keys.Left, Keys.Right };
+            var arrowKeys = new[] { Keys.Down, Keys.Up, Keys.Left, Keys.Right };
 
             if (e.KeyCode == Keys.V && e.Control)
             {
-                string data = Clipboard.GetData(DataFormats.Text).ToString();
-                string[] cells = data.Split('\t');
-                for (int i = 0; i < cells.Length; i++)
-                    dgrEditor[_currentColumnIndex + i, dgrEditor.CurrentRow.Index].Value = cells[i];
+                var data = Clipboard.GetData(DataFormats.Text).ToString();
+                var cells = data.Split('\t');
+                if (dgrEditor.CurrentRow != null)
+                    for (var i = 0; i < cells.Length; i++)
+                        dgrEditor[_currentColumnIndex + i, dgrEditor.CurrentRow.Index].Value = cells[i];
             }
+
             else if (e.KeyCode == Keys.X && e.Control)
             {
                 if (dgrEditor.CurrentCell != null)
@@ -268,6 +262,7 @@ namespace GlueCsvEditor.Controls
                     dgrEditor.CurrentCell.Value = string.Empty;
                 }
             }
+
             else if (e.KeyCode == Keys.F3)
             {
                 if (e.Shift)
@@ -295,7 +290,7 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_KeyUp(object sender, KeyEventArgs e)
         {
-            var arrowKeys = new Keys[] { Keys.Down, Keys.Up, Keys.Left, Keys.Right };
+            var arrowKeys = new[] { Keys.Down, Keys.Up, Keys.Left, Keys.Right };
             if (arrowKeys.Contains(e.KeyCode))
             {
                 if (_downArrowKeys.Contains(e.KeyCode))
@@ -347,7 +342,7 @@ namespace GlueCsvEditor.Controls
             var values = Enumerable.Range(1, headers.Count).Select(x => _data.GetValue(_currentRowIndex, x - 1)).ToList();
 
             // First check if all the values are empty
-            if (values.All(x => string.IsNullOrWhiteSpace(x)))
+            if (values.All(string.IsNullOrWhiteSpace))
             {
                 message = string.Format("Delete row #{0} (empty row)?", _currentRowIndex);
             }
@@ -570,10 +565,11 @@ namespace GlueCsvEditor.Controls
 
             // Get property information for the type
             var knownProperties = _data.GetKnownProperties(_currentColumnIndex);
+            var complexTypeProperties = knownProperties as ComplexTypeProperty[] ?? knownProperties.ToArray();
             var complexType = ComplexCsvTypeDetails.ParseValue(value);
             btnShowComplexProperties.Visible = true;
 
-            if (knownProperties.Count() == 0 && complexType == null)
+            if (!complexTypeProperties.Any() && complexType == null)
             {
                 btnShowComplexProperties.Visible = false;
                 return;
@@ -584,11 +580,9 @@ namespace GlueCsvEditor.Controls
                 complexType = new ComplexCsvTypeDetails { Namespace = ns, TypeName = type };
 
             // Go through all the properties and add any "known ones" that weren't part of the parsed set
-            foreach (var prop in knownProperties)
+            foreach (var prop in complexTypeProperties)
             {
-                var tp = complexType.Properties
-                                    .Where(x => x.Name.Equals(prop.Name, StringComparison.OrdinalIgnoreCase))
-                                    .FirstOrDefault();
+                var tp = complexType.Properties.FirstOrDefault(x => x.Name.Equals(prop.Name, StringComparison.OrdinalIgnoreCase));
 
                 if (tp == null)
                     complexType.Properties.Add(new ComplexTypeProperty { Name = prop.Name, Type = prop.Type });
@@ -597,12 +591,6 @@ namespace GlueCsvEditor.Controls
                 else
                     tp.Type = prop.Type;
             }
-
-            // Setup pgrid displayer
-            var displayer = new ComplexTypePropertyGridDisplayer(_data);
-            displayer.ComplexTypeUpdatedHandler = ComplexTypeUpdated;
-            displayer.Instance = complexType;
-            displayer.PropertyGrid = pgrPropertyEditor;
         }
 
         protected void ComplexTypeUpdated(string complexTypeString)
