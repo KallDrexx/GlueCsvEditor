@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using FlatRedBall.Glue;
 using FlatRedBall.Glue.Plugins.ExportedInterfaces;
 using FlatRedBall.Glue.Plugins.Interfaces;
@@ -11,8 +8,6 @@ using FlatRedBall.Glue.Plugins;
 using GlueCsvEditor.Controls;
 using System.Windows.Forms;
 using FlatRedBall.Glue.Controls;
-using System.IO;
-using FlatRedBall.IO.Csv;
 
 namespace GlueCsvEditor
 {
@@ -62,9 +57,9 @@ namespace GlueCsvEditor
         public override void StartUp()
         {
             // Initialize the handlers I need
-            this.InitializeCenterTabHandler = InitializeTab;
-            this.ReactToItemSelectHandler = ReactToItemSelect;
-            this.ReactToFileChangeHandler = ReactToFileChange;
+            InitializeCenterTabHandler = InitializeTab;
+            ReactToItemSelectHandler = ReactToItemSelect;
+            ReactToFileChangeHandler = ReactToFileChange;
         }
 
         public override Version Version
@@ -79,7 +74,7 @@ namespace GlueCsvEditor
 
         protected void OnClosedByUser(object sender)
         {
-            PluginManager.ShutDownPlugin(this);
+            PluginManagerBase.ShutDownPlugin(this);
         }
 
         protected void ReactToItemSelect(TreeNode selectedTreeNode)
@@ -97,6 +92,9 @@ namespace GlueCsvEditor
             if (IsCsv(selectedTreeNode.Tag))
             {
                 var csv = selectedTreeNode.Tag as ReferencedFileSave;
+                if (csv == null)
+                    throw new InvalidOperationException("Node is CSV but did not cast as a ReferencedFileSave");
+
                 _currentCsv = ProjectManager.MakeAbsolute(csv.Name, true);
                 char delimiter;
                 switch (csv.CsvDelimiter)
@@ -109,7 +107,6 @@ namespace GlueCsvEditor
                         delimiter = '\t';
                         break;
 
-                    case AvailableDelimiters.Comma:
                     default:
                         delimiter = ',';
                         break;
@@ -117,10 +114,9 @@ namespace GlueCsvEditor
 
                 try
                 {
-                    _tab = new PluginTab();
-                    _tab.Text = "CSV Editor";
+                    _tab = new PluginTab { Text = "CSV Editor" };
 
-                    _editor = new EditorMain(GlueCommands, GlueState, _currentCsv, delimiter);
+                    _editor = new EditorMain(_currentCsv, delimiter);
                     _tab.Controls.Add(_editor);
                     _tabContainer.Controls.Add(_tab);
                     _tabContainer.SelectTab(_tabContainer.Controls.Count - 1);

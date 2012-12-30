@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 
 namespace GlueCsvEditor.KnownValues
@@ -40,8 +39,7 @@ namespace GlueCsvEditor.KnownValues
                                 .GetAssemblies()
                                 .SelectMany(x => x.GetTypes())
                                 .Where(x => x.FullName.Equals(fullTypeName.Trim(), StringComparison.OrdinalIgnoreCase))
-                                .Where(x => x.IsEnum)
-                                .FirstOrDefault();
+                                .FirstOrDefault(x => x.IsEnum);
 
             if (type == null)
             {

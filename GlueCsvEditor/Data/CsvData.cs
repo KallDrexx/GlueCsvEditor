@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FlatRedBall.IO.Csv;
-using Microsoft.Xna.Framework;
 using GlueCsvEditor.KnownValues;
-using Microsoft.Build.BuildEngine;
-using FlatRedBall.Glue;
-using FlatRedBall.Glue.Parsing;
 
 namespace GlueCsvEditor.Data
 {
@@ -161,7 +157,7 @@ namespace GlueCsvEditor.Data
             var header = _csv.Headers[column];
             string type = CsvHeader.GetClassNameFromHeader(header.OriginalText) ?? "string";
 
-            int typeDataIndex = header.Name.IndexOf("(");
+            int typeDataIndex = header.Name.IndexOf("(", StringComparison.Ordinal);
             if (typeDataIndex < 0)
                 typeDataIndex = header.Name.Length;
 
@@ -171,7 +167,7 @@ namespace GlueCsvEditor.Data
                 isList = true;
                 type = type.Replace("List<", "");
                 if (type.Contains(">"))
-                    type = type.Remove(type.LastIndexOf(">"), 1);
+                    type = type.Remove(type.LastIndexOf(">", StringComparison.Ordinal), 1);
             }
             else
             {
@@ -237,6 +233,8 @@ namespace GlueCsvEditor.Data
         /// <param name="searchString"></param>
         /// <param name="startRow"></param>
         /// <param name="startColumn"></param>
+        /// <param name="ignoreStartingCell"></param>
+        /// <param name="reverse"></param>
         /// <returns></returns>
         public FoundCell FindNextValue(string searchString, int startRow, int startColumn, bool ignoreStartingCell = false, bool reverse = false)
         {
@@ -313,7 +311,6 @@ namespace GlueCsvEditor.Data
         /// Retrieves any known values for the specified cell
         /// </summary>
         /// <param name="column"></param>
-        /// <param name="row"></param>
         public IEnumerable<string> GetKnownValues(int column)
         {
             string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[column].OriginalText);
@@ -323,10 +320,11 @@ namespace GlueCsvEditor.Data
             type = type.Replace("List<", "").Replace(">", "");
 
             var foundTypes = GetKnownValuesForType(type);
-            if (foundTypes.Count() == 0)
+            var knownValues = foundTypes as string[] ?? foundTypes.ToArray();
+            if (!knownValues.Any())
                 return new UsedRcrColumnValueRetriever(_csv, column).GetKnownValues(type);
 
-            return foundTypes;
+            return knownValues;
         }
 
         public IEnumerable<string> GetKnownValuesForType(string type)
@@ -340,8 +338,8 @@ namespace GlueCsvEditor.Data
                 type = type.Replace("List<", "").Replace(">", "");
 
                 // This list is prioritized.  The first retriever to get a value is the only one used
-                var knownValueRetrievers = new List<IKnownValueRetriever>()
-                {
+                var knownValueRetrievers = new List<IKnownValueRetriever>
+                    {
                     new EnumReflectionValueRetriever(),
                     new FrbStateValueRetriever(),
                     new ParsedEnumValueRetriever(_cachedTypes.ProjectEnums),
@@ -352,8 +350,9 @@ namespace GlueCsvEditor.Data
                 foreach (var retriever in knownValueRetrievers)
                 {
                     var values = retriever.GetKnownValues(type);
-                    if (values.Count() > 0)
-                        return values;
+                    var knownValuesForType = values as string[] ?? values.ToArray();
+                    if (knownValuesForType.Any())
+                        return knownValuesForType;
                 }
             }
 

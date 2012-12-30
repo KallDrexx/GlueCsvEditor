@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FlatRedBall.Glue.Elements;
 
 namespace GlueCsvEditor.KnownValues
@@ -26,7 +25,7 @@ namespace GlueCsvEditor.KnownValues
             if (!elementName.Contains("Entities") && !elementName.Contains("Screens"))
                 return new string[0];
 
-            elementName = elementName.Substring(elementName.IndexOf(".") + 1)
+            elementName = elementName.Substring(elementName.IndexOf(".", StringComparison.Ordinal) + 1)
                                      .Replace(".", "/");
 
             var element = ObjectFinder.Self.GetIElement(elementName);
@@ -39,8 +38,9 @@ namespace GlueCsvEditor.KnownValues
                 // Loop through the element's uncategorized state values
                 //  and loop through all states for categories that are marked as shared
                 var states = element.States.Select(x => x.Name);
-                foreach (var cat in element.StateCategoryList.Where(x => x.SharesVariablesWithOtherCategories))
-                    states = states.Union(cat.States.Select(x => x.Name));
+                states = element.StateCategoryList
+                                .Where(x => x.SharesVariablesWithOtherCategories)
+                                .Aggregate(states, (current, cat) => current.Union(cat.States.Select(x => x.Name)));
 
                 return states.Distinct().OrderBy(x => x).ToList();
             }
