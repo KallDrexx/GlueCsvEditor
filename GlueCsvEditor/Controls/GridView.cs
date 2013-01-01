@@ -11,31 +11,30 @@ namespace GlueCsvEditor.Controls
     {
         #region Member Variables
 
-        protected int _lastColumnIndex = -1;
-        protected int _lastRowIndex = -1;
-        protected int _currentColumnIndex = 0;
-        protected int _currentRowIndex = 0;
-        protected bool _currentlyEditing;
-        protected CsvData _data;
-        protected IEnumerable<string> _knownTypes;
-        protected int _originalGridTop;
-        protected int _originalHeight;
-        protected List<Keys> _downArrowKeys;
-        protected CachedTypes _cachedTypes;
+        private int _lastColumnIndex = -1;
+        private int _currentColumnIndex;
+        private int _currentRowIndex;
+        private readonly CsvData _data;
+        private IEnumerable<string> _knownTypes;
+        private int _originalGridTop;
+        private int _originalHeight;
+        private bool _stringColumnSelected;
+        private readonly List<Keys> _downArrowKeys;
+        private readonly CachedTypes _cachedTypes;
 
         #endregion
 
-        protected int DataLoadingCount { get; set; }
+        #region Properties
 
-        protected bool DataLoading
+        private int DataLoadingCount { get; set; }
+
+        private bool DataLoading
         {
             get
             {
                 return DataLoadingCount != 0;
             }
         }
-
-        #region Public Properties
 
         public bool IgnoreNextFileChange { get; set; }
 
@@ -177,7 +176,6 @@ namespace GlueCsvEditor.Controls
                 dgrEditor.Rows[e.RowIndex].HeaderCell.Value = e.Value as string;
 
             // Since this is set in BeginEdit we need to end it here
-            _currentlyEditing = false;
 
             // Update the display
             UpdateCellDisplays(true);
@@ -188,7 +186,6 @@ namespace GlueCsvEditor.Controls
         private void dgrEditor_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
             _lastColumnIndex = _currentColumnIndex;
-            _lastRowIndex = _currentRowIndex;
             _currentColumnIndex = e.ColumnIndex;
             _currentRowIndex = e.RowIndex;
 
@@ -199,7 +196,6 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
-            _currentlyEditing = true;
         }
 
         private void dgrEditor_ColumnAdded(object sender, DataGridViewColumnEventArgs e)
@@ -464,38 +460,71 @@ namespace GlueCsvEditor.Controls
 
         private void btnShowComplexProperties_Click(object sender, EventArgs e)
         {
-            pgrPropertyEditor.Visible = !pgrPropertyEditor.Visible;
-            if (!pgrPropertyEditor.Visible) 
-                return;
+            Control activeControl;
+
+            // If we currently have a string column selected, don't show the property grid
+            //   instead show the textbox for text editing
+            if (_stringColumnSelected)
+            {
+                txtMultilineEditor.Visible = true;
+                
+                DataLoadingCount++;
+                txtMultilineEditor.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+                txtMultilineEditor.Focus();
+                DataLoadingCount--;
+
+                activeControl = txtMultilineEditor;
+            }
+            else
+            {
+                pgrPropertyEditor.Visible = !pgrPropertyEditor.Visible;
+                if (!pgrPropertyEditor.Visible)
+                    return;
+
+                pgrPropertyEditor.Focus();
+
+                activeControl = pgrPropertyEditor;
+            }
 
             // Resize the data grid
             _originalGridTop = dgrEditor.Top;
             _originalHeight = dgrEditor.Height;
-            dgrEditor.Height = dgrEditor.Bottom - pgrPropertyEditor.Bottom;
-            dgrEditor.Top = pgrPropertyEditor.Bottom;
-            pgrPropertyEditor.Focus();
+            dgrEditor.Height = dgrEditor.Bottom - activeControl.Bottom;
+            dgrEditor.Top = activeControl.Bottom;
         }
 
         private void pgrPropertyEditor_Leave(object sender, EventArgs e)
         {
             pgrPropertyEditor.Visible = false;
+            ResetDataGridSizing();
+        }
+        
+        private void txtMultilineEditor_Leave(object sender, EventArgs e)
+        {
+            txtMultilineEditor.Visible = false;
+            ResetDataGridSizing();
+        }
 
-            // Reset the property grid sizing
-            dgrEditor.Top = _originalGridTop;
-            dgrEditor.Height = _originalHeight;
+        private void txtMultilineEditor_TextChanged(object sender, EventArgs e)
+        {
+            if (DataLoading)
+                return;
+
+            _data.UpdateValue(_currentRowIndex, _currentColumnIndex, txtMultilineEditor.Text);
+            SaveCsv();
         }
 
         #endregion
 
         #region Internal Methods
 
-        protected void SaveCsv()
+        private void SaveCsv()
         {
             IgnoreNextFileChange = true;
             _data.SaveCsv();
         }
 
-        protected void RefreshRowHeaders()
+        private void RefreshRowHeaders()
         {
             // Add the first value of each record to the row header text
             if (_data.GetHeaderText().Count > 0)
@@ -503,7 +532,7 @@ namespace GlueCsvEditor.Controls
                     dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
         }
 
-        protected void UpdateColumnDetails()
+        private void UpdateColumnDetails()
         {
             if (DataLoading)
                 return;
@@ -519,7 +548,7 @@ namespace GlueCsvEditor.Controls
             }
         }
 
-        protected void GoToNextSearchMatch(bool reverse = false)
+        private void GoToNextSearchMatch(bool reverse = false)
         {
             if (string.IsNullOrWhiteSpace(txtSearch.Text))
                 return;
@@ -531,7 +560,7 @@ namespace GlueCsvEditor.Controls
             dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
         }
 
-        protected void SetupCellKnownValuesComboBox()
+        private void SetupCellKnownValuesComboBox()
         {
             cmbCelldata.Items.Clear();
             if (_currentColumnIndex != -1)
@@ -542,7 +571,7 @@ namespace GlueCsvEditor.Controls
             }
         }
 
-        protected void FilterKnownTypes()
+        private void FilterKnownTypes()
         {
             lstFilteredTypes.DataSource =
                 _knownTypes.Where(x => x.IndexOf(txtHeaderType.Text.Trim(), StringComparison.OrdinalIgnoreCase) >= 0)
@@ -551,12 +580,12 @@ namespace GlueCsvEditor.Controls
             lstFilteredTypes.ClearSelected();
         }
 
-        protected void UpdatePropertiesDisplay(string type, string value)
+        private void UpdatePropertiesDisplay(string type, string value)
         {
             if (string.IsNullOrWhiteSpace(type))
                 return;
 
-            string ns = string.Empty;
+            var ns = string.Empty;
             if (type.Contains(".") && type.Last() != '.')
             {
                 ns = type.Remove(type.LastIndexOf('.'));
@@ -606,12 +635,12 @@ namespace GlueCsvEditor.Controls
 #pragma warning restore 168
         }
 
-        protected void ComplexTypeUpdated(string complexTypeString)
+        private void ComplexTypeUpdated(string complexTypeString)
         {
             dgrEditor[_currentColumnIndex, _currentRowIndex].Value = complexTypeString;
         }
 
-        protected void UpdateCellDisplays(bool forceUpdate = false)
+        private void UpdateCellDisplays(bool forceUpdate = false)
         {
             DataLoadingCount++;
             if (_currentColumnIndex != -1)
@@ -630,19 +659,35 @@ namespace GlueCsvEditor.Controls
                 }
 
                 // Setup the combobox
-                string value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+                var value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
                 cmbCelldata.Text = value;
 
-                UpdatePropertiesDisplay(header.Type, value);
+                _stringColumnSelected = (header.Type == "string");
+                if (_stringColumnSelected)
+                {
+                    // Since a string column is selected, enable the elipsis button for multi-line input
+                    btnShowComplexProperties.Visible = true;
+                }
+                else
+                {
+                    UpdatePropertiesDisplay(header.Type, value);   
+                }
             }
             DataLoadingCount--;
         }
 
-        protected void SetDoubleBuffered(bool setting)
+        private void SetDoubleBuffered(bool setting)
         {
             Type dgvType = dgrEditor.GetType();
             var pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
             pi.SetValue(dgrEditor, setting, null);
+        }
+
+        private void ResetDataGridSizing()
+        {
+            // Reset the property grid sizing
+            dgrEditor.Top = _originalGridTop;
+            dgrEditor.Height = _originalHeight;
         }
 
         #endregion

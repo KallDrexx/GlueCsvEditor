@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.txtMultilineEditor = new System.Windows.Forms.TextBox();
             this.btnShowComplexProperties = new System.Windows.Forms.Button();
             this.pgrPropertyEditor = new System.Windows.Forms.PropertyGrid();
             this.cmbCelldata = new System.Windows.Forms.ComboBox();
@@ -65,6 +66,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.txtMultilineEditor);
             this.splitContainer1.Panel1.Controls.Add(this.btnShowComplexProperties);
             this.splitContainer1.Panel1.Controls.Add(this.pgrPropertyEditor);
             this.splitContainer1.Panel1.Controls.Add(this.cmbCelldata);
@@ -88,9 +90,22 @@
             this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(676, 525);
-            this.splitContainer1.SplitterDistance = 429;
+            this.splitContainer1.SplitterDistance = 423;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 2;
+            // 
+            // txtMultilineEditor
+            // 
+            this.txtMultilineEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtMultilineEditor.Location = new System.Drawing.Point(3, 35);
+            this.txtMultilineEditor.Multiline = true;
+            this.txtMultilineEditor.Name = "txtMultilineEditor";
+            this.txtMultilineEditor.Size = new System.Drawing.Size(413, 287);
+            this.txtMultilineEditor.TabIndex = 15;
+            this.txtMultilineEditor.Visible = false;
+            this.txtMultilineEditor.TextChanged += new System.EventHandler(this.txtMultilineEditor_TextChanged);
+            this.txtMultilineEditor.Leave += new System.EventHandler(this.txtMultilineEditor_Leave);
             // 
             // btnShowComplexProperties
             // 
@@ -109,7 +124,7 @@
             this.pgrPropertyEditor.HelpVisible = false;
             this.pgrPropertyEditor.Location = new System.Drawing.Point(3, 32);
             this.pgrPropertyEditor.Name = "pgrPropertyEditor";
-            this.pgrPropertyEditor.Size = new System.Drawing.Size(419, 290);
+            this.pgrPropertyEditor.Size = new System.Drawing.Size(413, 290);
             this.pgrPropertyEditor.TabIndex = 14;
             this.pgrPropertyEditor.ToolbarVisible = false;
             this.pgrPropertyEditor.Visible = false;
@@ -122,7 +137,7 @@
             this.cmbCelldata.FormattingEnabled = true;
             this.cmbCelldata.Location = new System.Drawing.Point(34, 5);
             this.cmbCelldata.Name = "cmbCelldata";
-            this.cmbCelldata.Size = new System.Drawing.Size(124, 21);
+            this.cmbCelldata.Size = new System.Drawing.Size(118, 21);
             this.cmbCelldata.TabIndex = 1;
             this.cmbCelldata.DropDown += new System.EventHandler(this.cmbCelldata_DropDown);
             this.cmbCelldata.TextChanged += new System.EventHandler(this.cmbCelldata_TextChanged);
@@ -141,7 +156,7 @@
             // btnDeleteRow
             // 
             this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDeleteRow.Location = new System.Drawing.Point(347, 495);
+            this.btnDeleteRow.Location = new System.Drawing.Point(341, 495);
             this.btnDeleteRow.Name = "btnDeleteRow";
             this.btnDeleteRow.Size = new System.Drawing.Size(75, 23);
             this.btnDeleteRow.TabIndex = 7;
@@ -163,7 +178,7 @@
             // btnFindNext
             // 
             this.btnFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFindNext.Location = new System.Drawing.Point(332, 4);
+            this.btnFindNext.Location = new System.Drawing.Point(326, 4);
             this.btnFindNext.Name = "btnFindNext";
             this.btnFindNext.Size = new System.Drawing.Size(90, 23);
             this.btnFindNext.TabIndex = 3;
@@ -174,7 +189,7 @@
             // txtSearch
             // 
             this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSearch.Location = new System.Drawing.Point(164, 6);
+            this.txtSearch.Location = new System.Drawing.Point(158, 6);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(170, 20);
             this.txtSearch.TabIndex = 2;
@@ -191,7 +206,7 @@
             this.dgrEditor.Location = new System.Drawing.Point(3, 33);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(419, 456);
+            this.dgrEditor.Size = new System.Drawing.Size(413, 456);
             this.dgrEditor.TabIndex = 4;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);
@@ -345,5 +360,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtHeaderName;
+        private System.Windows.Forms.TextBox txtMultilineEditor;
     }
 }
