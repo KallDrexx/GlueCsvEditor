@@ -15,6 +15,12 @@ namespace GlueCsvEditor.Controls
             InitializeComponent();
 
             // Load all the data
+            
+            LoadCsv(csvPath, delimiter);
+        }
+
+        private void LoadCsv(string csvPath, char delimiter)
+        {
             _cachedTypes = new CachedTypes(CachedTypesReadyHandler);
             _csvData = new CsvData(csvPath, _cachedTypes, delimiter);
         }
