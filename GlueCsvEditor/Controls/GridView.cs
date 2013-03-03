@@ -7,6 +7,14 @@ using System.Reflection;
 
 namespace GlueCsvEditor.Controls
 {
+
+    public enum LayoutState
+    {
+        OnlyDataGrid,
+        ShowPropertyGrid,
+        ShowMultiLineText
+    }
+
     public partial class GridView : UserControl
     {
         #region Member Variables
@@ -21,10 +29,64 @@ namespace GlueCsvEditor.Controls
         private bool _stringColumnSelected;
         private readonly List<Keys> _downArrowKeys;
         private readonly CachedTypes _cachedTypes;
-
+        private LayoutState mCurrentLayoutStateButPleaseUseThePropertyInstead;
         #endregion
 
         #region Properties
+
+        LayoutState CurrentLayoutState
+        {
+            get
+            {
+                return mCurrentLayoutStateButPleaseUseThePropertyInstead;
+            }
+            set
+            {
+                var oldCurrentState =
+                    mCurrentLayoutStateButPleaseUseThePropertyInstead;
+
+
+                mCurrentLayoutStateButPleaseUseThePropertyInstead = value;
+
+                if (mCurrentLayoutStateButPleaseUseThePropertyInstead == LayoutState.OnlyDataGrid)
+                {
+                    // Hide the top
+                    LeftSideSplitContainer.Panel1MinSize = 0;
+                    LeftSideSplitContainer.IsSplitterFixed = true;
+                    LeftSideSplitContainer.SplitterDistance = 0;
+
+                }
+                else
+                {
+                    // Show the top
+                    LeftSideSplitContainer.Panel1MinSize = 30;
+                    LeftSideSplitContainer.IsSplitterFixed = false;
+                    if (oldCurrentState == LayoutState.OnlyDataGrid)
+                    {
+                        LeftSideSplitContainer.SplitterDistance = LeftSideSplitContainer.Height / 2;
+                    }
+                }
+
+
+                // Show the right controls
+                RefreshAlternativeEditControlVisibility();
+
+                // Refresh the display
+                switch (mCurrentLayoutStateButPleaseUseThePropertyInstead)
+                {
+                    case LayoutState.ShowMultiLineText:
+
+                        RefreshMultiLineDisplay();
+                        break;
+                    case LayoutState.ShowPropertyGrid:
+                        break;
+
+                }
+            }
+        }
+
+
+
 
         private int DataLoadingCount { get; set; }
 
@@ -136,6 +198,8 @@ namespace GlueCsvEditor.Controls
             btnShowComplexProperties.Enabled = false;
             lstFilteredTypes.Enabled = false;
             cmbCelldata.Enabled = false;
+
+            CurrentLayoutState = LayoutState.OnlyDataGrid;
         }
 
         private void txtHeaderName_TextChanged(object sender, EventArgs e)
@@ -460,45 +524,27 @@ namespace GlueCsvEditor.Controls
 
         private void btnShowComplexProperties_Click(object sender, EventArgs e)
         {
-            Control activeControl;
 
-            // If we currently have a string column selected, don't show the property grid
-            //   instead show the textbox for text editing
-            if (_stringColumnSelected)
+            if (CurrentLayoutState != LayoutState.OnlyDataGrid)
             {
-                txtMultilineEditor.Visible = true;
-                
-                DataLoadingCount++;
-                txtMultilineEditor.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
-                txtMultilineEditor.Focus();
-                DataLoadingCount--;
-
-                activeControl = txtMultilineEditor;
+                CurrentLayoutState = LayoutState.OnlyDataGrid;
             }
             else
             {
-                pgrPropertyEditor.Visible = !pgrPropertyEditor.Visible;
-                if (!pgrPropertyEditor.Visible)
-                    return;
-
-                pgrPropertyEditor.Focus();
-
-                activeControl = pgrPropertyEditor;
+                // If we currently have a string column selected, don't show the property grid
+                //   instead show the textbox for text editing
+                if (_stringColumnSelected)
+                {
+                    CurrentLayoutState = LayoutState.ShowMultiLineText;
+                }
+                else
+                {
+                    CurrentLayoutState = LayoutState.ShowPropertyGrid;
+                    
+                }
             }
-
-            // Resize the data grid
-            _originalGridTop = dgrEditor.Top;
-            _originalHeight = dgrEditor.Height;
-            dgrEditor.Height = dgrEditor.Bottom - activeControl.Bottom;
-            dgrEditor.Top = activeControl.Bottom;
         }
 
-        private void pgrPropertyEditor_Leave(object sender, EventArgs e)
-        {
-            pgrPropertyEditor.Visible = false;
-            ResetDataGridSizing();
-        }
-        
         private void txtMultilineEditor_Leave(object sender, EventArgs e)
         {
             txtMultilineEditor.Visible = false;
@@ -663,16 +709,46 @@ namespace GlueCsvEditor.Controls
                 cmbCelldata.Text = value;
 
                 _stringColumnSelected = (header.Type == "string");
-                if (_stringColumnSelected)
+                if (CurrentLayoutState != LayoutState.OnlyDataGrid)
                 {
-                    // Since a string column is selected, enable the elipsis button for multi-line input
-                    btnShowComplexProperties.Visible = true;
+                    if (_stringColumnSelected)
+                    {
+                        CurrentLayoutState = LayoutState.ShowMultiLineText;
+                    }
+                    else
+                    {
+                        CurrentLayoutState = LayoutState.ShowPropertyGrid;
+                    }
                 }
-                else
+
+                if (!_stringColumnSelected)
                 {
-                    UpdatePropertiesDisplay(header.Type, value);   
+                    UpdatePropertiesDisplay(header.Type, value);
                 }
             }
+            DataLoadingCount--;
+        }
+        private void RefreshAlternativeEditControlVisibility()
+        {
+            switch (mCurrentLayoutStateButPleaseUseThePropertyInstead)
+            {
+                case LayoutState.ShowMultiLineText:
+                    pgrPropertyEditor.Visible = false;
+
+                    txtMultilineEditor.Visible = true;
+                    break;
+                case LayoutState.ShowPropertyGrid:
+                    pgrPropertyEditor.Visible = true;
+                    txtMultilineEditor.Visible = false;
+
+                    break;
+
+            }
+        }
+        private void RefreshMultiLineDisplay()
+        {
+            DataLoadingCount++;
+            txtMultilineEditor.Text = _data.GetValue(_currentRowIndex, _currentColumnIndex);
             DataLoadingCount--;
         }
 

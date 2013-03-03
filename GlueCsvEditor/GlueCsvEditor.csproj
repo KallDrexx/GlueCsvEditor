@@ -123,8 +123,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetDir)GlueCsvEditor.dll C:\Users\%25username%25\AppData\Roaming\Glue\GlueCsvEditor
-copy $(TargetDir)GlueCsvEditor.pdb C:\Users\%25username%25\AppData\Roaming\Glue\GlueCsvEditor</PostBuildEvent>
+    <PostBuildEvent>copy $(TargetDir)GlueCsvEditor.dll C:\Users\%25username%25\AppData\Roaming\FRBDK\Plugins\GlueCsvEditor\GlueCsvEditor.dll
+copy $(TargetDir)GlueCsvEditor.pdb C:\Users\%25username%25\AppData\Roaming\FRBDK\Plugins\GlueCsvEditor\GlueCsvEditor.pdb</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
