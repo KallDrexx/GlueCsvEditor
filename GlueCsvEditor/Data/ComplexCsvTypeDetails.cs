@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FlatRedBall.Instructions.Reflection;
 using System.ComponentModel;
 
 namespace GlueCsvEditor.Data
 {
     public class ComplexCsvTypeDetails
     {
-        protected const char PROPERTY_COLLECTION_START_CHAR = '(';
-        protected const char PROPERTY_COLLECTION_END_CHAR = ')';
+        private const char PropertyCollectionStartChar = '(';
+        private const char PropertyCollectionEndChar = ')';
 
         [Category("General Information")]
         public string TypeName { get; set; }
@@ -18,7 +17,10 @@ namespace GlueCsvEditor.Data
         [Category("General Information")]
         public string Namespace { get; set; }
 
-        public List<ComplexTypeProperty> Properties { get; protected set; }
+        [Category("General Information")]
+        public bool IsShorthandFormat { get; set; }
+
+        public List<ComplexTypeProperty> Properties { get; private set; }
 
         public ComplexCsvTypeDetails()
         {
@@ -26,6 +28,12 @@ namespace GlueCsvEditor.Data
         }
 
         public static ComplexCsvTypeDetails ParseValue(string value)
+        {
+            return ParseLonghandTypeFormat(value) 
+                ?? ParseShorthandTypeFormat(value);
+        }
+
+        private static ComplexCsvTypeDetails ParseLonghandTypeFormat(string value)
         {
             var result = new ComplexCsvTypeDetails();
 
@@ -36,8 +44,8 @@ namespace GlueCsvEditor.Data
                 return null;
 
             // Get indexes for braces/parenthesis
-            int start = value.IndexOf(PROPERTY_COLLECTION_START_CHAR);
-            int end = value.LastIndexOf(PROPERTY_COLLECTION_END_CHAR);
+            int start = value.IndexOf(PropertyCollectionStartChar);
+            int end = value.LastIndexOf(PropertyCollectionEndChar);
 
             if (start < 0 || end < 0)
                 return null; // Invalid format
@@ -46,8 +54,8 @@ namespace GlueCsvEditor.Data
             string isolatedTypeString = value.Substring(3, start - 3);
             if (isolatedTypeString.Contains("."))
             {
-                result.Namespace = isolatedTypeString.Remove(isolatedTypeString.LastIndexOf(".")).Trim();
-                result.TypeName = isolatedTypeString.Substring(isolatedTypeString.LastIndexOf(".") + 1).Trim();
+                result.Namespace = isolatedTypeString.Remove(isolatedTypeString.LastIndexOf(".", System.StringComparison.Ordinal)).Trim();
+                result.TypeName = isolatedTypeString.Substring(isolatedTypeString.LastIndexOf(".", System.StringComparison.Ordinal) + 1).Trim();
             }
             else
             {
@@ -57,10 +65,10 @@ namespace GlueCsvEditor.Data
 
             // Figure out the properties
             string propertiesString = value.Substring(start + 1, end - start - 1);
-            var propertyDefinitions = propertiesString.Split(new char[] { ',' });
+            var propertyDefinitions = propertiesString.Split(new char[] {','});
             foreach (var propertyDefinition in propertyDefinitions)
             {
-                var pair = propertyDefinition.Split(new char[] { '=' });
+                var pair = propertyDefinition.Split(new char[] {'='});
                 if (pair.Length != 2)
                     continue; // not a valid property definition
 
@@ -74,7 +82,66 @@ namespace GlueCsvEditor.Data
             return result;
         }
 
+        private static ComplexCsvTypeDetails ParseShorthandTypeFormat(string value)
+        {
+            var result = new ComplexCsvTypeDetails {IsShorthandFormat = true};
+
+            // Parse type specified in "property = value, property2 = value2" format
+            if (string.IsNullOrWhiteSpace(value) || !value.Contains("="))
+                return null;
+
+            var properties = value.Split(',');
+            foreach (var property in properties)
+            {
+                // Invalid propery definitions are ignored
+                var parts = property.Split('=');
+                if (parts.Length != 2)
+                    continue;
+
+                // First part is the property name
+                if (parts[0].Trim() == string.Empty)
+                    continue;
+
+                result.Properties.Add(new ComplexTypeProperty
+                {
+                    Name = parts[0].Trim(),
+                    Value = parts[1].Trim()
+                });
+            }
+
+            return result;
+        }
+
         public override string ToString()
+        {
+            return IsShorthandFormat 
+                ? ToShorthandString() 
+                : ToLonghandString();
+        }
+
+        private string ToShorthandString()
+        {
+            var output = new StringBuilder();
+
+            var filledProperties = Properties.Where(x => !string.IsNullOrWhiteSpace(x.Value))
+                                             .ToList();
+
+            for (int x = 0; x < filledProperties.Count; x++)
+            {
+                var prop = filledProperties[x];
+
+                if (x > 0)
+                    output.Append(", ");
+
+                output.Append(prop.Name);
+                output.Append(" = ");
+                output.Append(prop.Value);
+            }
+
+            return output.ToString();
+        }
+
+        private string ToLonghandString()
         {
             var output = new StringBuilder("new ");
 
@@ -90,11 +157,11 @@ namespace GlueCsvEditor.Data
             var filledProperties = Properties.Where(x => !string.IsNullOrWhiteSpace(x.Value))
                                              .ToList();
 
-            output.Append(PROPERTY_COLLECTION_START_CHAR);
+            output.Append(PropertyCollectionStartChar);
             output.Append(" ");
 
             // Add defined properties
-            if (filledProperties.Count > 0)
+            if (filledProperties.Any())
             {
                 for (int x = 0; x < filledProperties.Count; x++)
                 {
@@ -110,7 +177,7 @@ namespace GlueCsvEditor.Data
             }
 
             output.Append(" ");
-            output.Append(PROPERTY_COLLECTION_END_CHAR);
+            output.Append(PropertyCollectionEndChar);
 
             return output.ToString();
         }
