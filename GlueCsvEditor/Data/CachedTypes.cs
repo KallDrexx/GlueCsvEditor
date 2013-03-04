@@ -21,6 +21,8 @@ namespace GlueCsvEditor.Data
         protected List<ParsedClass> _parsedPrjectClasses;
         protected List<EntitySave> _entities;
         protected List<ScreenSave> _screens;
+
+        protected List<Type> _assemblyClasses;
         protected List<Type> _assemblyEnums;
 
         public delegate void CachedTypesReadyHandler();
@@ -111,6 +113,17 @@ namespace GlueCsvEditor.Data
             }
         }
 
+        public IEnumerable<Type> AssemblyClasses
+        {
+            get
+            {
+                if (!IsCacheReady)
+                    return new Type[0];
+
+                return _assemblyClasses;
+            }
+        }
+
         public IEnumerable<string> KnownTypes
         {
             get
@@ -119,6 +132,7 @@ namespace GlueCsvEditor.Data
                     return new string[0];
 
                 return BaseTypes.Union(_assemblyEnums.Select(x => x.FullName))
+                                .Union(_assemblyClasses.Select(x => x.FullName))
                                 .Union(_entities.SelectMany(x => GetGlueStateNamespaces(x)))
                                 .Union(_screens.SelectMany(x => GetGlueStateNamespaces(x)))
                                 .Union(_parsedPrjectClasses.Select(x => string.Concat(x.Namespace, ".", x.Name)))
@@ -166,6 +180,12 @@ namespace GlueCsvEditor.Data
                                               .GetAssemblies()
                                               .SelectMany(x => x.GetTypes())
                                               .Where(x => x.IsEnum)
+                                              .ToList();
+
+                    _assemblyClasses = AppDomain.CurrentDomain
+                                              .GetAssemblies()
+                                              .SelectMany(x => x.GetTypes())
+                                              .Where(x => !x.IsEnum)
                                               .ToList();
                 }
                 catch (Exception ex)

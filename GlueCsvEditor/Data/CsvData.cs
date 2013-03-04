@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using FlatRedBall.IO.Csv;
 using GlueCsvEditor.KnownValues;
@@ -371,10 +372,10 @@ namespace GlueCsvEditor.Data
                 // Remove the List<> if exists
                 type = type.Replace("List<", "").Replace(">", "");
 
+
                 // Check if the type matches a ParsedClass
                 var parsedClass = _cachedTypes.ProjectClasses
                                               .FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(type, StringComparison.OrdinalIgnoreCase));
-
                 if (parsedClass != null)
                 {
                     return parsedClass.ParsedProperties
@@ -384,6 +385,40 @@ namespace GlueCsvEditor.Data
                                           Type = x.Type.Name
                                       })
                                       .ToArray();
+                }
+                else
+                {
+
+                    var foundType = _cachedTypes.AssemblyClasses
+                        .FirstOrDefault(x => x.FullName.Equals(type, StringComparison.OrdinalIgnoreCase));
+
+                    if(foundType != null)
+                    {
+                        List<ComplexTypeProperty> toReturn = new List<ComplexTypeProperty>();
+
+                        foreach (var field in foundType.GetFields().Where(
+                            (f) =>
+                            {
+                                return f.IsStatic == false && f.IsPublic == true;
+                            }))
+                        {
+                            ComplexTypeProperty toAdd = new ComplexTypeProperty();
+                            toAdd.Name = field.Name;
+                            toAdd.Type = field.FieldType.Name;
+                            toReturn.Add(toAdd);
+                        }
+
+
+                        foreach (var property in foundType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                        {
+                            ComplexTypeProperty toAdd = new ComplexTypeProperty();
+                            toAdd.Name = property.Name;
+                            toAdd.Type = property.PropertyType.Name;
+                            toReturn.Add(toAdd);
+                        }
+                        return toReturn;
+
+                    }
                 }
             }
 

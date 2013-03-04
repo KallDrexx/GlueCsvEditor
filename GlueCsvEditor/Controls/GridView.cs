@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using GlueCsvEditor.Data;
 using System.Reflection;
+using System.Threading;
 
 namespace GlueCsvEditor.Controls
 {
@@ -617,13 +618,27 @@ namespace GlueCsvEditor.Controls
             }
         }
 
+        object mFilterKnownTypesLock = new object();
         private void FilterKnownTypes()
         {
-            lstFilteredTypes.DataSource =
-                _knownTypes.Where(x => x.IndexOf(txtHeaderType.Text.Trim(), StringComparison.OrdinalIgnoreCase) >= 0)
-                           .ToList();
+            ThreadPool.QueueUserWorkItem(stateObject=>
+            {
+                lock(mFilterKnownTypesLock)
+                {
+                    string trimmed = txtHeaderType.Text.Trim();
 
-            lstFilteredTypes.ClearSelected();
+                    var dataSource = _knownTypes.Where(x => x.IndexOf(trimmed, StringComparison.OrdinalIgnoreCase) >= 0)
+                               .ToList();
+                
+                    lstFilteredTypes.Invoke((MethodInvoker)(() =>
+                        {
+                            lstFilteredTypes.DataSource = dataSource;
+                            lstFilteredTypes.ClearSelected();
+                        }
+                        
+                     ));
+                }
+            });
         }
 
         private void UpdatePropertiesDisplay(string type, string value)
