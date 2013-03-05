@@ -8,8 +8,14 @@ namespace GlueCsvEditor.Data
 {
     public class ComplexCsvTypeDetails
     {
+        #region Fields
+
         private const char PropertyCollectionStartChar = '(';
         private const char PropertyCollectionEndChar = ')';
+
+        #endregion
+
+
 
         [Category("General Information")]
         public string TypeName { get; set; }
@@ -18,9 +24,24 @@ namespace GlueCsvEditor.Data
         public string Namespace { get; set; }
 
         [Category("General Information")]
-        public bool IsShorthandFormat { get; set; }
+        [DisplayName("Use \"new\"")]
+        public bool UseNewSyntax { get; set; }
+
+        [Browsable(false)]
+        public string DefaultType { get; set; }
+
 
         public List<ComplexTypeProperty> Properties { get; private set; }
+
+        public static bool IsLonghandComplexType(string value)
+        {
+            return value != null && value.StartsWith("new ", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsShorthandComplexDefinition(string value)
+        {
+            return string.IsNullOrWhiteSpace(value) == false && value.Contains("=");
+        }
 
         public ComplexCsvTypeDetails()
         {
@@ -35,88 +56,101 @@ namespace GlueCsvEditor.Data
 
         private static ComplexCsvTypeDetails ParseLonghandTypeFormat(string value)
         {
-            var result = new ComplexCsvTypeDetails();
+            var result = new ComplexCsvTypeDetails { UseNewSyntax = true };
+
 
             // Figure out if the type is in the format of 
             //   new Namespace.Type( Property1 = abc, Property2 = cdef )
             value = (value ?? string.Empty).Trim();
-            if (!value.StartsWith("new ", StringComparison.OrdinalIgnoreCase))
-                return null;
-
-            // Get indexes for braces/parenthesis
-            int start = value.IndexOf(PropertyCollectionStartChar);
-            int end = value.LastIndexOf(PropertyCollectionEndChar);
-
-            if (start < 0 || end < 0)
-                return null; // Invalid format
-
-            // Isolate the type string
-            string isolatedTypeString = value.Substring(3, start - 3);
-            if (isolatedTypeString.Contains("."))
+            if (IsLonghandComplexType(value))
             {
-                result.Namespace = isolatedTypeString.Remove(isolatedTypeString.LastIndexOf(".", System.StringComparison.Ordinal)).Trim();
-                result.TypeName = isolatedTypeString.Substring(isolatedTypeString.LastIndexOf(".", System.StringComparison.Ordinal) + 1).Trim();
+                // Get indexes for braces/parenthesis
+                int start = value.IndexOf(PropertyCollectionStartChar);
+                int end = value.LastIndexOf(PropertyCollectionEndChar);
+
+                if (start < 0 || end < 0)
+                    return null; // Invalid format
+
+                // Isolate the type string
+                string isolatedTypeString = value.Substring(3, start - 3);
+                if (isolatedTypeString.Contains("."))
+                {
+                    result.Namespace = isolatedTypeString.Remove(isolatedTypeString.LastIndexOf(".", System.StringComparison.Ordinal)).Trim();
+                    result.TypeName = isolatedTypeString.Substring(isolatedTypeString.LastIndexOf(".", System.StringComparison.Ordinal) + 1).Trim();
+                }
+                else
+                {
+                    result.Namespace = string.Empty;
+                    result.TypeName = isolatedTypeString.Trim();
+                }
+
+                // Figure out the properties
+                string propertiesString = value.Substring(start + 1, end - start - 1);
+                var propertyDefinitions = propertiesString.Split(new char[] { ',' });
+                foreach (var propertyDefinition in propertyDefinitions)
+                {
+                    var pair = propertyDefinition.Split(new char[] { '=' });
+                    if (pair.Length != 2)
+                        continue; // not a valid property definition
+
+                    result.Properties.Add(new ComplexTypeProperty
+                    {
+                        Name = pair[0].Trim(),
+                        Value = pair[1].Trim()
+                    });
+                }
             }
             else
             {
-                result.Namespace = string.Empty;
-                result.TypeName = isolatedTypeString.Trim();
+                result = null;
             }
-
-            // Figure out the properties
-            string propertiesString = value.Substring(start + 1, end - start - 1);
-            var propertyDefinitions = propertiesString.Split(new char[] {','});
-            foreach (var propertyDefinition in propertyDefinitions)
-            {
-                var pair = propertyDefinition.Split(new char[] {'='});
-                if (pair.Length != 2)
-                    continue; // not a valid property definition
-
-                result.Properties.Add(new ComplexTypeProperty
-                {
-                    Name = pair[0].Trim(),
-                    Value = pair[1].Trim()
-                });
-            }
-
             return result;
         }
 
         private static ComplexCsvTypeDetails ParseShorthandTypeFormat(string value)
         {
-            var result = new ComplexCsvTypeDetails {IsShorthandFormat = true};
+            var result = new ComplexCsvTypeDetails { UseNewSyntax = false };
 
             // Parse type specified in "property = value, property2 = value2" format
-            if (string.IsNullOrWhiteSpace(value) || !value.Contains("="))
-                return null;
-
-            var properties = value.Split(',');
-            foreach (var property in properties)
+            if (IsShorthandComplexDefinition(value))
             {
-                // Invalid propery definitions are ignored
-                var parts = property.Split('=');
-                if (parts.Length != 2)
-                    continue;
 
-                // First part is the property name
-                if (parts[0].Trim() == string.Empty)
-                    continue;
-
-                result.Properties.Add(new ComplexTypeProperty
+                var properties = value.Split(',');
+                foreach (var property in properties)
                 {
-                    Name = parts[0].Trim(),
-                    Value = parts[1].Trim()
-                });
-            }
+                    // Invalid propery definitions are ignored
+                    var parts = property.Split('=');
+                    if (parts.Length != 2)
+                        continue;
 
+                    // First part is the property name
+                    if (parts[0].Trim() == string.Empty)
+                        continue;
+
+                    result.Properties.Add(new ComplexTypeProperty
+                    {
+                        Name = parts[0].Trim(),
+                        Value = parts[1].Trim()
+                    });
+                }
+            }
+            else
+            {
+                result = null;
+            }
             return result;
         }
 
         public override string ToString()
         {
-            return IsShorthandFormat 
-                ? ToShorthandString() 
-                : ToLonghandString();
+            if (UseNewSyntax)
+            {
+                return ToLonghandString();
+            }
+            else
+            {
+                return ToShorthandString();
+            }
         }
 
         private string ToShorthandString()
@@ -145,15 +179,25 @@ namespace GlueCsvEditor.Data
         {
             var output = new StringBuilder("new ");
 
-            if (!string.IsNullOrWhiteSpace(Namespace))
+            if (string.IsNullOrEmpty(TypeName))
             {
-                output.Append(Namespace);
-                output.Append(".");
+                output.Append(DefaultType);
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(Namespace))
+                {
+                    output.Append(Namespace);
+                    output.Append(".");
+                }
+
+                output.Append(TypeName);
             }
 
-            output.Append(TypeName);
-
             // Get a list of all properties that do not hav empty values
+            // Victor Chelaru says: The user should be able to set empty
+            // strings here, and have them apply.  Therefore we need to differentiate
+            // between empty strings and null values.
             var filledProperties = Properties.Where(x => !string.IsNullOrWhiteSpace(x.Value))
                                              .ToList();
 
@@ -181,5 +225,6 @@ namespace GlueCsvEditor.Data
 
             return output.ToString();
         }
+
     }
 }

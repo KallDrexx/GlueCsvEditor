@@ -13,7 +13,8 @@ namespace GlueCsvEditor.Controls
     {
         OnlyDataGrid,
         ShowPropertyGrid,
-        ShowMultiLineText
+        ShowMultiLineText,
+        ExpandedShowNothing
     }
 
     public partial class GridView : UserControl
@@ -76,7 +77,6 @@ namespace GlueCsvEditor.Controls
                 switch (mCurrentLayoutStateButPleaseUseThePropertyInstead)
                 {
                     case LayoutState.ShowMultiLineText:
-
                         RefreshMultiLineDisplay();
                         break;
                     case LayoutState.ShowPropertyGrid:
@@ -621,11 +621,12 @@ namespace GlueCsvEditor.Controls
         object mFilterKnownTypesLock = new object();
         private void FilterKnownTypes()
         {
-            ThreadPool.QueueUserWorkItem(stateObject=>
+            // This can't be in the ThreadPool because we can't access winforms stuff from other threads
+            string trimmed = txtHeaderType.Text.Trim();
+            ThreadPool.QueueUserWorkItem(stateObject =>
             {
                 lock(mFilterKnownTypesLock)
                 {
-                    string trimmed = txtHeaderType.Text.Trim();
 
                     var dataSource = _knownTypes.Where(x => x.IndexOf(trimmed, StringComparison.OrdinalIgnoreCase) >= 0)
                                .ToList();
@@ -657,6 +658,7 @@ namespace GlueCsvEditor.Controls
             var knownProperties = _data.GetKnownProperties(_currentColumnIndex);
             var complexTypeProperties = knownProperties as ComplexTypeProperty[] ?? knownProperties.ToArray();
             var complexType = ComplexCsvTypeDetails.ParseValue(value);
+            
             btnShowComplexProperties.Visible = true;
 
             if (!complexTypeProperties.Any() && complexType == null)
@@ -668,6 +670,7 @@ namespace GlueCsvEditor.Controls
             // If the complex type coudln't be parsed from the current value, create one manually
             if (complexType == null)
                 complexType = new ComplexCsvTypeDetails { Namespace = ns, TypeName = type };
+            complexType.DefaultType = type;
 
             // Go through all the properties and add any "known ones" that weren't part of the parsed set
             foreach (var prop in complexTypeProperties)
@@ -724,21 +727,33 @@ namespace GlueCsvEditor.Controls
                 cmbCelldata.Text = value;
 
                 _stringColumnSelected = (header.Type == "string");
-                if (CurrentLayoutState != LayoutState.OnlyDataGrid)
+
+                if (!_stringColumnSelected && !ComplexCsvTypeDetails.IsLonghandComplexType(value) &&
+                    !ComplexCsvTypeDetails.IsShorthandComplexDefinition(value))
                 {
-                    if (_stringColumnSelected)
+                    if (CurrentLayoutState != LayoutState.OnlyDataGrid)
                     {
-                        CurrentLayoutState = LayoutState.ShowMultiLineText;
-                    }
-                    else
-                    {
-                        CurrentLayoutState = LayoutState.ShowPropertyGrid;
+                        CurrentLayoutState = LayoutState.ExpandedShowNothing;
                     }
                 }
-
-                if (!_stringColumnSelected)
+                else
                 {
-                    UpdatePropertiesDisplay(header.Type, value);
+                    if (CurrentLayoutState != LayoutState.OnlyDataGrid)
+                    {
+                        if (_stringColumnSelected)
+                        {
+                            CurrentLayoutState = LayoutState.ShowMultiLineText;
+                        }
+                        else
+                        {
+                            CurrentLayoutState = LayoutState.ShowPropertyGrid;
+                        }
+                    }
+
+                    if (!_stringColumnSelected)
+                    {
+                        UpdatePropertiesDisplay(header.Type, value);
+                    }
                 }
             }
             DataLoadingCount--;
@@ -757,7 +772,11 @@ namespace GlueCsvEditor.Controls
                     txtMultilineEditor.Visible = false;
 
                     break;
+                case LayoutState.ExpandedShowNothing:
+                    pgrPropertyEditor.Visible = false;
+                    txtMultilineEditor.Visible = false;
 
+                    break;
             }
         }
         private void RefreshMultiLineDisplay()

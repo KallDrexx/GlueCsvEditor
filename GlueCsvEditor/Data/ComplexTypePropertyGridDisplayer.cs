@@ -2,12 +2,26 @@
 using System.Linq;
 using FlatRedBall.Glue.GuiDisplay;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace GlueCsvEditor.Data
 {
     public class ComplexTypePropertyGridDisplayer : PropertyGridDisplayer
     {
+        #region Fields
+
         protected CsvData _csvData;
+        CategoryAttribute mPropertyCategory = new CategoryAttribute("Properties");
+
+        #endregion
+
+        #region Properties
+
+        public string ColumnType
+        {
+            get;
+            set;
+        }
 
         public override object Instance
         {
@@ -20,10 +34,18 @@ namespace GlueCsvEditor.Data
                 mInstance = value;
                 UpdateDisplayedFields(value as ComplexCsvTypeDetails);
                 base.Instance = value;
+
+                // Victor Chelaru
+                // Right now we ahve to set the after member change *after* changing base.Instance
+                // I need to fix this
+                GetPropertyGridMember("UseNewSyntax").AfterMemberChange += AfterUseNewSyntaxChanged;
+
             }
         }
 
         public ComplexTypeUpdatedDelegate ComplexTypeUpdatedHandler { get; set; }
+
+        #endregion
 
         public ComplexTypePropertyGridDisplayer(CsvData csvData)
         {
@@ -41,37 +63,64 @@ namespace GlueCsvEditor.Data
             ExcludeMember("ConstructorValues");
             ExcludeMember("Properties");
 
-            var propertyCategory = new CategoryAttribute("Properties");
 
             // Add properties
-            for (int x = 0; x < complexTypeDetails.Properties.Count; x++)
+            for (int i = 0; i < complexTypeDetails.Properties.Count; i++)
             {
-                int count = x; // Required for delegates to evaluate properly
-                string propertyName = complexTypeDetails.Properties[x].Name;
-                if (!string.IsNullOrWhiteSpace(complexTypeDetails.Properties[x].Type))
-                    propertyName = string.Concat(propertyName, " (", complexTypeDetails.Properties[x].Type, ")");
-                
-                // Setup events
-                Func<object> getter = () => complexTypeDetails.Properties[count].Value;
-                MemberChangeEventHandler setter = (sender, args) => 
-                {
-                    complexTypeDetails.Properties[count].Value = args.Value as string;
-                    if (ComplexTypeUpdatedHandler != null)
-                    {
-                        var complexCsvTypeDetails = mInstance as ComplexCsvTypeDetails;
-                        if (complexCsvTypeDetails != null)
-                            ComplexTypeUpdatedHandler(complexCsvTypeDetails.ToString());
-                    }
-                };
+                ComplexTypeProperty property = complexTypeDetails.Properties[i];
 
-                // Setup type converter
-                var knownValues = _csvData.GetKnownValuesForType(complexTypeDetails.Properties[x].Type);
-                TypeConverter converter = null;
-                var enumerable = knownValues as string[] ?? knownValues.ToArray();
-                if (enumerable.Any())
-                    converter = new AvailableKnownValuesTypeConverter(enumerable);
+                IncludeComplexProperty(property);
+            }
 
-                IncludeMember(propertyName, typeof(string), setter, getter, converter, new Attribute[] { propertyCategory });
+            if (complexTypeDetails.UseNewSyntax == false)
+            {
+                ExcludeMember("Namespace");
+                ExcludeMember("TypeName");
+            }
+
+        }
+
+        private void AfterUseNewSyntaxChanged(object sender, MemberChangeArgs args)
+        {
+
+            CallOnUpdate();
+        }
+
+        private void IncludeComplexProperty(ComplexTypeProperty property)
+        {
+            string propertyName = property.Name;
+            if (!string.IsNullOrWhiteSpace(property.Type))
+            {
+                propertyName = string.Concat(propertyName, " (", property.Type, ")");
+            }
+
+            // Setup events
+            Func<object> getter = () => property.Value;
+            MemberChangeEventHandler setter = (sender, args) =>
+            {
+                property.Value = args.Value as string;
+                CallOnUpdate();
+            };
+
+            // Setup type converter
+            var knownValues = _csvData.GetKnownValuesForType(property.Type);
+            TypeConverter converter = null;
+            var enumerable = knownValues as string[] ?? knownValues.ToArray();
+            if (enumerable.Any())
+            {
+                converter = new AvailableKnownValuesTypeConverter(enumerable);
+            }
+
+            IncludeMember(propertyName, typeof(string), setter, getter, converter, new Attribute[] { mPropertyCategory });
+        }
+
+        private void CallOnUpdate()
+        {
+            if (ComplexTypeUpdatedHandler != null)
+            {
+                var complexCsvTypeDetails = mInstance as ComplexCsvTypeDetails;
+                if (complexCsvTypeDetails != null)
+                    ComplexTypeUpdatedHandler(complexCsvTypeDetails.ToString());
             }
         }
 
