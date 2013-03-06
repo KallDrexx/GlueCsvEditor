@@ -561,6 +561,15 @@ namespace GlueCsvEditor.Controls
             SaveCsv();
         }
 
+        private void cmbCelldata_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (_currentRowIndex < (dgrEditor.RowCount - 1))
+                    dgrEditor.CurrentCell = dgrEditor[_currentColumnIndex, _currentRowIndex + 1];
+            }
+        }
+
         #endregion
 
         #region Internal Methods
