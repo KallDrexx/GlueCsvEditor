@@ -336,8 +336,13 @@ namespace GlueCsvEditor.Controls
 
             else if (e.KeyCode == Keys.Delete)
             {
-                // Clear the whole cell's value
-                dgrEditor[_currentColumnIndex, _currentRowIndex].Value = string.Empty;
+                // Clear the value of all selected cells
+                var cells = dgrEditor.SelectedCells;
+                for (int x = 0; x < cells.Count; x++)
+                {
+                    cells[x].Value = string.Empty;
+                }
+
                 e.Handled = true;
             }
 
