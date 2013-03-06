@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -411,10 +412,23 @@ namespace GlueCsvEditor.Data
 
                         foreach (var property in foundType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                         {
-                            ComplexTypeProperty toAdd = new ComplexTypeProperty();
-                            toAdd.Name = property.Name;
-                            toAdd.Type = property.PropertyType.Name;
-                            toReturn.Add(toAdd);
+                            var found = property.GetCustomAttributes(typeof(BrowsableAttribute), true);
+                            bool shouldSkip = false;
+                            foreach (BrowsableAttribute attribute in found)
+                            {
+                                if (attribute != null && attribute.Browsable == false)
+                                {
+                                    shouldSkip = true;
+                                }
+                            }
+                            if (shouldSkip == false)
+                            {
+                                ComplexTypeProperty toAdd = new ComplexTypeProperty();
+
+                                toAdd.Name = property.Name;
+                                toAdd.Type = property.PropertyType.Name;
+                                toReturn.Add(toAdd);
+                            }
                         }
                         return toReturn;
 

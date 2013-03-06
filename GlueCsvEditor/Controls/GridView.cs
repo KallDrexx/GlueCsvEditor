@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using GlueCsvEditor.Data;
 using System.Reflection;
 using System.Threading;
+using FlatRedBall.Glue.Parsing;
 
 namespace GlueCsvEditor.Controls
 {
@@ -579,6 +580,21 @@ namespace GlueCsvEditor.Controls
 
         #region Internal Methods
 
+        private bool IsComplexType(string typeAsString)
+        {
+            Type type = TypeManager.GetTypeFromString(typeAsString);
+
+            if (type == null || type.IsPrimitive == false || type.IsEnum == false)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
         private void SaveCsv()
         {
             IgnoreNextFileChange = true;
@@ -683,7 +699,10 @@ namespace GlueCsvEditor.Controls
 
             // If the complex type coudln't be parsed from the current value, create one manually
             if (complexType == null)
+            {
                 complexType = new ComplexCsvTypeDetails { Namespace = ns, TypeName = type };
+            }
+
             complexType.DefaultType = type;
 
             // Go through all the properties and add any "known ones" that weren't part of the parsed set
@@ -742,8 +761,10 @@ namespace GlueCsvEditor.Controls
 
                 _stringColumnSelected = (header.Type == "string");
 
-                if (!_stringColumnSelected && !ComplexCsvTypeDetails.IsLonghandComplexType(value) &&
-                    !ComplexCsvTypeDetails.IsShorthandComplexDefinition(value))
+                bool isComplexType = IsComplexType(header.Type);
+
+                if (!_stringColumnSelected &&
+                    isComplexType == false)
                 {
                     if (CurrentLayoutState != LayoutState.OnlyDataGrid)
                     {
