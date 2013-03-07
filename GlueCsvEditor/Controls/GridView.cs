@@ -316,8 +316,26 @@ namespace GlueCsvEditor.Controls
             {
                 if (dgrEditor.CurrentCell != null)
                 {
-                    Clipboard.SetText(dgrEditor.CurrentCell.Value.ToString());
-                    dgrEditor.CurrentCell.Value = string.Empty;
+
+                    // If this fails, we will just ignore
+                    bool succeeded = false;
+                    try
+                    {
+                        Clipboard.SetDataObject(
+                            dgrEditor.CurrentCell.Value.ToString(), //text to store in clipboard
+                            true,        //do keep after our app exits
+                            5,           //retry 5 times
+                            200);        //200ms delay between retries
+                        succeeded = true;
+                    }
+                    catch
+                    {
+                        succeeded = false;
+                    }
+                    if (succeeded)
+                    {
+                        dgrEditor.CurrentCell.Value = string.Empty;
+                    }
                 }
             }
 
