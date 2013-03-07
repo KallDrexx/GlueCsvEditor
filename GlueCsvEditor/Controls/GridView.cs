@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using GlueCsvEditor.Data;
 using System.Reflection;
@@ -9,7 +10,6 @@ using FlatRedBall.Glue.Parsing;
 
 namespace GlueCsvEditor.Controls
 {
-
     public enum LayoutState
     {
         OnlyDataGrid,
@@ -27,12 +27,11 @@ namespace GlueCsvEditor.Controls
         private int _currentRowIndex;
         private readonly CsvData _data;
         private IEnumerable<string> _knownTypes;
-        private int _originalGridTop;
-        private int _originalHeight;
         private bool _stringColumnSelected;
         private readonly List<Keys> _downArrowKeys;
         private readonly CachedTypes _cachedTypes;
-        private LayoutState mCurrentLayoutStateButPleaseUseThePropertyInstead;
+        private LayoutState _currentLayoutStateButPleaseUseThePropertyInstead;
+        private readonly object _filterKnownTypesLock = new object();
         #endregion
 
         #region Properties
@@ -41,17 +40,17 @@ namespace GlueCsvEditor.Controls
         {
             get
             {
-                return mCurrentLayoutStateButPleaseUseThePropertyInstead;
+                return _currentLayoutStateButPleaseUseThePropertyInstead;
             }
             set
             {
                 var oldCurrentState =
-                    mCurrentLayoutStateButPleaseUseThePropertyInstead;
+                    _currentLayoutStateButPleaseUseThePropertyInstead;
 
 
-                mCurrentLayoutStateButPleaseUseThePropertyInstead = value;
+                _currentLayoutStateButPleaseUseThePropertyInstead = value;
 
-                if (mCurrentLayoutStateButPleaseUseThePropertyInstead == LayoutState.OnlyDataGrid)
+                if (_currentLayoutStateButPleaseUseThePropertyInstead == LayoutState.OnlyDataGrid)
                 {
                     // Hide the top
                     LeftSideSplitContainer.Panel1MinSize = 0;
@@ -75,7 +74,7 @@ namespace GlueCsvEditor.Controls
                 RefreshAlternativeEditControlVisibility();
 
                 // Refresh the display
-                switch (mCurrentLayoutStateButPleaseUseThePropertyInstead)
+                switch (_currentLayoutStateButPleaseUseThePropertyInstead)
                 {
                     case LayoutState.ShowMultiLineText:
                         RefreshMultiLineDisplay();
@@ -86,9 +85,6 @@ namespace GlueCsvEditor.Controls
                 }
             }
         }
-
-
-
 
         private int DataLoadingCount { get; set; }
 
@@ -401,40 +397,24 @@ namespace GlueCsvEditor.Controls
 
         private void btnDeleteRow_Click(object sender, EventArgs e)
         {
-            string message;
-
-            // Find some identifying information for the row to present in
-            //   a confirmation box
-            var headers = Enumerable.Range(1, _data.GetHeaderText().Count).Select(x => _data.GetHeaderDetails(x - 1)).ToList();
-            var values = Enumerable.Range(1, headers.Count).Select(x => _data.GetValue(_currentRowIndex, x - 1)).ToList();
-
-            // First check if all the values are empty
-            if (values.All(string.IsNullOrWhiteSpace))
+            var multipleRowsSelected = false;
+            int? lastRow = null;
+            for (int x = 0; x < dgrEditor.SelectedCells.Count; x++)
             {
-                message = string.Format("Delete row #{0} (empty row)?", _currentRowIndex);
+                var curRowIndex = dgrEditor.SelectedCells[x].RowIndex;
+                if (lastRow != null && lastRow != curRowIndex)
+                {
+                    multipleRowsSelected = true;
+                    break;
+                }
+
+                lastRow = curRowIndex;
             }
-            else if (headers.Any(x => x.IsRequired))
-            {
-                var requiredHeader = headers.FirstOrDefault(x => x.IsRequired);
-                message = string.Format("Delete row #{0} ({1})?", _currentRowIndex, values[headers.IndexOf(requiredHeader)]);
-            }
+
+            if (multipleRowsSelected)
+                DeleteMultipleRows();
             else
-            {
-                // Get the first non-empty value
-                var val = values.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-                message = string.Format("Delete row #{0} ({1})?", _currentRowIndex, val);
-            }
-
-            var result = MessageBox.Show(message, "Confirm Row Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-            if (result == DialogResult.Yes)
-            {
-                _data.RemoveRow(_currentRowIndex);
-                SaveCsv();
-
-                dgrEditor.RowCount = _data.GetRecordCount();
-                dgrEditor.Invalidate();
-                RefreshRowHeaders();
-            }
+                DeleteSingleRow();
         }
 
         private void btnAddColumn_Click(object sender, EventArgs e)
@@ -555,7 +535,6 @@ namespace GlueCsvEditor.Controls
         private void txtMultilineEditor_Leave(object sender, EventArgs e)
         {
             txtMultilineEditor.Visible = false;
-            ResetDataGridSizing();
         }
 
         private void txtMultilineEditor_TextChanged(object sender, EventArgs e)
@@ -648,14 +627,13 @@ namespace GlueCsvEditor.Controls
             }
         }
 
-        object mFilterKnownTypesLock = new object();
         private void FilterKnownTypes()
         {
             // This can't be in the ThreadPool because we can't access winforms stuff from other threads
             string trimmed = txtHeaderType.Text.Trim();
             ThreadPool.QueueUserWorkItem(stateObject =>
             {
-                lock(mFilterKnownTypesLock)
+                lock(_filterKnownTypesLock)
                 {
 
                     var dataSource = _knownTypes.Where(x => x.IndexOf(trimmed, StringComparison.OrdinalIgnoreCase) >= 0)
@@ -793,9 +771,10 @@ namespace GlueCsvEditor.Controls
             }
             DataLoadingCount--;
         }
+
         private void RefreshAlternativeEditControlVisibility()
         {
-            switch (mCurrentLayoutStateButPleaseUseThePropertyInstead)
+            switch (_currentLayoutStateButPleaseUseThePropertyInstead)
             {
                 case LayoutState.ShowMultiLineText:
                     pgrPropertyEditor.Visible = false;
@@ -814,6 +793,7 @@ namespace GlueCsvEditor.Controls
                     break;
             }
         }
+
         private void RefreshMultiLineDisplay()
         {
             DataLoadingCount++;
@@ -828,11 +808,115 @@ namespace GlueCsvEditor.Controls
             pi.SetValue(dgrEditor, setting, null);
         }
 
-        private void ResetDataGridSizing()
+        private void DeleteSingleRow()
         {
-            // Reset the property grid sizing
-            dgrEditor.Top = _originalGridTop;
-            dgrEditor.Height = _originalHeight;
+            string message;
+            // Find some identifying information for the row to present in
+            //   a confirmation box
+            var headers = Enumerable.Range(1, _data.GetHeaderText().Count).Select(x => _data.GetHeaderDetails(x - 1)).ToList();
+            var values = Enumerable.Range(1, headers.Count).Select(x => _data.GetValue(_currentRowIndex, x - 1)).ToList();
+
+            // First check if all the values are empty
+            if (values.All(string.IsNullOrWhiteSpace))
+            {
+                message = string.Format("Delete row #{0} (empty row)?", _currentRowIndex);
+            }
+            else if (headers.Any(x => x.IsRequired))
+            {
+                var requiredHeader = headers.FirstOrDefault(x => x.IsRequired);
+                message = string.Format("Delete row #{0} ({1})?", _currentRowIndex, values[headers.IndexOf(requiredHeader)]);
+            }
+            else
+            {
+                // Get the first non-empty value
+                var val = values.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+                message = string.Format("Delete row #{0} ({1})?", _currentRowIndex, val);
+            }
+
+            var result = MessageBox.Show(message, "Confirm Row Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            if (result == DialogResult.Yes)
+            {
+                _data.RemoveRow(_currentRowIndex);
+                SaveCsv();
+
+                dgrEditor.RowCount = _data.GetRecordCount();
+                dgrEditor.Invalidate();
+                RefreshRowHeaders();
+            }
+        }
+
+        private void DeleteMultipleRows()
+        {
+            var message = new StringBuilder("Delete rows ");
+
+            // Get all selected rows
+            var rowIndexes = dgrEditor.SelectedCells
+                                      .Cast<DataGridViewCell>()
+                                      .Select(x => x.RowIndex)
+                                      .Distinct()
+                                      .OrderBy(x => x)
+                                      .ToArray();
+
+            // Check if the indexes are consecutive
+            var isConsecutive = true;
+            var lastIndex = (int?) null;
+            foreach (var rowIndex in rowIndexes )
+            {
+                if (lastIndex != null && lastIndex + 1 != rowIndex)
+                {
+                    isConsecutive = false;
+                    break;
+                }
+
+                lastIndex = rowIndex;
+            }
+
+            if (isConsecutive)
+            {
+                message.Append(rowIndexes[0])
+                       .Append("-")
+                       .Append(rowIndexes[rowIndexes.Length - 1] + 1);
+            }
+            else
+            {
+                for (int x = 0; x < rowIndexes.Length; x++)
+                {
+                    if (x > 0)
+                        message.Append(", ");
+
+                    if (x == rowIndexes.Length - 1)
+                        message.Append("and ");
+
+                    message.Append(rowIndexes[x] + 1);
+                }
+            }
+
+            var result = MessageBox.Show(message.ToString(), "Confirm Row Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            if (result == DialogResult.Yes)
+            {
+                // Required to prevent crashes if the user deletes the last rows
+                //   If the selection is not cleared, CellEnter will be called
+                //   On the incorrect row/column out of bounds of the CSV and crash
+                dgrEditor.ClearSelection();
+                dgrEditor.CurrentCell = null;
+
+                // Delete the rows in descending order
+                for (int x = rowIndexes.Length - 1; x >= 0; x-- )
+                    _data.RemoveRow(rowIndexes[x]);
+
+                SaveCsv();
+
+                var recordCount = _data.GetRecordCount();
+                if (_currentRowIndex >= recordCount)
+                    _currentRowIndex = recordCount - 1;
+
+                dgrEditor.RowCount = recordCount;
+                dgrEditor.Invalidate();
+                RefreshRowHeaders();
+
+                dgrEditor.CurrentCell = dgrEditor[_currentColumnIndex, _currentRowIndex];
+                UpdateCellDisplays();
+            }
         }
 
         #endregion
