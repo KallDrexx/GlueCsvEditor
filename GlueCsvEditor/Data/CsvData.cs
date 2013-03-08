@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using FlatRedBall.Glue.Plugins;
 using FlatRedBall.IO.Csv;
 using GlueCsvEditor.KnownValues;
 
@@ -306,7 +307,14 @@ namespace GlueCsvEditor.Data
         {
             _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
             CsvFileManager.Delimiter = _delimiter;
-            CsvFileManager.Serialize(_csv, _csvPath);
+            try
+            {
+                CsvFileManager.Serialize(_csv, _csvPath);
+            }
+            catch (Exception e)
+            {
+                PluginManager.ReceiveOutput("Error saving the file " + _csvPath + "\n" + e.ToString());
+            }
         }
 
         /// <summary>
