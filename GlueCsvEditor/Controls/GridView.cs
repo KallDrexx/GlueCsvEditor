@@ -759,6 +759,8 @@ namespace GlueCsvEditor.Controls
 
                 bool isComplexType = IsComplexType(header.Type);
 
+                btnShowComplexProperties.Enabled = isComplexType || _stringColumnSelected;
+
                 if (!_stringColumnSelected &&
                     isComplexType == false)
                 {
