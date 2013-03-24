@@ -59,7 +59,11 @@ namespace GlueCsvEditor.Controls
 
         protected void CachedTypesReadyHandler()
         {
-            _gridView.CachedTypesReady();
+            // Don't let this crash Glue:
+            if (_gridView != null)
+            {
+                _gridView.CachedTypesReady();
+            }
         }
     }
 }

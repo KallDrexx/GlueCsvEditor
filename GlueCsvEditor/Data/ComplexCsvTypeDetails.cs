@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using FlatRedBall.Utilities;
 
 namespace GlueCsvEditor.Data
 {
@@ -106,7 +107,6 @@ namespace GlueCsvEditor.Data
             }
             return result;
         }
-
         private static ComplexCsvTypeDetails ParseShorthandTypeFormat(string value)
         {
             var result = new ComplexCsvTypeDetails { UseNewSyntax = false };
@@ -115,8 +115,8 @@ namespace GlueCsvEditor.Data
             if (IsShorthandComplexDefinition(value))
             {
 
-                var properties = value.Split(',');
-                foreach (var property in properties)
+                var splitProperties = FlatRedBall.Instructions.Reflection.PropertyValuePair.SplitProperties(value);
+                foreach (var property in splitProperties)
                 {
                     // Invalid propery definitions are ignored
                     var parts = property.Split('=');
