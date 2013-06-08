@@ -98,6 +98,8 @@ namespace GlueCsvEditor.Controls
 
         public bool IgnoreNextFileChange { get; set; }
 
+        public bool IgnoreChangesToRightSideUi { get; set; }
+
         #endregion
 
         #region Public Methods
@@ -115,11 +117,13 @@ namespace GlueCsvEditor.Controls
 
         public void ReloadCsvDisplay()
         {
+            IgnoreChangesToRightSideUi = true;
             // Clear the right editor side
             txtHeaderName.Text = string.Empty;
             txtHeaderType.Text = string.Empty;
             chkIsList.Checked = false;
             chkIsList.Checked = false;
+            IgnoreChangesToRightSideUi = false;
 
             SuspendLayout();
             DataLoadingCount++;
@@ -202,12 +206,17 @@ namespace GlueCsvEditor.Controls
 
         private void txtHeaderName_TextChanged(object sender, EventArgs e)
         {
+            if (IgnoreChangesToRightSideUi)
+            {
+                return;
+            }
+
             UpdateColumnDetails();
         }
 
         private void txtHeaderType_TextChanged(object sender, EventArgs e)
         {
-            if (DataLoading)
+            if (DataLoading || IgnoreChangesToRightSideUi)
                 return;
 
             UpdateColumnDetails();
@@ -217,11 +226,21 @@ namespace GlueCsvEditor.Controls
 
         private void chkIsRequired_CheckedChanged(object sender, EventArgs e)
         {
+            if (IgnoreChangesToRightSideUi)
+            {
+                return;
+            }
+
             UpdateColumnDetails();
         }
 
         private void chkIsList_CheckedChanged(object sender, EventArgs e)
         {
+            if (IgnoreChangesToRightSideUi)
+            {
+                return;
+            }
+
             UpdateColumnDetails();
         }
 

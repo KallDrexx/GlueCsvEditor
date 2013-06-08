@@ -14,10 +14,16 @@ namespace GlueCsvEditor
     [Export(typeof(PluginBase))]
     public class CsvEditorPlugin : PluginBase
     {
+        #region Fields
+
         protected EditorMain _editor;
         protected TabControl _tabContainer;
         protected PluginTab _tab;
         protected string _currentCsv;
+
+        #endregion
+
+        #region Properties
 
         [Import("GlueProjectSave")]
         public GlueProjectSave GlueProjectSave
@@ -41,6 +47,8 @@ namespace GlueCsvEditor
         }
 
         public override string FriendlyName { get { return "  Csv Editor"; } }
+
+        #endregion
 
         public override bool ShutDown(PluginShutDownReason reason)
         {
@@ -131,7 +139,10 @@ namespace GlueCsvEditor
         protected void ReactToFileChange(string filename)
         {
             if (filename.Equals(_currentCsv, StringComparison.OrdinalIgnoreCase))
+            {
+                PluginManager.ReceiveOutput("CSV Editor: Loading file because of external change " + filename);
                 _editor.NotifyOfCsvUpdate();
+            }
         }
 
         protected bool IsCsv(object obj)
