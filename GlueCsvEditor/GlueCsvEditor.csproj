@@ -12,6 +12,8 @@
     <AssemblyName>GlueCsvEditor</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,6 +56,9 @@
     </Reference>
     <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -94,6 +99,7 @@
     <Compile Include="Data\CsvColumnHeader.cs" />
     <Compile Include="Data\CsvData.cs" />
     <Compile Include="Data\FoundCell.cs" />
+    <Compile Include="Settings\EditorLayoutSettings.cs" />
     <Compile Include="KnownValues\EnumReflectionValueRetriever.cs" />
     <Compile Include="KnownValues\FrbStateValueRetriever.cs" />
     <Compile Include="KnownValues\IKnownValueRetriever.cs" />
@@ -101,6 +107,7 @@
     <Compile Include="KnownValues\ParsedEnumValueRetriever.cs" />
     <Compile Include="KnownValues\UsedRcrColumnValueRetriever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\SettingsManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Controls\EditorMain.resx">
@@ -120,12 +127,15 @@
     <Content Include="Libraries\XnaPc\Glue.exe" />
     <Content Include="Libraries\XnaPc\GlueSaveClasses.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy $(TargetDir)GlueCsvEditor.dll C:\Users\%25username%25\AppData\Roaming\FRBDK\Plugins\GlueCsvEditor\GlueCsvEditor.dll
 copy $(TargetDir)GlueCsvEditor.pdb C:\Users\%25username%25\AppData\Roaming\FRBDK\Plugins\GlueCsvEditor\GlueCsvEditor.pdb</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

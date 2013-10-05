@@ -16,10 +16,10 @@ namespace GlueCsvEditor
     {
         #region Fields
 
-        protected EditorMain _editor;
-        protected TabControl _tabContainer;
-        protected PluginTab _tab;
-        protected string _currentCsv;
+        private EditorMain _editor;
+        private TabControl _tabContainer;
+        private PluginTab _tab;
+        private string _currentCsv;
 
         #endregion
 
@@ -75,23 +75,20 @@ namespace GlueCsvEditor
             get { return new Version(1, 0); }
         }
 
-        protected void InitializeTab(TabControl tabControl)
+        private void InitializeTab(TabControl tabControl)
         {
             _tabContainer = tabControl;
         }
 
-        protected void OnClosedByUser(object sender)
-        {
-            PluginManagerBase.ShutDownPlugin(this);
-        }
-
-        protected void ReactToItemSelect(TreeNode selectedTreeNode)
+        private void ReactToItemSelect(TreeNode selectedTreeNode)
         {
             // Close the existing tab
             if (_tab != null)
             {
-                _tabContainer.Controls.Remove(_tab);
+                _editor.SaveEditorSettings();
                 _editor = null;
+
+                _tabContainer.Controls.Remove(_tab);
                 _tab = null;
                 _currentCsv = null;
             }
@@ -136,16 +133,17 @@ namespace GlueCsvEditor
             }
         }
 
-        protected void ReactToFileChange(string filename)
+        private void ReactToFileChange(string filename)
         {
             if (filename.Equals(_currentCsv, StringComparison.OrdinalIgnoreCase))
             {
                 PluginManager.ReceiveOutput("CSV Editor: Loading file because of external change " + filename);
+                _editor.SaveEditorSettings();
                 _editor.NotifyOfCsvUpdate();
             }
         }
 
-        protected bool IsCsv(object obj)
+        private bool IsCsv(object obj)
         {
             var csv = obj as ReferencedFileSave;
             if (csv == null)

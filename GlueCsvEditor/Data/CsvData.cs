@@ -12,10 +12,10 @@ namespace GlueCsvEditor.Data
 {
     public class CsvData
     {
-        protected string _csvPath;
-        protected char _delimiter;
-        protected CachedTypes _cachedTypes;
-        protected RuntimeCsvRepresentation _csv;
+        private readonly string _csvPath;
+        private char _delimiter;
+        private CachedTypes _cachedTypes;
+        private RuntimeCsvRepresentation _csv;
 
         public CsvData(string csvPath, CachedTypes cachedTypes, char delimiter = ',')
         {
@@ -24,6 +24,8 @@ namespace GlueCsvEditor.Data
             _cachedTypes = cachedTypes;
             Reload();
         }
+
+        public string CsvPath { get { return _csvPath; } }
 
         /// <summary>
         /// Adds a new row at the specified index

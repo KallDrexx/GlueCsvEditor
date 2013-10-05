@@ -6,9 +6,9 @@ namespace GlueCsvEditor.Controls
 {
     public partial class EditorMain : UserControl
     {
-        protected CsvData _csvData;
-        protected GridView _gridView;
-        protected CachedTypes _cachedTypes;
+        private CsvData _csvData;
+        private GridView _gridView;
+        private CachedTypes _cachedTypes;
 
         public EditorMain(string csvPath, char delimiter)
         {
@@ -33,6 +33,11 @@ namespace GlueCsvEditor.Controls
                 ReloadCsv();
         }
 
+        public void SaveEditorSettings()
+        {
+            _gridView.SaveEditorSettings();
+        }
+
         private void EditorMain_Load(object sender, EventArgs e)
         {
             Dock = DockStyle.Fill;
@@ -48,7 +53,7 @@ namespace GlueCsvEditor.Controls
             //ReloadCsv();
         }
 
-        protected void ReloadCsv()
+        private void ReloadCsv()
         {
             lock (this)
             {
@@ -57,7 +62,7 @@ namespace GlueCsvEditor.Controls
             }
         }
 
-        protected void CachedTypesReadyHandler()
+        private void CachedTypesReadyHandler()
         {
             // Don't let this crash Glue:
             if (_gridView != null)

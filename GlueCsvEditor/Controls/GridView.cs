@@ -7,6 +7,7 @@ using GlueCsvEditor.Data;
 using System.Reflection;
 using System.Threading;
 using FlatRedBall.Glue.Parsing;
+using GlueCsvEditor.Settings;
 
 namespace GlueCsvEditor.Controls
 {
@@ -22,16 +23,18 @@ namespace GlueCsvEditor.Controls
     {
         #region Member Variables
 
+        private readonly List<Keys> _downArrowKeys;
+        private readonly CachedTypes _cachedTypes;
+        private readonly EditorLayoutSettings _editorLayoutSettings;
+        private readonly object _filterKnownTypesLock = new object();
         private int _lastColumnIndex = -1;
         private int _currentColumnIndex;
         private int _currentRowIndex;
         private readonly CsvData _data;
         private IEnumerable<string> _knownTypes;
         private bool _stringColumnSelected;
-        private readonly List<Keys> _downArrowKeys;
-        private readonly CachedTypes _cachedTypes;
         private LayoutState _currentLayoutStateButPleaseUseThePropertyInstead;
-        private readonly object _filterKnownTypesLock = new object();
+
         #endregion
 
         #region Properties
@@ -111,6 +114,7 @@ namespace GlueCsvEditor.Controls
             _cachedTypes = cachedTypes;
             _downArrowKeys = new List<Keys>();
             _knownTypes = new string[0];
+            _editorLayoutSettings = SettingsManager.LoadEditorSettings(data);
 
             InitializeComponent();
         }
@@ -144,6 +148,7 @@ namespace GlueCsvEditor.Controls
             dgrEditor.RowCount = _data.GetRecordCount();
 
             RefreshRowHeaders();
+            ApplyLayoutSettings();
             ResumeLayout();
 
             // Auto-focus on the first cell
@@ -184,6 +189,17 @@ namespace GlueCsvEditor.Controls
                 FilterKnownTypes();
                 UpdateCellDisplays(true);
             });
+        }
+
+        public void SaveEditorSettings()
+        {
+            var widths = dgrEditor.Columns
+                                  .Cast<DataGridViewColumn>()
+                                  .Select(x => x.Width)
+                                  .ToArray();
+
+            _editorLayoutSettings.ColumnWidths = widths;
+            SettingsManager.SaveEditorSettings(_data, _editorLayoutSettings);
         }
 
         #endregion
@@ -615,6 +631,8 @@ namespace GlueCsvEditor.Controls
         {
             IgnoreNextFileChange = true;
             _data.SaveCsv();
+
+            SaveEditorSettings();
         }
 
         private void RefreshRowHeaders()
@@ -955,6 +973,23 @@ namespace GlueCsvEditor.Controls
 
                 dgrEditor.CurrentCell = dgrEditor[_currentColumnIndex, _currentRowIndex];
                 UpdateCellDisplays();
+            }
+        }
+
+        private void ApplyLayoutSettings()
+        {
+            if (_editorLayoutSettings == null)
+                return;
+
+            if (_editorLayoutSettings.ColumnWidths != null)
+            {
+                for (int x = 0; x < dgrEditor.Columns.Count; x++)
+                {
+                    if (x >= _editorLayoutSettings.ColumnWidths.Length)
+                        break;
+
+                    dgrEditor.Columns[x].Width = _editorLayoutSettings.ColumnWidths[x];
+                }
             }
         }
 
