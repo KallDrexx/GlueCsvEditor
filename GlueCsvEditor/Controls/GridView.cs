@@ -205,6 +205,7 @@ namespace GlueCsvEditor.Controls
             // Save selected sell
             _editorLayoutSettings.LastSelectedColumnIndex = dgrEditor.CurrentCell.ColumnIndex;
             _editorLayoutSettings.LastSelectedRowIndex = dgrEditor.CurrentCell.RowIndex;
+            _editorLayoutSettings.HeaderColumnWidth = dgrEditor.RowHeadersWidth;
 
             SettingsManager.SaveEditorSettings(_data, _editorLayoutSettings);
         }
@@ -999,6 +1000,9 @@ namespace GlueCsvEditor.Controls
                     dgrEditor.Columns[x].Width = _editorLayoutSettings.ColumnWidths[x];
                 }
             }
+
+            if (_editorLayoutSettings.HeaderColumnWidth > 0)
+                dgrEditor.RowHeadersWidth = _editorLayoutSettings.HeaderColumnWidth;
 
             // Select the previously selected cell
             if (_editorLayoutSettings.LastSelectedColumnIndex >= dgrEditor.Columns.Count)
