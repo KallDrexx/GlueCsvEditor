@@ -49,7 +49,7 @@ namespace GlueCsvEditor.Settings
             {
                 var content = JsonConvert.SerializeObject(settings);
 
-                using (var stream = File.OpenWrite(settingsPath))
+                using (var stream = File.Open(settingsPath, FileMode.Create, FileAccess.Write))
                 using (var writer = new StreamWriter(stream))
                 {
                     writer.Write(content);

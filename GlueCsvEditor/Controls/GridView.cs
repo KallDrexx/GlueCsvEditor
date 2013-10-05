@@ -148,7 +148,6 @@ namespace GlueCsvEditor.Controls
             dgrEditor.RowCount = _data.GetRecordCount();
 
             RefreshRowHeaders();
-            ApplyLayoutSettings();
             ResumeLayout();
 
             // Auto-focus on the first cell
@@ -172,6 +171,8 @@ namespace GlueCsvEditor.Controls
                 btnRemove.Enabled = false;
             }
 
+            ApplyLayoutSettings();
+
             DataLoadingCount--;
         }
 
@@ -193,12 +194,18 @@ namespace GlueCsvEditor.Controls
 
         public void SaveEditorSettings()
         {
+            // Save column widths
             var widths = dgrEditor.Columns
                                   .Cast<DataGridViewColumn>()
                                   .Select(x => x.Width)
                                   .ToArray();
 
             _editorLayoutSettings.ColumnWidths = widths;
+
+            // Save selected sell
+            _editorLayoutSettings.LastSelectedColumnIndex = dgrEditor.CurrentCell.ColumnIndex;
+            _editorLayoutSettings.LastSelectedRowIndex = dgrEditor.CurrentCell.RowIndex;
+
             SettingsManager.SaveEditorSettings(_data, _editorLayoutSettings);
         }
 
@@ -981,6 +988,7 @@ namespace GlueCsvEditor.Controls
             if (_editorLayoutSettings == null)
                 return;
 
+            // Set the column widths
             if (_editorLayoutSettings.ColumnWidths != null)
             {
                 for (int x = 0; x < dgrEditor.Columns.Count; x++)
@@ -991,6 +999,16 @@ namespace GlueCsvEditor.Controls
                     dgrEditor.Columns[x].Width = _editorLayoutSettings.ColumnWidths[x];
                 }
             }
+
+            // Select the previously selected cell
+            if (_editorLayoutSettings.LastSelectedColumnIndex >= dgrEditor.Columns.Count)
+                _editorLayoutSettings.LastSelectedColumnIndex = dgrEditor.Columns.Count - 1;
+
+            if (_editorLayoutSettings.LastSelectedRowIndex >= dgrEditor.Rows.Count)
+                _editorLayoutSettings.LastSelectedRowIndex = dgrEditor.Rows.Count - 1;
+
+            dgrEditor.CurrentCell =
+                dgrEditor[_editorLayoutSettings.LastSelectedColumnIndex, _editorLayoutSettings.LastSelectedRowIndex];
         }
 
         #endregion
