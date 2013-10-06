@@ -35,6 +35,8 @@ namespace GlueCsvEditor.Controls
         private bool _stringColumnSelected;
         private LayoutState _currentLayoutStateButPleaseUseThePropertyInstead;
 
+        System.Windows.Forms.Timer mTimer;
+
         #endregion
 
         #region Properties
@@ -117,6 +119,28 @@ namespace GlueCsvEditor.Controls
             _editorLayoutSettings = SettingsManager.LoadEditorSettings(data);
 
             InitializeComponent();
+            mTimer = new System.Windows.Forms.Timer();
+            mTimer.Interval = 50;
+            mTimer.Enabled = true;
+            mTimer.Tick += HandleTick;
+            
+            
+        }
+        bool mShouldScroll = false;
+        void HandleTick(object sender, EventArgs e)
+        {
+            if (mShouldScroll)
+            {
+
+                dgrEditor.CurrentCell =
+                    dgrEditor[_editorLayoutSettings.LastSelectedColumnIndex, _editorLayoutSettings.LastSelectedRowIndex];
+
+                //mShouldScroll = true;
+
+                dgrEditor.FirstDisplayedScrollingColumnIndex = _editorLayoutSettings.LastSelectedColumnIndex;
+                mShouldScroll = false;
+
+            }
         }
 
         public void ReloadCsvDisplay()
@@ -1011,8 +1035,12 @@ namespace GlueCsvEditor.Controls
             if (_editorLayoutSettings.LastSelectedRowIndex >= dgrEditor.Rows.Count)
                 _editorLayoutSettings.LastSelectedRowIndex = dgrEditor.Rows.Count - 1;
 
-            dgrEditor.CurrentCell =
-                dgrEditor[_editorLayoutSettings.LastSelectedColumnIndex, _editorLayoutSettings.LastSelectedRowIndex];
+            //dgrEditor.CurrentCell =
+            //    dgrEditor[_editorLayoutSettings.LastSelectedColumnIndex, _editorLayoutSettings.LastSelectedRowIndex];
+
+            mShouldScroll = true;
+            mTimer.Start();
+            //dgrEditor.FirstDisplayedScrollingColumnIndex = _editorLayoutSettings.LastSelectedColumnIndex;
         }
 
         #endregion

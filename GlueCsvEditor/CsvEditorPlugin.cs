@@ -72,7 +72,7 @@ namespace GlueCsvEditor
 
         public override Version Version
         {
-            get { return new Version(1, 0); }
+            get { return new Version(1, 0, 1); }
         }
 
         private void InitializeTab(TabControl tabControl)
