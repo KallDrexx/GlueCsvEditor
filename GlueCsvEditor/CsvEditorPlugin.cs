@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Reflection;
 using FlatRedBall.Glue;
 using FlatRedBall.Glue.Plugins.ExportedInterfaces;
 using FlatRedBall.Glue.Plugins.Interfaces;
@@ -23,8 +24,6 @@ namespace GlueCsvEditor
 
         #endregion
 
-        #region Properties
-
         [Import("GlueProjectSave")]
         public GlueProjectSave GlueProjectSave
         {
@@ -46,9 +45,17 @@ namespace GlueCsvEditor
 		    set;
         }
 
-        public override string FriendlyName { get { return "  Csv Editor"; } }
+        public override Version Version
+        {
+            get 
+            { 
+                return Assembly.GetAssembly(typeof (CsvEditorPlugin))
+                               .GetName()
+                               .Version; 
+            }
+        }
 
-        #endregion
+        public override string FriendlyName { get { return "  Csv Editor"; } }
 
         public override bool ShutDown(PluginShutDownReason reason)
         {
@@ -68,11 +75,6 @@ namespace GlueCsvEditor
             InitializeCenterTabHandler = InitializeTab;
             ReactToItemSelectHandler = ReactToItemSelect;
             ReactToFileChangeHandler = ReactToFileChange;
-        }
-
-        public override Version Version
-        {
-            get { return new Version(1, 0, 1); }
         }
 
         private void InitializeTab(TabControl tabControl)
