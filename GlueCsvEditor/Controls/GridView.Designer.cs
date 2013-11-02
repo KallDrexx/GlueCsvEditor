@@ -93,7 +93,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(676, 525);
-            this.splitContainer1.SplitterDistance = 408;
+            this.splitContainer1.SplitterDistance = 405;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 2;
             // 
@@ -114,7 +114,7 @@
             this.cmbCelldata.FormattingEnabled = true;
             this.cmbCelldata.Location = new System.Drawing.Point(34, 5);
             this.cmbCelldata.Name = "cmbCelldata";
-            this.cmbCelldata.Size = new System.Drawing.Size(103, 21);
+            this.cmbCelldata.Size = new System.Drawing.Size(100, 21);
             this.cmbCelldata.TabIndex = 1;
             this.cmbCelldata.DropDown += new System.EventHandler(this.cmbCelldata_DropDown);
             this.cmbCelldata.TextChanged += new System.EventHandler(this.cmbCelldata_TextChanged);
@@ -134,7 +134,7 @@
             // btnDeleteRow
             // 
             this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDeleteRow.Location = new System.Drawing.Point(311, 495);
+            this.btnDeleteRow.Location = new System.Drawing.Point(308, 495);
             this.btnDeleteRow.Name = "btnDeleteRow";
             this.btnDeleteRow.Size = new System.Drawing.Size(90, 23);
             this.btnDeleteRow.TabIndex = 7;
@@ -156,7 +156,7 @@
             // btnFindNext
             // 
             this.btnFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFindNext.Location = new System.Drawing.Point(311, 4);
+            this.btnFindNext.Location = new System.Drawing.Point(308, 4);
             this.btnFindNext.Name = "btnFindNext";
             this.btnFindNext.Size = new System.Drawing.Size(90, 23);
             this.btnFindNext.TabIndex = 3;
@@ -167,7 +167,7 @@
             // txtSearch
             // 
             this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSearch.Location = new System.Drawing.Point(143, 6);
+            this.txtSearch.Location = new System.Drawing.Point(140, 6);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(170, 20);
             this.txtSearch.TabIndex = 2;
@@ -192,7 +192,7 @@
             // LeftSideSplitContainer.Panel2
             // 
             this.LeftSideSplitContainer.Panel2.Controls.Add(this.dgrEditor);
-            this.LeftSideSplitContainer.Size = new System.Drawing.Size(398, 457);
+            this.LeftSideSplitContainer.Size = new System.Drawing.Size(395, 457);
             this.LeftSideSplitContainer.SplitterDistance = 180;
             this.LeftSideSplitContainer.TabIndex = 16;
             // 
@@ -202,7 +202,7 @@
             this.txtMultilineEditor.Location = new System.Drawing.Point(0, 0);
             this.txtMultilineEditor.Multiline = true;
             this.txtMultilineEditor.Name = "txtMultilineEditor";
-            this.txtMultilineEditor.Size = new System.Drawing.Size(396, 178);
+            this.txtMultilineEditor.Size = new System.Drawing.Size(393, 178);
             this.txtMultilineEditor.TabIndex = 15;
             this.txtMultilineEditor.Visible = false;
             this.txtMultilineEditor.TextChanged += new System.EventHandler(this.txtMultilineEditor_TextChanged);
@@ -214,7 +214,7 @@
             this.pgrPropertyEditor.HelpVisible = false;
             this.pgrPropertyEditor.Location = new System.Drawing.Point(0, 0);
             this.pgrPropertyEditor.Name = "pgrPropertyEditor";
-            this.pgrPropertyEditor.Size = new System.Drawing.Size(396, 178);
+            this.pgrPropertyEditor.Size = new System.Drawing.Size(393, 178);
             this.pgrPropertyEditor.TabIndex = 14;
             this.pgrPropertyEditor.ToolbarVisible = false;
             // 
@@ -226,7 +226,7 @@
             this.dgrEditor.Location = new System.Drawing.Point(0, 0);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(396, 271);
+            this.dgrEditor.Size = new System.Drawing.Size(393, 271);
             this.dgrEditor.TabIndex = 4;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);

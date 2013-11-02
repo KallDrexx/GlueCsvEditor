@@ -627,7 +627,15 @@ namespace GlueCsvEditor.Controls
             dgrEditor.CurrentCell =
                     dgrEditor[_editorLayoutSettings.LastSelectedColumnIndex, _editorLayoutSettings.LastSelectedRowIndex];
 
-            dgrEditor.FirstDisplayedScrollingColumnIndex = _editorLayoutSettings.LastSelectedColumnIndex;
+            try
+            {
+                dgrEditor.FirstDisplayedScrollingColumnIndex = _editorLayoutSettings.LastSelectedColumnIndex;
+            }
+            catch (InvalidOperationException)
+            {
+                // Most likely this is caused by the window being too small and not enough room
+                // to set the first displayed column.  Nothing to be done so just ignore the error
+            }
         }
 
         #endregion
