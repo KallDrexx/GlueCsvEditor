@@ -624,11 +624,12 @@ namespace GlueCsvEditor.Controls
         {
             _scrollTimer.Stop();
 
-            dgrEditor.CurrentCell =
-                    dgrEditor[_editorLayoutSettings.LastSelectedColumnIndex, _editorLayoutSettings.LastSelectedRowIndex];
-
             try
             {
+                dgrEditor.CurrentCell =
+                    dgrEditor[_editorLayoutSettings.LastSelectedColumnIndex, _editorLayoutSettings.LastSelectedRowIndex];
+
+
                 dgrEditor.FirstDisplayedScrollingColumnIndex = _editorLayoutSettings.LastSelectedColumnIndex;
             }
             catch (InvalidOperationException)
