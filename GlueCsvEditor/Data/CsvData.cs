@@ -120,6 +120,19 @@ namespace GlueCsvEditor.Data
             return _csv.Records[row][column];
         }
 
+        public bool TryGetValue(int row, int column, out string value)
+        {
+            value = null;
+            if (row < _csv.Records.Count && column < _csv.Records[row].Length)
+            {
+
+                value = _csv.Records[row][column];
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Updates the value in the specified row and column
         /// </summary>

@@ -84,55 +84,97 @@ namespace GlueCsvEditor
 
         private void ReactToItemSelect(TreeNode selectedTreeNode)
         {
-            // Close the existing tab
             if (_tab != null)
             {
                 _editor.SaveEditorSettings();
-                _editor = null;
-
-                _tabContainer.Controls.Remove(_tab);
-                _tab = null;
-                _currentCsv = null;
             }
 
             // Determine if a csv was selected
             if (IsCsv(selectedTreeNode.Tag))
             {
-                var csv = selectedTreeNode.Tag as ReferencedFileSave;
-                if (csv == null)
-                    throw new InvalidOperationException("Node is CSV but did not cast as a ReferencedFileSave");
-
-                _currentCsv = ProjectManager.MakeAbsolute(csv.Name, true);
-                char delimiter;
-                switch (csv.CsvDelimiter)
+                if (_tab == null)
                 {
-                    case AvailableDelimiters.Pipe:
-                        delimiter = '|';
-                        break;
-
-                    case AvailableDelimiters.Tab:
-                        delimiter = '\t';
-                        break;
-
-                    default:
-                        delimiter = ',';
-                        break;
+                    CreateNewCsvControl(selectedTreeNode);
                 }
-
-                try
+                else
                 {
-                    _tab = new PluginTab { Text = "CSV Editor" };
-
-                    _editor = new EditorMain(_currentCsv, delimiter);
-                    _tab.Controls.Add(_editor);
-                    _tabContainer.Controls.Add(_tab);
-                    _tabContainer.SelectTab(_tabContainer.Controls.Count - 1);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Failed to create a CSV runtime representation: " + ex.Message, "Error");
+                    LoadFile(selectedTreeNode);
                 }
             }
+            else
+            {
+                // Close the existing tab
+                if (_tab != null)
+                {
+                    _editor = null;
+
+                    _tabContainer.Controls.Remove(_tab);
+                    _tab = null;
+                    _currentCsv = null;
+                }
+            }
+        }
+
+        private void CreateNewCsvControl(TreeNode selectedTreeNode)
+        {
+            bool succeeded = false;
+
+            try
+            {
+                _tab = new PluginTab { Text = "CSV Editor" };
+
+                _editor = new EditorMain();
+
+
+                _tab.Controls.Add(_editor);
+                _tabContainer.Controls.Add(_tab);
+
+
+                succeeded = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create a CSV runtime representation: " + ex.Message, "Error");
+            }
+
+            if (succeeded)
+            {
+                LoadFile(selectedTreeNode);
+            }
+        }
+
+        private void LoadFile(TreeNode selectedTreeNode)
+        {
+            var csvRfs = selectedTreeNode.Tag as ReferencedFileSave;
+            if (csvRfs == null)
+                throw new InvalidOperationException("Node is CSV but did not cast as a ReferencedFileSave");
+
+
+
+            char delimiter;
+            _currentCsv = ProjectManager.MakeAbsolute(csvRfs.Name, true);
+
+
+            switch (csvRfs.CsvDelimiter)
+            {
+                case AvailableDelimiters.Pipe:
+                    delimiter = '|';
+                    break;
+
+                case AvailableDelimiters.Tab:
+                    delimiter = '\t';
+                    break;
+
+                default:
+                    delimiter = ',';
+                    break;
+            }
+
+
+            _editor.LoadCsv(_currentCsv, delimiter);
+
+            int indexToSelect = _tabContainer.Controls.IndexOf(_tab);
+            _tabContainer.SelectTab(indexToSelect);
         }
 
         private void ReactToFileChange(string filename)

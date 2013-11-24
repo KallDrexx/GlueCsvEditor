@@ -10,19 +10,20 @@ namespace GlueCsvEditor.Controls
         private GridView _gridView;
         private CachedTypes _cachedTypes;
 
-        public EditorMain(string csvPath, char delimiter)
+        string mCsvFileName;
+
+        public EditorMain()
         {
             InitializeComponent();
-
-            // Load all the data
-            
-            LoadCsv(csvPath, delimiter);
         }
 
-        private void LoadCsv(string csvPath, char delimiter)
+        public void LoadCsv(string csvPath, char delimiter)
         {
             _cachedTypes = new CachedTypes(CachedTypesReadyHandler);
             _csvData = new CsvData(csvPath, _cachedTypes, delimiter);
+
+
+            _gridView.CsvData = _csvData;
         }
 
         public void NotifyOfCsvUpdate()
@@ -42,9 +43,8 @@ namespace GlueCsvEditor.Controls
         {
             Dock = DockStyle.Fill;
 
-            _gridView = new GridView(_csvData, _cachedTypes);
+            _gridView = new GridView(_cachedTypes);
             Controls.Add(_gridView);
-
             // Victor Chelaru November 22, 2012
             // I don't think we need this because
             // it causes a double-load of the CSV.

@@ -42,7 +42,8 @@ namespace GlueCsvExecutable
                 throw new NotImplementedException();
             }
 
-            mEditorMain = new EditorMain(fileName, ',');
+            mEditorMain = new EditorMain();
+            mEditorMain.LoadCsv(fileName, ',');
             this.Controls.Add(mEditorMain);
             mEditorMain.Dock = DockStyle.Fill;
             mEditorMain.BringToFront();

@@ -26,13 +26,13 @@ namespace GlueCsvEditor.Controls
 
         private readonly List<Keys> _downArrowKeys;
         private readonly CachedTypes _cachedTypes;
-        private readonly EditorLayoutSettings _editorLayoutSettings;
+        private EditorLayoutSettings _editorLayoutSettings;
         private readonly object _filterKnownTypesLock = new object();
         private int _lastColumnIndex = -1;
         private int _currentColumnIndex;
         private int _currentRowIndex;
-        private readonly CsvData _data;
-        private IEnumerable<string> _knownTypes;
+        private CsvData _data;
+
         private bool _stringColumnSelected;
         private LayoutState _currentLayoutStateButPleaseUseThePropertyInstead;
         private readonly FormsTimer _scrollTimer;
@@ -105,18 +105,30 @@ namespace GlueCsvEditor.Controls
 
         public bool IgnoreChangesToRightSideUi { get; set; }
 
+        public CsvData CsvData
+        {
+            get
+            {
+                return _data;
+            }
+            set
+            {
+                _data = value;
+                _editorLayoutSettings = SettingsManager.LoadEditorSettings(_data);
+
+                ReloadCsvDisplay();
+            }
+        }
+
         #endregion
 
         #region Public Methods
 
-        public GridView(CsvData data, CachedTypes cachedTypes)
+        public GridView(CachedTypes cachedTypes)
         {
             DataLoadingCount = 0;
-            _data = data;
             _cachedTypes = cachedTypes;
             _downArrowKeys = new List<Keys>();
-            _knownTypes = new string[0];
-            _editorLayoutSettings = SettingsManager.LoadEditorSettings(data);
 
             InitializeComponent();
             _scrollTimer = new System.Windows.Forms.Timer {Interval = 50};
@@ -133,26 +145,16 @@ namespace GlueCsvEditor.Controls
             chkIsList.Checked = false;
             IgnoreChangesToRightSideUi = false;
 
-            SuspendLayout();
             DataLoadingCount++;
 
             // Reset the current column count so we are sure the CellEnter event
             //  so we can guarantee that the cell displays are updated
             _currentColumnIndex = -1;
             _currentRowIndex = -1;
+            
+            SuspendLayout();
 
-            // Add the CSV headers to the datagrid
-            var headers = _data.GetHeaderText();
-
-            dgrEditor.Columns.Clear();
-            foreach (var header in headers)
-                dgrEditor.Columns.Add(header, header);
-
-            // Add the records
-            dgrEditor.RowCount = _data.GetRecordCount();
-
-            RefreshRowHeaders();
-            ResumeLayout();
+            var headers = RefreshDisplayTo(_data);
 
             // Auto-focus on the first cell
             if (headers.Count > 0 && dgrEditor.Rows.Count > 0)
@@ -180,6 +182,28 @@ namespace GlueCsvEditor.Controls
             DataLoadingCount--;
         }
 
+        private List<string> RefreshDisplayTo(CsvData dataToLoad)
+        {
+            // Add the CSV headers to the datagrid
+            var headers = dataToLoad.GetHeaderText();
+
+            dgrEditor.CurrentCell = null;
+            while (dgrEditor.Columns.Count != 0)
+            {
+                dgrEditor.Columns.RemoveAt(dgrEditor.Columns.Count - 1);
+            }
+
+            foreach (var header in headers)
+                dgrEditor.Columns.Add(header, header);
+
+            // Add the records
+            dgrEditor.RowCount = dataToLoad.GetRecordCount();
+
+            RefreshRowHeaders();
+            ResumeLayout();
+            return headers;
+        }
+
         public void CachedTypesReady()
         {
             // Make sure this call is done in the control's thread
@@ -190,7 +214,7 @@ namespace GlueCsvEditor.Controls
                 btnShowComplexProperties.Enabled = true;
 
                 // Load all the known types
-                _knownTypes = _cachedTypes.KnownTypes;
+                //_knownTypes = _cachedTypes.KnownTypes;
                 FilterKnownTypes();
                 UpdateCellDisplays(true);
             });
@@ -222,7 +246,6 @@ namespace GlueCsvEditor.Controls
         {
             Dock = DockStyle.Fill;
             SetDoubleBuffered(true);
-            ReloadCsvDisplay();
 
             // Disable any controls that rely on the cached types
             btnShowComplexProperties.Enabled = false;
@@ -343,7 +366,9 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
-            e.Value = _data.GetValue(e.RowIndex, e.ColumnIndex);
+            string value;
+            _data.TryGetValue(e.RowIndex, e.ColumnIndex, out value);
+            e.Value = value;
         }
 
         private void dgrEditor_KeyDown(object sender, KeyEventArgs e)
@@ -670,8 +695,21 @@ namespace GlueCsvEditor.Controls
         {
             // Add the first value of each record to the row header text
             if (_data.GetHeaderText().Count > 0)
+            {
                 for (int x = 0; x < _data.GetRecordCount(); x++)
-                    dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
+                {
+                    string value = _data.GetValue(x, 0);
+                    dgrEditor.Rows[x].HeaderCell.Value = value;
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        dgrEditor.Rows[x].DefaultCellStyle.BackColor = System.Drawing.Color.LightBlue;
+                    }
+                    else
+                    {
+                        dgrEditor.Rows[x].DefaultCellStyle.BackColor = System.Drawing.Color.White;
+                    }
+                }
+            }
         }
 
         private void UpdateColumnDetails()
@@ -722,16 +760,7 @@ namespace GlueCsvEditor.Controls
                 lock(_filterKnownTypesLock)
                 {
 
-                    var dataSource = _knownTypes.Where(x => x.IndexOf(trimmed, StringComparison.OrdinalIgnoreCase) >= 0)
-                               .ToList();
-                
-                    lstFilteredTypes.Invoke((MethodInvoker)(() =>
-                        {
-                            lstFilteredTypes.DataSource = dataSource;
-                            lstFilteredTypes.ClearSelected();
-                        }
-                        
-                     ));
+
                 }
             });
         }
