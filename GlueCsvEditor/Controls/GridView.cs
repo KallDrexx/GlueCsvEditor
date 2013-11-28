@@ -228,13 +228,20 @@ namespace GlueCsvEditor.Controls
                                   .Select(x => x.Width)
                                   .ToArray();
 
+            if (_editorLayoutSettings == null)
+            {
+                _editorLayoutSettings = new EditorLayoutSettings();
+            }
+
             _editorLayoutSettings.ColumnWidths = widths;
 
+            
             // Save selected sell
             _editorLayoutSettings.LastSelectedColumnIndex = dgrEditor.CurrentCell.ColumnIndex;
             _editorLayoutSettings.LastSelectedRowIndex = dgrEditor.CurrentCell.RowIndex;
             _editorLayoutSettings.HeaderColumnWidth = dgrEditor.RowHeadersWidth;
 
+            
             SettingsManager.SaveEditorSettings(_data, _editorLayoutSettings);
         }
 
@@ -298,6 +305,8 @@ namespace GlueCsvEditor.Controls
         private void dgrEditor_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
             DataLoadingCount++;
+
+            string oldValue = _data.GetValue(e.RowIndex, e.ColumnIndex);
 
             _data.UpdateValue(e.RowIndex, e.ColumnIndex, e.Value as string);
             cmbCelldata.Text = e.Value as string;

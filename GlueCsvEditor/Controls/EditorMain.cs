@@ -15,11 +15,14 @@ namespace GlueCsvEditor.Controls
         public EditorMain()
         {
             InitializeComponent();
+
+            _cachedTypes = new CachedTypes(CachedTypesReadyHandler);
+            _gridView = new GridView(_cachedTypes);
+            Controls.Add(_gridView);
         }
 
         public void LoadCsv(string csvPath, char delimiter)
         {
-            _cachedTypes = new CachedTypes(CachedTypesReadyHandler);
             _csvData = new CsvData(csvPath, _cachedTypes, delimiter);
 
 
@@ -43,8 +46,7 @@ namespace GlueCsvEditor.Controls
         {
             Dock = DockStyle.Fill;
 
-            _gridView = new GridView(_cachedTypes);
-            Controls.Add(_gridView);
+
             // Victor Chelaru November 22, 2012
             // I don't think we need this because
             // it causes a double-load of the CSV.

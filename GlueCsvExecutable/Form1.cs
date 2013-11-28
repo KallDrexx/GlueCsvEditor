@@ -37,16 +37,15 @@ namespace GlueCsvExecutable
 
         private void ShowCsv(string fileName)
         {
-            if (mEditorMain != null)
+            if (mEditorMain == null)
             {
-                throw new NotImplementedException();
+                mEditorMain = new EditorMain();
+                this.Controls.Add(mEditorMain);
+                mEditorMain.Dock = DockStyle.Fill;
+                mEditorMain.BringToFront();
             }
 
-            mEditorMain = new EditorMain();
             mEditorMain.LoadCsv(fileName, ',');
-            this.Controls.Add(mEditorMain);
-            mEditorMain.Dock = DockStyle.Fill;
-            mEditorMain.BringToFront();
         }
     }
 }

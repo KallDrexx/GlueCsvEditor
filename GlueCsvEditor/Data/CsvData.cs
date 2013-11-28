@@ -17,6 +17,8 @@ namespace GlueCsvEditor.Data
         private CachedTypes _cachedTypes;
         private RuntimeCsvRepresentation _csv;
 
+
+
         public CsvData(string csvPath, CachedTypes cachedTypes, char delimiter = ',')
         {
             _csvPath = csvPath;
