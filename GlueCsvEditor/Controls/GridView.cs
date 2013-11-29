@@ -39,6 +39,7 @@ namespace GlueCsvEditor.Controls
         private readonly FormsTimer _scrollTimer;
 
         private UndoController mUndoController;
+        private SearchController mSearchController;
 
         #endregion
 
@@ -120,6 +121,8 @@ namespace GlueCsvEditor.Controls
                 _editorLayoutSettings = SettingsManager.LoadEditorSettings(_data);
 
                 ReloadCsvDisplay();
+
+                mSearchController.CsvData = _data;
             }
         }
 
@@ -136,7 +139,13 @@ namespace GlueCsvEditor.Controls
 
             InitializeComponent();
             _scrollTimer = new System.Windows.Forms.Timer {Interval = 50};
-            _scrollTimer.Tick += ScrollTimer_Tick;   
+            _scrollTimer.Tick += ScrollTimer_Tick;
+
+            mSearchController = new SearchController();
+            mSearchController.Initialize(dgrEditor, txtSearch);
+
+
+            dgrEditor.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Blue;
         }
 
         public void ReloadCsvDisplay()
@@ -500,10 +509,9 @@ namespace GlueCsvEditor.Controls
 
             else if (e.KeyCode == Keys.F3)
             {
-                if (e.Shift)
-                    GoToNextSearchMatch(true);
-                else
-                    GoToNextSearchMatch();
+
+
+                mSearchController.GoToNextSearchMatch(_currentRowIndex, _currentColumnIndex, e.Shift);
 
                 e.Handled = true;
             }
@@ -543,6 +551,7 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_Leave(object sender, EventArgs e)
         {
+            dgrEditor.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Orange;
             // Clear out all the known pressed keys
             _downArrowKeys.Clear();
         }
@@ -617,6 +626,9 @@ namespace GlueCsvEditor.Controls
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
+            
+
+
             if (string.IsNullOrWhiteSpace(txtSearch.Text))
                 return;
 
@@ -631,30 +643,36 @@ namespace GlueCsvEditor.Controls
         {
             if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Down)
             {
-                GoToNextSearchMatch();
+                mSearchController.GoToNextSearchMatch(_currentRowIndex, _currentColumnIndex);
+
                 e.Handled = true;
             }
 
             else if (e.KeyCode == Keys.Up)
             {
-                GoToNextSearchMatch(true);
+                mSearchController.GoToNextSearchMatch(_currentRowIndex, _currentColumnIndex, true);
+
                 e.Handled = true;
             }
 
             else if (e.KeyCode == Keys.F3)
             {
-                if (e.Shift)
-                    GoToNextSearchMatch(true);
-                else
-                    GoToNextSearchMatch();
+                mSearchController.GoToNextSearchMatch(_currentRowIndex, _currentColumnIndex, e.Shift);
 
                 e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                // Lose focus, go down to the spreadsheet portion
+                dgrEditor.Focus();
+                txtSearch.Text = null;
             }
         }
 
         private void btnFindNext_Click(object sender, EventArgs e)
         {
-            GoToNextSearchMatch();
+            mSearchController.GoToNextSearchMatch(_currentRowIndex, _currentColumnIndex);
+
         }
 
         private void cmbCelldata_TextChanged(object sender, EventArgs e)
@@ -818,18 +836,6 @@ namespace GlueCsvEditor.Controls
                 var header = _data.GetHeaderText()[_currentColumnIndex];
                 dgrEditor.Columns[_currentColumnIndex].HeaderText = header;
             }
-        }
-
-        private void GoToNextSearchMatch(bool reverse = false)
-        {
-            if (string.IsNullOrWhiteSpace(txtSearch.Text))
-                return;
-
-            var cell = _data.FindNextValue(txtSearch.Text, _currentRowIndex, _currentColumnIndex, true, reverse);
-            if (cell == null)
-                return;
-
-            dgrEditor.CurrentCell = dgrEditor[cell.ColumnIndex, cell.RowIndex];
         }
 
         private void SetupCellKnownValuesComboBox()
@@ -1100,5 +1106,16 @@ namespace GlueCsvEditor.Controls
         }
 
         #endregion
+
+        internal void FocusSearchTextBox()
+        {
+            this.txtSearch.Focus();
+        }
+
+        private void dgrEditor_Enter(object sender, EventArgs e)
+        {
+            dgrEditor.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Blue;
+
+        }
     }
 }

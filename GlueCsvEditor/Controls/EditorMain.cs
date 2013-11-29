@@ -95,6 +95,10 @@ namespace GlueCsvEditor.Controls
                     }
                     return true;
                     //break;
+                case Keys.Control | Keys.F:
+                    _gridView.FocusSearchTextBox();
+
+                    return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
