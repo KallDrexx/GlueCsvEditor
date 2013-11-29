@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using GlueCsvEditor.Data;
+using GlueCsvEditor.Controllers;
 
 namespace GlueCsvEditor.Controls
 {
@@ -10,6 +11,8 @@ namespace GlueCsvEditor.Controls
         private GridView _gridView;
         private CachedTypes _cachedTypes;
 
+        UndoController mUndoController;
+
         string mCsvFileName;
 
         public EditorMain()
@@ -17,14 +20,16 @@ namespace GlueCsvEditor.Controls
             InitializeComponent();
 
             _cachedTypes = new CachedTypes(CachedTypesReadyHandler);
-            _gridView = new GridView(_cachedTypes);
+            mUndoController = new UndoController();
+
+            _gridView = new GridView(_cachedTypes, mUndoController);
             Controls.Add(_gridView);
         }
 
         public void LoadCsv(string csvPath, char delimiter)
         {
             _csvData = new CsvData(csvPath, _cachedTypes, delimiter);
-
+            mUndoController.CsvData = _csvData;
 
             _gridView.CsvData = _csvData;
         }
@@ -71,6 +76,27 @@ namespace GlueCsvEditor.Controls
             {
                 _gridView.CachedTypesReady();
             }
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // ctrl z, ctrl + z, ctrl, z, ctrlz, undo
+            switch (keyData)
+            {
+                case Keys.Control | Keys.Z:
+                    int row;
+                    int column;
+                    mUndoController.PerformUndo(out row, out column);
+                    if (row > -1 && column > -1)
+                    {
+                        this._gridView.RefreshCell(row, column);
+                        this._gridView.UpdateCellDisplays(true);
+                        _gridView.SelectCell(row, column);
+                    }
+                    return true;
+                    //break;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }

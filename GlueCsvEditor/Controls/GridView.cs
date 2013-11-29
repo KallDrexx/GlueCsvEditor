@@ -9,6 +9,7 @@ using System.Threading;
 using FlatRedBall.Glue.Parsing;
 using GlueCsvEditor.Settings;
 using FormsTimer = System.Windows.Forms.Timer;
+using GlueCsvEditor.Controllers;
 
 namespace GlueCsvEditor.Controls
 {
@@ -36,6 +37,8 @@ namespace GlueCsvEditor.Controls
         private bool _stringColumnSelected;
         private LayoutState _currentLayoutStateButPleaseUseThePropertyInstead;
         private readonly FormsTimer _scrollTimer;
+
+        private UndoController mUndoController;
 
         #endregion
 
@@ -124,8 +127,9 @@ namespace GlueCsvEditor.Controls
 
         #region Public Methods
 
-        public GridView(CachedTypes cachedTypes)
+        public GridView(CachedTypes cachedTypes, UndoController undoController)
         {
+            mUndoController = undoController;
             DataLoadingCount = 0;
             _cachedTypes = cachedTypes;
             _downArrowKeys = new List<Keys>();
@@ -245,6 +249,77 @@ namespace GlueCsvEditor.Controls
             SettingsManager.SaveEditorSettings(_data, _editorLayoutSettings);
         }
 
+        public void UpdateCellDisplays(bool forceUpdate = false)
+        {
+            DataLoadingCount++;
+            if (_currentColumnIndex != -1)
+            {
+                // Update the selected header information
+                var header = _data.GetHeaderDetails(_currentColumnIndex);
+
+                // Only update the header details if we changed columns
+                if (_lastColumnIndex != _currentColumnIndex || forceUpdate)
+                {
+                    txtHeaderName.Text = header.Name;
+                    txtHeaderType.Text = header.Type;
+                    chkIsList.Checked = header.IsList;
+                    chkIsRequired.Checked = header.IsRequired;
+                    FilterKnownTypes();
+                }
+
+                // Setup the combobox
+                var value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
+                cmbCelldata.Text = value;
+
+                _stringColumnSelected = (header.Type == "string");
+
+                bool isComplexType = IsComplexType(header.Type);
+
+                btnShowComplexProperties.Enabled = isComplexType || _stringColumnSelected;
+
+                if (!_stringColumnSelected &&
+                    isComplexType == false)
+                {
+                    if (CurrentLayoutState != LayoutState.OnlyDataGrid)
+                    {
+                        CurrentLayoutState = LayoutState.ExpandedShowNothing;
+                    }
+                }
+                else
+                {
+                    if (CurrentLayoutState != LayoutState.OnlyDataGrid)
+                    {
+                        if (_stringColumnSelected)
+                        {
+                            CurrentLayoutState = LayoutState.ShowMultiLineText;
+                        }
+                        else
+                        {
+                            CurrentLayoutState = LayoutState.ShowPropertyGrid;
+                        }
+                    }
+
+                    if (!_stringColumnSelected)
+                    {
+                        UpdatePropertiesDisplay(header.Type, value);
+                    }
+                }
+            }
+            DataLoadingCount--;
+        }
+
+        public void RefreshCell(int row, int column)
+        {
+            bool oldIsRecording = mUndoController.IsRecordingUndos;
+            mUndoController.IsRecordingUndos = false;
+
+            dgrEditor[column, row].Value = (string)_data.GetValue(row, column);
+
+            mUndoController.IsRecordingUndos = oldIsRecording;
+
+
+        }
+
         #endregion
 
         #region Form Events
@@ -308,7 +383,10 @@ namespace GlueCsvEditor.Controls
 
             string oldValue = _data.GetValue(e.RowIndex, e.ColumnIndex);
 
-            _data.UpdateValue(e.RowIndex, e.ColumnIndex, e.Value as string);
+            _data.SetValue(e.RowIndex, e.ColumnIndex, e.Value as string);
+
+
+
             cmbCelldata.Text = e.Value as string;
             SaveCsv();
 
@@ -584,7 +662,7 @@ namespace GlueCsvEditor.Controls
             if (DataLoading)
                 return;
 
-            _data.UpdateValue(_currentRowIndex, _currentColumnIndex, cmbCelldata.Text);
+            _data.SetValue(_currentRowIndex, _currentColumnIndex, cmbCelldata.Text);
             SaveCsv();
 
             // Update the value in the datagrid
@@ -641,7 +719,7 @@ namespace GlueCsvEditor.Controls
             if (DataLoading)
                 return;
 
-            _data.UpdateValue(_currentRowIndex, _currentColumnIndex, txtMultilineEditor.Text);
+            _data.SetValue(_currentRowIndex, _currentColumnIndex, txtMultilineEditor.Text);
             SaveCsv();
         }
 
@@ -654,23 +732,28 @@ namespace GlueCsvEditor.Controls
             }
         }
 
-        private void ScrollTimer_Tick(object sender, EventArgs e)
+        public void SelectCell(int row, int column)
         {
-            _scrollTimer.Stop();
-
             try
             {
                 dgrEditor.CurrentCell =
-                    dgrEditor[_editorLayoutSettings.LastSelectedColumnIndex, _editorLayoutSettings.LastSelectedRowIndex];
+                    dgrEditor[column, row];
 
 
-                dgrEditor.FirstDisplayedScrollingColumnIndex = _editorLayoutSettings.LastSelectedColumnIndex;
+                dgrEditor.FirstDisplayedScrollingColumnIndex = column;
             }
             catch (InvalidOperationException)
             {
                 // Most likely this is caused by the window being too small and not enough room
                 // to set the first displayed column.  Nothing to be done so just ignore the error
             }
+        }
+
+        private void ScrollTimer_Tick(object sender, EventArgs e)
+        {
+            _scrollTimer.Stop();
+
+            SelectCell(_editorLayoutSettings.LastSelectedRowIndex, _editorLayoutSettings.LastSelectedColumnIndex);
         }
 
         #endregion
@@ -837,65 +920,6 @@ namespace GlueCsvEditor.Controls
         private void ComplexTypeUpdated(string complexTypeString)
         {
             dgrEditor[_currentColumnIndex, _currentRowIndex].Value = complexTypeString;
-        }
-
-        private void UpdateCellDisplays(bool forceUpdate = false)
-        {
-            DataLoadingCount++;
-            if (_currentColumnIndex != -1)
-            {
-                // Update the selected header information
-                var header = _data.GetHeaderDetails(_currentColumnIndex);
-
-                // Only update the header details if we changed columns
-                if (_lastColumnIndex != _currentColumnIndex || forceUpdate)
-                {
-                    txtHeaderName.Text = header.Name;
-                    txtHeaderType.Text = header.Type;
-                    chkIsList.Checked = header.IsList;
-                    chkIsRequired.Checked = header.IsRequired;
-                    FilterKnownTypes();
-                }
-
-                // Setup the combobox
-                var value = _data.GetValue(_currentRowIndex, _currentColumnIndex);
-                cmbCelldata.Text = value;
-
-                _stringColumnSelected = (header.Type == "string");
-
-                bool isComplexType = IsComplexType(header.Type);
-
-                btnShowComplexProperties.Enabled = isComplexType || _stringColumnSelected;
-
-                if (!_stringColumnSelected &&
-                    isComplexType == false)
-                {
-                    if (CurrentLayoutState != LayoutState.OnlyDataGrid)
-                    {
-                        CurrentLayoutState = LayoutState.ExpandedShowNothing;
-                    }
-                }
-                else
-                {
-                    if (CurrentLayoutState != LayoutState.OnlyDataGrid)
-                    {
-                        if (_stringColumnSelected)
-                        {
-                            CurrentLayoutState = LayoutState.ShowMultiLineText;
-                        }
-                        else
-                        {
-                            CurrentLayoutState = LayoutState.ShowPropertyGrid;
-                        }
-                    }
-
-                    if (!_stringColumnSelected)
-                    {
-                        UpdatePropertiesDisplay(header.Type, value);
-                    }
-                }
-            }
-            DataLoadingCount--;
         }
 
         private void RefreshAlternativeEditControlVisibility()

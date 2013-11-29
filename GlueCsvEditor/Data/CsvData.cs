@@ -12,12 +12,53 @@ namespace GlueCsvEditor.Data
 {
     public class CsvData
     {
+        #region Fields
+
         private readonly string _csvPath;
         private char _delimiter;
         private CachedTypes _cachedTypes;
         private RuntimeCsvRepresentation _csv;
 
+        #endregion
 
+        #region Properties
+
+        public string CsvPath { get { return _csvPath; } }
+
+        public int RowCount { get { return  _csv.Records.Count; } }
+
+        public int ColumnCount 
+        { 
+            get 
+            {
+                if (_csv.Records.Count == 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return _csv.Records[0].Length;
+                }
+            } 
+        }
+
+        #endregion
+
+        #region Events 
+
+        /// <summary>
+        /// Event raised before a value is changed.  The values are Row, Column.
+        /// </summary>
+        public event Action<int, int> BeforeValueChange;
+
+        /// <summary>
+        /// Event raised after a value is changed.  The values are Row, Column
+        /// </summary>
+        public event Action<int, int> AfterValueChange;
+
+        #endregion
+
+        #region Methods
 
         public CsvData(string csvPath, CachedTypes cachedTypes, char delimiter = ',')
         {
@@ -27,7 +68,6 @@ namespace GlueCsvEditor.Data
             Reload();
         }
 
-        public string CsvPath { get { return _csvPath; } }
 
         /// <summary>
         /// Adds a new row at the specified index
@@ -141,7 +181,7 @@ namespace GlueCsvEditor.Data
         /// <param name="row"></param>
         /// <param name="column"></param>
         /// <param name="value"></param>
-        public void UpdateValue(int row, int column, string value)
+        public void SetValue(int row, int column, string value)
         {
             if (row >= _csv.Records.Count)
                 throw new ArgumentOutOfRangeException("row");
@@ -149,7 +189,17 @@ namespace GlueCsvEditor.Data
             if (column >= _csv.Records[row].Length)
                 throw new ArgumentOutOfRangeException("column");
 
+            if (BeforeValueChange != null)
+            {
+                BeforeValueChange(row, column);
+            }
+
             _csv.Records[row][column] = value;
+
+            if (AfterValueChange != null)
+            {
+                AfterValueChange(row, column);
+            }
         }
 
         /// <summary>
@@ -463,5 +513,7 @@ namespace GlueCsvEditor.Data
 
             return new ComplexTypeProperty[0];
         }
+
+        #endregion
     }
 }
