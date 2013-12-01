@@ -40,6 +40,7 @@ namespace GlueCsvEditor.Controls
 
         private UndoController mUndoController;
         private SearchController mSearchController;
+        private CopyPasteController mCopyPasteController;
 
         #endregion
 
@@ -144,6 +145,8 @@ namespace GlueCsvEditor.Controls
             mSearchController = new SearchController();
             mSearchController.Initialize(dgrEditor, txtSearch);
 
+            mCopyPasteController = new CopyPasteController();
+            mCopyPasteController.Initialize(dgrEditor);
 
             dgrEditor.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Blue;
         }
@@ -473,40 +476,21 @@ namespace GlueCsvEditor.Controls
 
             if (e.KeyCode == Keys.V && e.Control)
             {
-                var data = Clipboard.GetData(DataFormats.Text).ToString();
-                var cells = data.Split('\t');
-                if (dgrEditor.CurrentRow != null)
-                    for (var i = 0; i < cells.Length; i++)
-                        dgrEditor[_currentColumnIndex + i, dgrEditor.CurrentRow.Index].Value = cells[i];
+                mCopyPasteController.HandlePaste(_currentColumnIndex);
+                SaveCsv();
+                e.Handled = true;
             }
 
             else if (e.KeyCode == Keys.X && e.Control)
             {
-                if (dgrEditor.CurrentCell != null)
-                {
-
-                    // If this fails, we will just ignore
-                    bool succeeded = false;
-                    try
-                    {
-                        Clipboard.SetDataObject(
-                            dgrEditor.CurrentCell.Value.ToString(), //text to store in clipboard
-                            true,        //do keep after our app exits
-                            5,           //retry 5 times
-                            200);        //200ms delay between retries
-                        succeeded = true;
-                    }
-                    catch
-                    {
-                        succeeded = false;
-                    }
-                    if (succeeded)
-                    {
-                        dgrEditor.CurrentCell.Value = string.Empty;
-                    }
-                }
+                mCopyPasteController.HandleCut();
+                e.Handled = true;
             }
-
+            else if (e.KeyCode == Keys.C && e.Control)
+            {
+                mCopyPasteController.HandleCopy();
+                e.Handled = true;
+            }
             else if (e.KeyCode == Keys.F3)
             {
 
