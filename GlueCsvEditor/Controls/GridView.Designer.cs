@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.btnShowComplexProperties = new System.Windows.Forms.Button();
             this.cmbCelldata = new System.Windows.Forms.ComboBox();
@@ -41,7 +42,6 @@
             this.pgrPropertyEditor = new System.Windows.Forms.PropertyGrid();
             this.dgrEditor = new System.Windows.Forms.DataGridView();
             this.txtHeaderType = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.lstFilteredTypes = new System.Windows.Forms.ListBox();
             this.btnAddColumn = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
@@ -50,6 +50,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.txtHeaderName = new System.Windows.Forms.TextBox();
+            this.DataGridContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -83,7 +84,6 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderType);
-            this.splitContainer1.Panel2.Controls.Add(this.label2);
             this.splitContainer1.Panel2.Controls.Add(this.lstFilteredTypes);
             this.splitContainer1.Panel2.Controls.Add(this.btnAddColumn);
             this.splitContainer1.Panel2.Controls.Add(this.btnRemove);
@@ -93,7 +93,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.label1);
             this.splitContainer1.Panel2.Controls.Add(this.txtHeaderName);
             this.splitContainer1.Size = new System.Drawing.Size(676, 525);
-            this.splitContainer1.SplitterDistance = 399;
+            this.splitContainer1.SplitterDistance = 568;
             this.splitContainer1.SplitterWidth = 7;
             this.splitContainer1.TabIndex = 2;
             // 
@@ -114,7 +114,7 @@
             this.cmbCelldata.FormattingEnabled = true;
             this.cmbCelldata.Location = new System.Drawing.Point(34, 5);
             this.cmbCelldata.Name = "cmbCelldata";
-            this.cmbCelldata.Size = new System.Drawing.Size(94, 21);
+            this.cmbCelldata.Size = new System.Drawing.Size(263, 21);
             this.cmbCelldata.TabIndex = 1;
             this.cmbCelldata.DropDown += new System.EventHandler(this.cmbCelldata_DropDown);
             this.cmbCelldata.TextChanged += new System.EventHandler(this.cmbCelldata_TextChanged);
@@ -134,7 +134,7 @@
             // btnDeleteRow
             // 
             this.btnDeleteRow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDeleteRow.Location = new System.Drawing.Point(302, 495);
+            this.btnDeleteRow.Location = new System.Drawing.Point(471, 495);
             this.btnDeleteRow.Name = "btnDeleteRow";
             this.btnDeleteRow.Size = new System.Drawing.Size(90, 23);
             this.btnDeleteRow.TabIndex = 7;
@@ -156,7 +156,7 @@
             // btnFindNext
             // 
             this.btnFindNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFindNext.Location = new System.Drawing.Point(302, 4);
+            this.btnFindNext.Location = new System.Drawing.Point(471, 4);
             this.btnFindNext.Name = "btnFindNext";
             this.btnFindNext.Size = new System.Drawing.Size(90, 23);
             this.btnFindNext.TabIndex = 3;
@@ -167,7 +167,7 @@
             // txtSearch
             // 
             this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSearch.Location = new System.Drawing.Point(134, 6);
+            this.txtSearch.Location = new System.Drawing.Point(303, 6);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(170, 20);
             this.txtSearch.TabIndex = 2;
@@ -192,7 +192,7 @@
             // LeftSideSplitContainer.Panel2
             // 
             this.LeftSideSplitContainer.Panel2.Controls.Add(this.dgrEditor);
-            this.LeftSideSplitContainer.Size = new System.Drawing.Size(389, 457);
+            this.LeftSideSplitContainer.Size = new System.Drawing.Size(558, 457);
             this.LeftSideSplitContainer.SplitterDistance = 180;
             this.LeftSideSplitContainer.TabIndex = 16;
             // 
@@ -202,7 +202,7 @@
             this.txtMultilineEditor.Location = new System.Drawing.Point(0, 0);
             this.txtMultilineEditor.Multiline = true;
             this.txtMultilineEditor.Name = "txtMultilineEditor";
-            this.txtMultilineEditor.Size = new System.Drawing.Size(387, 178);
+            this.txtMultilineEditor.Size = new System.Drawing.Size(556, 178);
             this.txtMultilineEditor.TabIndex = 15;
             this.txtMultilineEditor.Visible = false;
             this.txtMultilineEditor.TextChanged += new System.EventHandler(this.txtMultilineEditor_TextChanged);
@@ -214,7 +214,7 @@
             this.pgrPropertyEditor.HelpVisible = false;
             this.pgrPropertyEditor.Location = new System.Drawing.Point(0, 0);
             this.pgrPropertyEditor.Name = "pgrPropertyEditor";
-            this.pgrPropertyEditor.Size = new System.Drawing.Size(387, 178);
+            this.pgrPropertyEditor.Size = new System.Drawing.Size(556, 178);
             this.pgrPropertyEditor.TabIndex = 14;
             this.pgrPropertyEditor.ToolbarVisible = false;
             // 
@@ -222,11 +222,12 @@
             // 
             this.dgrEditor.AllowUserToAddRows = false;
             this.dgrEditor.AllowUserToDeleteRows = false;
+            this.dgrEditor.ContextMenuStrip = this.DataGridContextMenuStrip;
             this.dgrEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgrEditor.Location = new System.Drawing.Point(0, 0);
             this.dgrEditor.Name = "dgrEditor";
             this.dgrEditor.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgrEditor.Size = new System.Drawing.Size(387, 271);
+            this.dgrEditor.Size = new System.Drawing.Size(556, 271);
             this.dgrEditor.TabIndex = 4;
             this.dgrEditor.VirtualMode = true;
             this.dgrEditor.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgrEditor_CellBeginEdit);
@@ -239,83 +240,75 @@
             this.dgrEditor.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgrEditor_KeyDown);
             this.dgrEditor.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dgrEditor_KeyUp);
             this.dgrEditor.Leave += new System.EventHandler(this.dgrEditor_Leave);
+            this.dgrEditor.MouseUp += new System.Windows.Forms.MouseEventHandler(this.dgrEditor_MouseUp);
             // 
             // txtHeaderType
             // 
             this.txtHeaderType.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtHeaderType.Location = new System.Drawing.Point(12, 133);
+            this.txtHeaderType.Location = new System.Drawing.Point(0, 133);
             this.txtHeaderType.Name = "txtHeaderType";
-            this.txtHeaderType.Size = new System.Drawing.Size(248, 20);
+            this.txtHeaderType.Size = new System.Drawing.Size(99, 20);
             this.txtHeaderType.TabIndex = 11;
             this.txtHeaderType.TextChanged += new System.EventHandler(this.txtHeaderType_TextChanged);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 160);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(167, 13);
-            this.label2.TabIndex = 9;
-            this.label2.Text = "(double click to select type below)";
             // 
             // lstFilteredTypes
             // 
             this.lstFilteredTypes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstFilteredTypes.FormattingEnabled = true;
-            this.lstFilteredTypes.Location = new System.Drawing.Point(12, 176);
+            this.lstFilteredTypes.Location = new System.Drawing.Point(0, 205);
             this.lstFilteredTypes.Name = "lstFilteredTypes";
-            this.lstFilteredTypes.Size = new System.Drawing.Size(248, 121);
+            this.lstFilteredTypes.Size = new System.Drawing.Size(99, 121);
             this.lstFilteredTypes.TabIndex = 12;
             this.lstFilteredTypes.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lstFilteredTypes_MouseDoubleClick);
             // 
             // btnAddColumn
             // 
-            this.btnAddColumn.Location = new System.Drawing.Point(10, 3);
+            this.btnAddColumn.Location = new System.Drawing.Point(-1, 3);
             this.btnAddColumn.Name = "btnAddColumn";
-            this.btnAddColumn.Size = new System.Drawing.Size(75, 23);
+            this.btnAddColumn.Size = new System.Drawing.Size(99, 23);
             this.btnAddColumn.TabIndex = 8;
-            this.btnAddColumn.Text = "Add Column";
+            this.btnAddColumn.Text = "Prepend Column";
             this.btnAddColumn.UseVisualStyleBackColor = true;
             this.btnAddColumn.Click += new System.EventHandler(this.btnAddColumn_Click);
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(10, 32);
+            this.btnRemove.Location = new System.Drawing.Point(-1, 32);
             this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(102, 23);
+            this.btnRemove.Size = new System.Drawing.Size(99, 23);
             this.btnRemove.TabIndex = 9;
-            this.btnRemove.Text = "Remove Column";
+            this.btnRemove.Text = "Delete Column";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
             // chkIsList
             // 
             this.chkIsList.AutoSize = true;
-            this.chkIsList.Location = new System.Drawing.Point(12, 334);
+            this.chkIsList.Location = new System.Drawing.Point(1, 182);
             this.chkIsList.Name = "chkIsList";
-            this.chkIsList.Size = new System.Drawing.Size(59, 17);
+            this.chkIsList.Size = new System.Drawing.Size(42, 17);
             this.chkIsList.TabIndex = 14;
-            this.chkIsList.Text = "Is List?";
+            this.chkIsList.Text = "List";
             this.chkIsList.UseVisualStyleBackColor = true;
             this.chkIsList.Click += new System.EventHandler(this.chkIsList_CheckedChanged);
             // 
             // chkIsRequired
             // 
             this.chkIsRequired.AutoSize = true;
-            this.chkIsRequired.Location = new System.Drawing.Point(12, 310);
+            this.chkIsRequired.Location = new System.Drawing.Point(1, 159);
             this.chkIsRequired.Name = "chkIsRequired";
-            this.chkIsRequired.Size = new System.Drawing.Size(75, 17);
+            this.chkIsRequired.Size = new System.Drawing.Size(69, 17);
             this.chkIsRequired.TabIndex = 13;
-            this.chkIsRequired.Text = "Required?";
+            this.chkIsRequired.Text = "Required";
             this.chkIsRequired.UseVisualStyleBackColor = true;
             this.chkIsRequired.Click += new System.EventHandler(this.chkIsRequired_CheckedChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 116);
+            this.label3.Location = new System.Drawing.Point(-4, 116);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(34, 13);
             this.label3.TabIndex = 4;
@@ -324,7 +317,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 61);
+            this.label1.Location = new System.Drawing.Point(-2, 61);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(76, 13);
             this.label1.TabIndex = 2;
@@ -334,11 +327,16 @@
             // 
             this.txtHeaderName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtHeaderName.Location = new System.Drawing.Point(12, 77);
+            this.txtHeaderName.Location = new System.Drawing.Point(0, 77);
             this.txtHeaderName.Name = "txtHeaderName";
-            this.txtHeaderName.Size = new System.Drawing.Size(248, 20);
+            this.txtHeaderName.Size = new System.Drawing.Size(99, 20);
             this.txtHeaderName.TabIndex = 10;
             this.txtHeaderName.TextChanged += new System.EventHandler(this.txtHeaderName_TextChanged);
+            // 
+            // DataGridContextMenuStrip
+            // 
+            this.DataGridContextMenuStrip.Name = "DataGridContextMenuStrip";
+            this.DataGridContextMenuStrip.Size = new System.Drawing.Size(61, 4);
             // 
             // GridView
             // 
@@ -377,7 +375,6 @@
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.DataGridView dgrEditor;
         private System.Windows.Forms.TextBox txtHeaderType;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ListBox lstFilteredTypes;
         private System.Windows.Forms.Button btnAddColumn;
         private System.Windows.Forms.Button btnRemove;
@@ -388,5 +385,6 @@
         private System.Windows.Forms.TextBox txtHeaderName;
         private System.Windows.Forms.TextBox txtMultilineEditor;
         private System.Windows.Forms.SplitContainer LeftSideSplitContainer;
+        private System.Windows.Forms.ContextMenuStrip DataGridContextMenuStrip;
     }
 }

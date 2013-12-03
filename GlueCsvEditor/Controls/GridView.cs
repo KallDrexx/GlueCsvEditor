@@ -75,7 +75,7 @@ namespace GlueCsvEditor.Controls
                     LeftSideSplitContainer.IsSplitterFixed = false;
                     if (oldCurrentState == LayoutState.OnlyDataGrid)
                     {
-                        LeftSideSplitContainer.SplitterDistance = LeftSideSplitContainer.Height / 2;
+                        LeftSideSplitContainer.SplitterDistance = _editorLayoutSettings.PropertyGridSplitterLocation;
                     }
                 }
 
@@ -250,14 +250,18 @@ namespace GlueCsvEditor.Controls
             }
 
             _editorLayoutSettings.ColumnWidths = widths;
+            _editorLayoutSettings.PropertyGridSplitterLocation = LeftSideSplitContainer.SplitterDistance;
 
-            
-            // Save selected sell
-            _editorLayoutSettings.LastSelectedColumnIndex = dgrEditor.CurrentCell.ColumnIndex;
-            _editorLayoutSettings.LastSelectedRowIndex = dgrEditor.CurrentCell.RowIndex;
-            _editorLayoutSettings.HeaderColumnWidth = dgrEditor.RowHeadersWidth;
 
-            
+            if (dgrEditor.CurrentCell != null)
+            {
+
+                // Save selected sell
+                _editorLayoutSettings.LastSelectedColumnIndex = dgrEditor.CurrentCell.ColumnIndex;
+                _editorLayoutSettings.LastSelectedRowIndex = dgrEditor.CurrentCell.RowIndex;
+                _editorLayoutSettings.HeaderColumnWidth = dgrEditor.RowHeadersWidth;
+
+            }
             SettingsManager.SaveEditorSettings(_data, _editorLayoutSettings);
         }
 
@@ -461,7 +465,7 @@ namespace GlueCsvEditor.Controls
 
             // If the first column was removed, update the header cell values
             if (e.Column.Index == 0)
-                if (_data.GetHeaderText().Count > 0)
+                if (_data.GetHeaderText().Count > 0 && dgrEditor.ColumnCount > 0)
                     for (int x = 0; x < _data.GetRecordCount(); x++)
                         dgrEditor.Rows[x].HeaderCell.Value = _data.GetValue(x, 0);
         }
@@ -592,12 +596,13 @@ namespace GlueCsvEditor.Controls
 
         private void btnAddColumn_Click(object sender, EventArgs e)
         {
-            dgrEditor.Columns.Add(string.Empty, "");
-            txtHeaderName.Enabled = true;
-            txtHeaderType.Enabled = true;
-            chkIsList.Enabled = true;
-            chkIsRequired.Enabled = true;
-            btnRemove.Enabled = true;
+            if (DataLoading)
+                return;
+
+            _data.AddColumn(_currentColumnIndex);
+            SaveCsv();
+
+            ReloadCsvDisplay();
         }
 
         private void btnRemove_Click(object sender, EventArgs e)
@@ -737,15 +742,17 @@ namespace GlueCsvEditor.Controls
             }
         }
 
-        public void SelectCell(int row, int column)
+        public void SelectCell(int row, int column, bool scrollTo = true)
         {
             try
             {
                 dgrEditor.CurrentCell =
                     dgrEditor[column, row];
 
-
-                dgrEditor.FirstDisplayedScrollingColumnIndex = column;
+                if (scrollTo)
+                {
+                    dgrEditor.FirstDisplayedScrollingColumnIndex = column;
+                }
             }
             catch (InvalidOperationException)
             {
@@ -757,8 +764,11 @@ namespace GlueCsvEditor.Controls
         private void ScrollTimer_Tick(object sender, EventArgs e)
         {
             _scrollTimer.Stop();
-
-            SelectCell(_editorLayoutSettings.LastSelectedRowIndex, _editorLayoutSettings.LastSelectedColumnIndex);
+            if (_editorLayoutSettings.LastSelectedRowIndex != -1 &&
+                _editorLayoutSettings.LastSelectedColumnIndex != -1)
+            {
+                SelectCell(_editorLayoutSettings.LastSelectedRowIndex, _editorLayoutSettings.LastSelectedColumnIndex);
+            }
         }
 
         #endregion
@@ -1103,6 +1113,32 @@ namespace GlueCsvEditor.Controls
         {
             dgrEditor.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Blue;
 
+        }
+
+        private void dgrEditor_MouseUp(object sender, MouseEventArgs e)
+        {
+            var result = dgrEditor.HitTest(e.X, e.Y);
+
+            RefreshContextMenu(result.RowIndex, result.ColumnIndex);
+
+            if (result.RowIndex == -1)
+            {
+                // selecting the entire row
+            }
+            else if (result.ColumnIndex == -1)
+            {
+                // selecting the entire column
+            }
+            else
+            {
+                SelectCell(result.RowIndex, result.ColumnIndex, scrollTo:false);
+            }
+        }
+
+        private void RefreshContextMenu(int p1, int p2)
+        {
+            DataGridContextMenuStrip.Items.Clear();
+            //DataGridContextMenuStrip.Items.Add("Hello", null, (a, b) => { });
         }
     }
 }
