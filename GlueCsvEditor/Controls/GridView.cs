@@ -411,6 +411,9 @@ namespace GlueCsvEditor.Controls
             // Update the display
             UpdateCellDisplays(true);
 
+            // This refreshes the row so it shows white/blue as appropriate
+            RefreshRowHeaders();
+
             DataLoadingCount--;
         }
 
