@@ -102,6 +102,11 @@ namespace GlueCsvEditor.Data
         {
             string headerName = "NewColumn" + index;
 
+            List<string> headerNames = new List<string>();
+            headerNames.AddRange(_csv.Headers.Select(item => item.Name));
+
+            headerName = FlatRedBall.Utilities.StringFunctions.MakeStringUnique(
+                headerName, headerNames);
             // Add this column to the RCR
             var headers = new List<CsvHeader>(_csv.Headers);
             headers.Insert(index, new CsvHeader { Name = headerName, OriginalText = headerName + " (string)" });

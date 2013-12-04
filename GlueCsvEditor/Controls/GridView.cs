@@ -149,6 +149,8 @@ namespace GlueCsvEditor.Controls
             mCopyPasteController.Initialize(dgrEditor);
 
             dgrEditor.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Blue;
+
+            RefreshContextMenu(0, 0);
         }
 
         public void ReloadCsvDisplay()
@@ -179,7 +181,6 @@ namespace GlueCsvEditor.Controls
                 txtHeaderType.Enabled = true;
                 chkIsList.Enabled = true;
                 chkIsRequired.Enabled = true;
-                btnRemove.Enabled = true;
 
                 dgrEditor.CurrentCell = dgrEditor[0, 0];
             }
@@ -190,7 +191,6 @@ namespace GlueCsvEditor.Controls
                 txtHeaderType.Enabled = false;
                 chkIsList.Enabled = false;
                 chkIsRequired.Enabled = false;
-                btnRemove.Enabled = false;
             }
 
             ApplyLayoutSettings();
@@ -225,7 +225,6 @@ namespace GlueCsvEditor.Controls
             // Make sure this call is done in the control's thread
             Invoke((MethodInvoker)delegate
             {
-                lstFilteredTypes.Enabled = true;
                 cmbCelldata.Enabled = true;
                 btnShowComplexProperties.Enabled = true;
 
@@ -347,7 +346,6 @@ namespace GlueCsvEditor.Controls
 
             // Disable any controls that rely on the cached types
             btnShowComplexProperties.Enabled = false;
-            lstFilteredTypes.Enabled = false;
             cmbCelldata.Enabled = false;
 
             CurrentLayoutState = LayoutState.OnlyDataGrid;
@@ -547,29 +545,29 @@ namespace GlueCsvEditor.Controls
             _downArrowKeys.Clear();
         }
 
-        private void btnAddRow_Click(object sender, EventArgs e)
-        {
-            _data.AddRow(_currentRowIndex + 1);
-            SaveCsv();
-
-            dgrEditor.RowCount = _data.GetRecordCount();
-            RefreshRowHeaders();
-            UpdateCellDisplays(true);
-            dgrEditor.Invalidate();
-        }
-
-        private void btnPrependRow_Click(object sender, EventArgs e)
+        private void AddRowAtIndex(int index)
         {
             if (DataLoading)
                 return;
 
-            _data.AddRow(_currentRowIndex);
+            _data.AddRow(index);
             SaveCsv();
 
             dgrEditor.RowCount = _data.GetRecordCount();
             RefreshRowHeaders();
             UpdateCellDisplays(true);
             dgrEditor.Invalidate();
+
+        }
+
+        private void btnAddRow_Click(object sender, EventArgs e)
+        {
+            AddRowAtIndex(_currentRowIndex + 1);
+        }
+
+        private void btnPrependRow_Click(object sender, EventArgs e)
+        {
+            AddRowAtIndex(_currentRowIndex);
         }
 
         private void btnDeleteRow_Click(object sender, EventArgs e)
@@ -596,10 +594,15 @@ namespace GlueCsvEditor.Controls
 
         private void btnAddColumn_Click(object sender, EventArgs e)
         {
+            AddColumnAtIndex(_currentColumnIndex);
+        }
+
+        private void AddColumnAtIndex(int index)
+        {
             if (DataLoading)
                 return;
 
-            _data.AddColumn(_currentColumnIndex);
+            _data.AddColumn(index);
             SaveCsv();
 
             ReloadCsvDisplay();
@@ -607,13 +610,20 @@ namespace GlueCsvEditor.Controls
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
-            string message = string.Format("Are you sure you want to remove the '{0}' column?", _data.GetHeaderText()[_currentColumnIndex]);
+            int columnIndex = _currentColumnIndex;
+
+            DeleteSingleColumn(columnIndex);
+        }
+
+        private void DeleteSingleColumn(int columnIndex)
+        {
+            string message = string.Format("Are you sure you want to remove the '{0}' column?", _data.GetHeaderText()[columnIndex]);
             var result = MessageBox.Show(message, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
             if (result != DialogResult.Yes)
                 return;
 
             // Delete the current column
-            dgrEditor.Columns.RemoveAt(_currentColumnIndex);
+            dgrEditor.Columns.RemoveAt(columnIndex);
         }
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
@@ -684,17 +694,17 @@ namespace GlueCsvEditor.Controls
             SetupCellKnownValuesComboBox();
         }
 
-        private void lstFilteredTypes_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            if (lstFilteredTypes.SelectedIndex != -1)
-            {
-                var rect = lstFilteredTypes.GetItemRectangle(lstFilteredTypes.SelectedIndex);
-                if (rect.Contains(e.Location))
-                {
-                    txtHeaderType.Text = lstFilteredTypes.SelectedValue as string;
-                }
-            }
-        }
+        //private void lstFilteredTypes_MouseDoubleClick(object sender, MouseEventArgs e)
+        //{
+        //    if (lstFilteredTypes.SelectedIndex != -1)
+        //    {
+        //        var rect = lstFilteredTypes.GetItemRectangle(lstFilteredTypes.SelectedIndex);
+        //        if (rect.Contains(e.Location))
+        //        {
+        //            txtHeaderType.Text = lstFilteredTypes.SelectedValue as string;
+        //        }
+        //    }
+        //}
 
         private void btnShowComplexProperties_Click(object sender, EventArgs e)
         {
@@ -963,33 +973,40 @@ namespace GlueCsvEditor.Controls
 
         private void DeleteSingleRow()
         {
+            int rowIndex = _currentRowIndex;
+
+            DeleteSingleRow(rowIndex);
+        }
+
+        private void DeleteSingleRow(int rowIndex)
+        {
             string message;
             // Find some identifying information for the row to present in
             //   a confirmation box
             var headers = Enumerable.Range(1, _data.GetHeaderText().Count).Select(x => _data.GetHeaderDetails(x - 1)).ToList();
-            var values = Enumerable.Range(1, headers.Count).Select(x => _data.GetValue(_currentRowIndex, x - 1)).ToList();
+            var values = Enumerable.Range(1, headers.Count).Select(x => _data.GetValue(rowIndex, x - 1)).ToList();
 
             // First check if all the values are empty
             if (values.All(string.IsNullOrWhiteSpace))
             {
-                message = string.Format("Delete row #{0} (empty row)?", _currentRowIndex);
+                message = string.Format("Delete row #{0} (empty row)?", rowIndex);
             }
             else if (headers.Any(x => x.IsRequired))
             {
                 var requiredHeader = headers.FirstOrDefault(x => x.IsRequired);
-                message = string.Format("Delete row #{0} ({1})?", _currentRowIndex, values[headers.IndexOf(requiredHeader)]);
+                message = string.Format("Delete row #{0} ({1})?", rowIndex, values[headers.IndexOf(requiredHeader)]);
             }
             else
             {
                 // Get the first non-empty value
                 var val = values.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-                message = string.Format("Delete row #{0} ({1})?", _currentRowIndex, val);
+                message = string.Format("Delete row #{0} ({1})?", rowIndex, val);
             }
 
             var result = MessageBox.Show(message, "Confirm Row Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
             if (result == DialogResult.Yes)
             {
-                _data.RemoveRow(_currentRowIndex);
+                _data.RemoveRow(rowIndex);
                 SaveCsv();
 
                 dgrEditor.RowCount = _data.GetRecordCount();
@@ -1117,27 +1134,84 @@ namespace GlueCsvEditor.Controls
 
         private void dgrEditor_MouseUp(object sender, MouseEventArgs e)
         {
-            var result = dgrEditor.HitTest(e.X, e.Y);
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                var result = dgrEditor.HitTest(e.X, e.Y);
 
-            RefreshContextMenu(result.RowIndex, result.ColumnIndex);
+                RefreshContextMenu(result.RowIndex, result.ColumnIndex);
 
-            if (result.RowIndex == -1)
-            {
-                // selecting the entire row
-            }
-            else if (result.ColumnIndex == -1)
-            {
-                // selecting the entire column
-            }
-            else
-            {
-                SelectCell(result.RowIndex, result.ColumnIndex, scrollTo:false);
+                if (result.RowIndex == -1)
+                {
+                    // selecting the entire row
+                }
+                else if (result.ColumnIndex == -1)
+                {
+                    // selecting the entire column
+                }
+                else
+                {
+                    SelectCell(result.RowIndex, result.ColumnIndex, scrollTo: false);
+                }
             }
         }
 
-        private void RefreshContextMenu(int p1, int p2)
+        private void RefreshContextMenu(int row, int column)
         {
             DataGridContextMenuStrip.Items.Clear();
+
+            bool showAddColumn = column != -1;
+            bool showAddRow = row != -1;
+
+            var items = DataGridContextMenuStrip.Items;
+
+
+            if (showAddRow)
+            {
+                ToolStripMenuItem rowAddItem = items.Add("Add Row") as ToolStripMenuItem;
+
+                rowAddItem.DropDownItems.Add("Before", null, (a, b) =>
+                    {
+                        AddRowAtIndex(row);
+
+                    });
+                rowAddItem.DropDownItems.Add("After", null, (a, b) =>
+                    {
+                        AddRowAtIndex(row + 1);
+                    });
+            }
+
+            if (showAddColumn)
+            {
+                ToolStripMenuItem columnAddItem = items.Add("Add Column") as ToolStripMenuItem;
+
+                columnAddItem.DropDownItems.Add("Before", null, (a, b) => 
+                    {
+                        AddColumnAtIndex(column);
+                    });
+                columnAddItem.DropDownItems.Add("After", null, (a, b) =>
+                    {
+                        AddColumnAtIndex(column + 1);
+                
+                    });
+            }
+
+            items.Add("-");
+
+            if (showAddRow)
+            {
+                items.Add("Delete Row", null, (a, b) =>
+                    {
+                        DeleteSingleRow(row);
+                    });
+            }
+            if (showAddColumn)
+            {
+                items.Add("Delete Column", null, (a, b) =>
+                    {
+                        DeleteSingleColumn(column);
+                    });
+            }
+
             //DataGridContextMenuStrip.Items.Add("Hello", null, (a, b) => { });
         }
     }
