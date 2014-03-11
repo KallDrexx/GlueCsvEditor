@@ -325,9 +325,13 @@ namespace GlueCsvEditor.Data
             do
             {
                 if ((ignoreStartingCell && !isFirstSearchedCell) || !ignoreStartingCell)
-                    if (_csv.Records[row][column].IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    var recordAtLocation = _csv.Records[row][column];
+                    if (recordAtLocation != null && recordAtLocation.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
                         return new FoundCell { ColumnIndex = column, RowIndex = row };
-
+                    }
+                }
                 // This cell doesn't have the record, go to the next
                 if (!reverse)
                 {
