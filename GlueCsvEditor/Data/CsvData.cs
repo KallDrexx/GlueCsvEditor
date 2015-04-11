@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -379,18 +380,37 @@ namespace GlueCsvEditor.Data
         /// <summary>
         /// Saves all csv data
         /// </summary>
-        public void SaveCsv()
+        public bool SaveCsv()
         {
+            bool wasSaved = false;
+
             _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
-            CsvFileManager.Delimiter = _delimiter;
-            try
+
+            FileInfo fileInfo = new FileInfo(_csvPath);
+            if (fileInfo.IsReadOnly)
             {
-                CsvFileManager.Serialize(_csv, _csvPath);
+                PluginManager.ReceiveOutput("CSV file is marked readonly so it cannot be saved:\n" + _csvPath +
+                "\nPerhaps Excel is open?");
             }
-            catch (Exception e)
+            else
             {
-                PluginManager.ReceiveOutput("Error saving the file " + _csvPath + "\n" + e.ToString());
+                CsvFileManager.Delimiter = _delimiter;
+                try
+                {
+                    CsvFileManager.Serialize(_csv, _csvPath);
+                    wasSaved = true;
+                }
+                catch (IOException)
+                {
+                    PluginManager.ReceiveOutput("Could not save the CSV file:\n\t" + 
+                        _csvPath + "\n\tGlue will not be able to save the file if it is open in Excel.");
+                }
+                catch (Exception e)
+                {
+                    PluginManager.ReceiveOutput("Error saving the file " + _csvPath + "\n" + e.ToString());
+                }
             }
+            return wasSaved;
         }
 
         /// <summary>

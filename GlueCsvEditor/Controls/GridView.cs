@@ -802,10 +802,13 @@ namespace GlueCsvEditor.Controls
 
         private void SaveCsv()
         {
-            IgnoreNextFileChange = true;
-            _data.SaveCsv();
+                IgnoreNextFileChange = true;
+            bool wasSaved = _data.SaveCsv();
+            if (wasSaved)
+            {
 
-            SaveEditorSettings();
+                SaveEditorSettings();
+            }
         }
 
         private void RefreshRowHeaders()
