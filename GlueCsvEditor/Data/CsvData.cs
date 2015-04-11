@@ -380,17 +380,18 @@ namespace GlueCsvEditor.Data
         /// <summary>
         /// Saves all csv data
         /// </summary>
-        public bool SaveCsv()
+        public GeneralResponse SaveCsv()
         {
-            bool wasSaved = false;
+            GeneralResponse toReturn = new GeneralResponse();
 
             _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
 
             FileInfo fileInfo = new FileInfo(_csvPath);
             if (fileInfo.IsReadOnly)
             {
-                PluginManager.ReceiveOutput("CSV file is marked readonly so it cannot be saved:\n" + _csvPath +
-                "\nPerhaps Excel is open?");
+                toReturn.Succeeded = false;
+                toReturn.Message = "CSV file is marked readonly so it cannot be saved:\n" + _csvPath +
+                    "\nPerhaps Excel is open?";
             }
             else
             {
@@ -398,19 +399,21 @@ namespace GlueCsvEditor.Data
                 try
                 {
                     CsvFileManager.Serialize(_csv, _csvPath);
-                    wasSaved = true;
+                    toReturn.Succeeded = true;
                 }
                 catch (IOException)
                 {
-                    PluginManager.ReceiveOutput("Could not save the CSV file:\n\t" + 
-                        _csvPath + "\n\tGlue will not be able to save the file if it is open in Excel.");
+                    toReturn.Succeeded = false;
+                    toReturn.Message = "Could not save the CSV file:\n\t" + 
+                        _csvPath + "\n\tGlue will not be able to save the file if it is open in Excel.";
                 }
                 catch (Exception e)
                 {
-                    PluginManager.ReceiveOutput("Error saving the file " + _csvPath + "\n" + e.ToString());
+                    toReturn.Succeeded = false;
+                    toReturn.Message = "Error saving the file " + _csvPath + "\n" + e.ToString();
                 }
             }
-            return wasSaved;
+            return toReturn;
         }
 
         /// <summary>

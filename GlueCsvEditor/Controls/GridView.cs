@@ -10,6 +10,7 @@ using FlatRedBall.Glue.Parsing;
 using GlueCsvEditor.Settings;
 using FormsTimer = System.Windows.Forms.Timer;
 using GlueCsvEditor.Controllers;
+using FlatRedBall.Glue.Plugins;
 
 namespace GlueCsvEditor.Controls
 {
@@ -802,12 +803,23 @@ namespace GlueCsvEditor.Controls
 
         private void SaveCsv()
         {
-                IgnoreNextFileChange = true;
-            bool wasSaved = _data.SaveCsv();
-            if (wasSaved)
+            IgnoreNextFileChange = true;
+            
+            var response =_data.SaveCsv();
+            
+            if(response.Succeeded)
             {
-
                 SaveEditorSettings();
+            }
+            else
+            {
+                PluginManager.ReceiveOutput(response.Message);
+                // Justin requested that 
+                // we should show a MessageBox
+                // so that the user knows they may
+                // lose data.
+                MessageBox.Show(response.Message);
+
             }
         }
 

@@ -102,6 +102,7 @@
     <Compile Include="Data\CsvColumnHeader.cs" />
     <Compile Include="Data\CsvData.cs" />
     <Compile Include="Data\FoundCell.cs" />
+    <Compile Include="Data\GeneralResponse.cs" />
     <Compile Include="Settings\EditorLayoutSettings.cs" />
     <Compile Include="KnownValues\EnumReflectionValueRetriever.cs" />
     <Compile Include="KnownValues\FrbStateValueRetriever.cs" />
