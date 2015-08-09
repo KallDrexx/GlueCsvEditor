@@ -9,6 +9,8 @@ using FlatRedBall.Glue.Plugins;
 using GlueCsvEditor.Controls;
 using System.Windows.Forms;
 using FlatRedBall.Glue.Controls;
+using EditorObjects.IoC;
+using GlueCsvEditor.Styling;
 
 namespace GlueCsvEditor
 {
@@ -18,8 +20,7 @@ namespace GlueCsvEditor
         #region Fields
 
         private EditorMain _editor;
-        private TabControl _tabContainer;
-        private PluginTab _tab;
+
         private string _currentCsv;
 
         #endregion
@@ -59,12 +60,7 @@ namespace GlueCsvEditor
 
         public override bool ShutDown(PluginShutDownReason reason)
         {
-            if (_tab != null)
-                _tabContainer.Controls.Remove(_tab);
-
-            _tabContainer = null;
-            _tab = null;
-            _editor = null;
+            base.RemoveTab();
 
             return true;
         }
@@ -72,19 +68,15 @@ namespace GlueCsvEditor
         public override void StartUp()
         {
             // Initialize the handlers I need
-            InitializeCenterTabHandler = InitializeTab;
             ReactToItemSelectHandler = ReactToItemSelect;
             ReactToFileChangeHandler = ReactToFileChange;
-        }
 
-        private void InitializeTab(TabControl tabControl)
-        {
-            _tabContainer = tabControl;
+            Container.Set<ColoringLogic>(new ColoringLogic());
         }
 
         private void ReactToItemSelect(TreeNode selectedTreeNode)
         {
-            if (_tab != null)
+            if (_editor != null && _editor.Parent != null)
             {
                 _editor.SaveEditorSettings();
             }
@@ -92,26 +84,25 @@ namespace GlueCsvEditor
             // Determine if a csv was selected
             if (IsCsv(selectedTreeNode.Tag))
             {
-                if (_tab == null)
+                if(_editor == null || _editor.Parent == null)
                 {
                     CreateNewCsvControl(selectedTreeNode);
+
+                    base.AddToTab(PluginManager.CenterTab, _editor, "CSV");
+
                 }
                 else
                 {
-                    LoadFile(selectedTreeNode);
+                    AddTab();
                 }
+
+                LoadFile(selectedTreeNode);
             }
             else
             {
-                // Close the existing tab
-                if (_tab != null)
-                {
-                    _editor = null;
+                base.RemoveTab();
 
-                    _tabContainer.Controls.Remove(_tab);
-                    _tab = null;
-                    _currentCsv = null;
-                }
+                _editor = null;
             }
         }
 
@@ -121,15 +112,7 @@ namespace GlueCsvEditor
 
             try
             {
-                _tab = new PluginTab { Text = "CSV Editor" };
-
                 _editor = new EditorMain();
-
-
-                _tab.Controls.Add(_editor);
-                _tabContainer.Controls.Add(_tab);
-
-
                 succeeded = true;
             }
             catch (Exception ex)
@@ -137,10 +120,6 @@ namespace GlueCsvEditor
                 MessageBox.Show("Failed to create a CSV runtime representation: " + ex.Message, "Error");
             }
 
-            if (succeeded)
-            {
-                LoadFile(selectedTreeNode);
-            }
         }
 
         private void LoadFile(TreeNode selectedTreeNode)
@@ -173,8 +152,6 @@ namespace GlueCsvEditor
 
             _editor.LoadCsv(_currentCsv, delimiter);
 
-            int indexToSelect = _tabContainer.Controls.IndexOf(_tab);
-            _tabContainer.SelectTab(indexToSelect);
         }
 
         private void ReactToFileChange(string filename)

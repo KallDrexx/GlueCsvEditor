@@ -11,6 +11,7 @@ using GlueCsvEditor.Settings;
 using FormsTimer = System.Windows.Forms.Timer;
 using GlueCsvEditor.Controllers;
 using FlatRedBall.Glue.Plugins;
+using GlueCsvEditor.Styling;
 
 namespace GlueCsvEditor.Controls
 {
@@ -830,16 +831,15 @@ namespace GlueCsvEditor.Controls
             {
                 for (int x = 0; x < _data.GetRecordCount(); x++)
                 {
+                    var row = dgrEditor.Rows[x];
+
                     string value = _data.GetValue(x, 0);
-                    dgrEditor.Rows[x].HeaderCell.Value = value;
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        dgrEditor.Rows[x].DefaultCellStyle.BackColor = System.Drawing.Color.LightBlue;
-                    }
-                    else
-                    {
-                        dgrEditor.Rows[x].DefaultCellStyle.BackColor = System.Drawing.Color.White;
-                    }
+
+
+                    row.HeaderCell.Value = value;
+
+                    EditorObjects.IoC.Container.Get<ColoringLogic>().SetRowColor(row, value);
+
                 }
             }
         }
