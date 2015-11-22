@@ -82,7 +82,7 @@ namespace GlueCsvEditor
             }
 
             // Determine if a csv was selected
-            if (IsCsv(selectedTreeNode.Tag))
+            if (selectedTreeNode != null && IsCsv(selectedTreeNode.Tag))
             {
                 if(_editor == null || _editor.Parent == null)
                 {
