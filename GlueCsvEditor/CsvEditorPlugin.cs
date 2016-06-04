@@ -159,8 +159,11 @@ namespace GlueCsvEditor
             if (filename.Equals(_currentCsv, StringComparison.OrdinalIgnoreCase))
             {
                 PluginManager.ReceiveOutput("CSV Editor: Loading file because of external change " + filename);
-                _editor.SaveEditorSettings();
-                _editor.NotifyOfCsvUpdate();
+                if (_editor != null)
+                {
+                    _editor.SaveEditorSettings();
+                    _editor.NotifyOfCsvUpdate();
+                }
             }
         }
 
