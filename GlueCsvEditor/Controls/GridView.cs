@@ -67,8 +67,12 @@ namespace GlueCsvEditor.Controls
                     // Hide the top
                     LeftSideSplitContainer.Panel1MinSize = 0;
                     LeftSideSplitContainer.IsSplitterFixed = true;
-                    LeftSideSplitContainer.SplitterDistance = 0;
-
+                    // This seems to crash on some devices. Not sure why:
+                    try
+                    {
+                        LeftSideSplitContainer.SplitterDistance = 0;
+                    }
+                    catch { }
                 }
                 else
                 {
@@ -77,7 +81,12 @@ namespace GlueCsvEditor.Controls
                     LeftSideSplitContainer.IsSplitterFixed = false;
                     if (oldCurrentState == LayoutState.OnlyDataGrid)
                     {
-                        LeftSideSplitContainer.SplitterDistance = _editorLayoutSettings.PropertyGridSplitterLocation;
+                        try
+                        {
+                            LeftSideSplitContainer.SplitterDistance = _editorLayoutSettings.PropertyGridSplitterLocation;
+
+                        }
+                        catch { }
                     }
                 }
 
