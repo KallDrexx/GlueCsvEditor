@@ -8,7 +8,6 @@ using FlatRedBall.Glue.SaveClasses;
 using FlatRedBall.Glue.Plugins;
 using GlueCsvEditor.Controls;
 using System.Windows.Forms;
-using FlatRedBall.Glue.Controls;
 using EditorObjects.IoC;
 using GlueCsvEditor.Styling;
 
@@ -56,7 +55,7 @@ namespace GlueCsvEditor
             }
         }
 
-        public override string FriendlyName { get { return "  Csv Editor"; } }
+        public override string FriendlyName { get { return "Csv Editor"; } }
 
         public override bool ShutDown(PluginShutDownReason reason)
         {

@@ -18,7 +18,7 @@ namespace GlueCsvEditor.Data
         private readonly string _csvPath;
         private char _delimiter;
         private CachedTypes _cachedTypes;
-        private RuntimeCsvRepresentation _csv;
+        public RuntimeCsvRepresentation CsvRepresentation { get; private set; }
 
         #endregion
 
@@ -26,19 +26,19 @@ namespace GlueCsvEditor.Data
 
         public string CsvPath { get { return _csvPath; } }
 
-        public int RowCount { get { return  _csv.Records.Count; } }
+        public int RowCount { get { return  CsvRepresentation.Records.Count; } }
 
         public int ColumnCount 
         { 
             get 
             {
-                if (_csv.Records.Count == 0)
+                if (CsvRepresentation.Records.Count == 0)
                 {
                     return 0;
                 }
                 else
                 {
-                    return _csv.Records[0].Length;
+                    return CsvRepresentation.Records[0].Length;
                 }
             } 
         }
@@ -80,7 +80,7 @@ namespace GlueCsvEditor.Data
             if (index < 0)
                 index = 0;
 
-            _csv.Records.Insert(index, new string[_csv.Headers.Length]);
+            CsvRepresentation.Records.Insert(index, new string[CsvRepresentation.Headers.Length]);
         }
 
         /// <summary>
@@ -89,10 +89,10 @@ namespace GlueCsvEditor.Data
         /// <param name="index"></param>
         public void RemoveRow(int index)
         {
-            if (index >= _csv.Records.Count)
+            if (index >= CsvRepresentation.Records.Count)
                 throw new ArgumentOutOfRangeException("index");
 
-            _csv.Records.RemoveAt(index);
+            CsvRepresentation.Records.RemoveAt(index);
         }
 
         /// <summary>
@@ -104,21 +104,21 @@ namespace GlueCsvEditor.Data
             string headerName = "NewColumn" + index;
 
             List<string> headerNames = new List<string>();
-            headerNames.AddRange(_csv.Headers.Select(item => item.Name));
+            headerNames.AddRange(CsvRepresentation.Headers.Select(item => item.Name));
 
             headerName = FlatRedBall.Utilities.StringFunctions.MakeStringUnique(
                 headerName, headerNames);
             // Add this column to the RCR
-            var headers = new List<CsvHeader>(_csv.Headers);
+            var headers = new List<CsvHeader>(CsvRepresentation.Headers);
             headers.Insert(index, new CsvHeader { Name = headerName, OriginalText = headerName + " (string)" });
-            _csv.Headers = headers.ToArray();
+            CsvRepresentation.Headers = headers.ToArray();
 
             // Add the column to all the records
-            for (int x = 0; x < _csv.Records.Count; x++)
+            for (int x = 0; x < CsvRepresentation.Records.Count; x++)
             {
-                var values = new List<string>(_csv.Records[x]);
+                var values = new List<string>(CsvRepresentation.Records[x]);
                 values.Insert(index, string.Empty);
-                _csv.Records[x] = values.ToArray();
+                CsvRepresentation.Records[x] = values.ToArray();
             }
         }
 
@@ -129,16 +129,16 @@ namespace GlueCsvEditor.Data
         public void RemoveColumn(int index)
         {
             // Remove this column to the RCR
-            var headers = new List<CsvHeader>(_csv.Headers);
+            var headers = new List<CsvHeader>(CsvRepresentation.Headers);
             headers.RemoveAt(index);
-            _csv.Headers = headers.ToArray();
+            CsvRepresentation.Headers = headers.ToArray();
 
             // Remove the column to all the records
-            for (int x = 0; x < _csv.Records.Count; x++)
+            for (int x = 0; x < CsvRepresentation.Records.Count; x++)
             {
-                var values = new List<string>(_csv.Records[x]);
+                var values = new List<string>(CsvRepresentation.Records[x]);
                 values.RemoveAt(index);
-                _csv.Records[x] = values.ToArray();
+                CsvRepresentation.Records[x] = values.ToArray();
             }
         }
 
@@ -148,7 +148,7 @@ namespace GlueCsvEditor.Data
         /// <returns></returns>
         public int GetRecordCount()
         {
-            return _csv.Records.Count;
+            return CsvRepresentation.Records.Count;
         }
 
         /// <summary>
@@ -159,22 +159,22 @@ namespace GlueCsvEditor.Data
         /// <returns></returns>
         public string GetValue(int row, int column)
         {
-            if (row >= _csv.Records.Count)
+            if (row >= CsvRepresentation.Records.Count)
                 throw new ArgumentOutOfRangeException("row");
 
-            if (column >= _csv.Records[row].Length)
+            if (column >= CsvRepresentation.Records[row].Length)
                 throw new ArgumentOutOfRangeException("column");
 
-            return _csv.Records[row][column];
+            return CsvRepresentation.Records[row][column];
         }
 
         public bool TryGetValue(int row, int column, out string value)
         {
             value = null;
-            if (row < _csv.Records.Count && column < _csv.Records[row].Length)
+            if (row < CsvRepresentation.Records.Count && column < CsvRepresentation.Records[row].Length)
             {
 
-                value = _csv.Records[row][column];
+                value = CsvRepresentation.Records[row][column];
                 return true;
             }
 
@@ -189,10 +189,10 @@ namespace GlueCsvEditor.Data
         /// <param name="value"></param>
         public void SetValue(int row, int column, string value)
         {
-            if (row >= _csv.Records.Count)
+            if (row >= CsvRepresentation.Records.Count)
                 throw new ArgumentOutOfRangeException("row");
 
-            if (column >= _csv.Records[row].Length)
+            if (column >= CsvRepresentation.Records[row].Length)
                 throw new ArgumentOutOfRangeException("column");
 
             if (BeforeValueChange != null)
@@ -200,7 +200,7 @@ namespace GlueCsvEditor.Data
                 BeforeValueChange(row, column);
             }
 
-            _csv.Records[row][column] = value;
+            CsvRepresentation.Records[row][column] = value;
 
             if (AfterValueChange != null)
             {
@@ -214,7 +214,7 @@ namespace GlueCsvEditor.Data
         /// <returns></returns>
         public List<string> GetHeaderText()
         {
-            return _csv.Headers
+            return CsvRepresentation.Headers
                        .Select(x => x.OriginalText)
                        .ToList();
         }
@@ -226,11 +226,11 @@ namespace GlueCsvEditor.Data
         /// <returns></returns>
         public CsvColumnHeader GetHeaderDetails(int column)
         {
-            if (column >= _csv.Headers.Length)
+            if (column >= CsvRepresentation.Headers.Length)
                 throw new ArgumentOutOfRangeException("column");
 
             bool isList;
-            var header = _csv.Headers[column];
+            var header = CsvRepresentation.Headers[column];
             string type = CsvHeader.GetClassNameFromHeader(header.OriginalText) ?? "string";
 
             int typeDataIndex = header.Name.IndexOf("(", StringComparison.Ordinal);
@@ -270,7 +270,7 @@ namespace GlueCsvEditor.Data
         /// <returns>Returns the new display string for the header</returns>
         public string SetHeader(int column, string name, string type, bool isRequired, bool isList)
         {
-            if (column >= _csv.Headers.Length)
+            if (column >= CsvRepresentation.Headers.Length)
                 throw new ArgumentOutOfRangeException("column");
 
             // Form the new text value
@@ -292,13 +292,13 @@ namespace GlueCsvEditor.Data
             text.Append(")");
 
             // Update the header details
-            var header = _csv.Headers[column];
+            var header = CsvRepresentation.Headers[column];
             header.OriginalText = text.ToString();
             header.Name = text.ToString();
             header.IsRequired = isRequired;
 
-            _csv.Headers[column] = header;
-            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
+            CsvRepresentation.Headers[column] = header;
+            CsvRepresentation.RemoveHeaderWhitespaceAndDetermineIfRequired();
             return text.ToString();
         }
 
@@ -327,7 +327,7 @@ namespace GlueCsvEditor.Data
             {
                 if ((ignoreStartingCell && !isFirstSearchedCell) || !ignoreStartingCell)
                 {
-                    var recordAtLocation = _csv.Records[row][column];
+                    var recordAtLocation = CsvRepresentation.Records[row][column];
                     if (recordAtLocation != null && recordAtLocation.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         return new FoundCell { ColumnIndex = column, RowIndex = row };
@@ -337,12 +337,12 @@ namespace GlueCsvEditor.Data
                 if (!reverse)
                 {
                     column++;
-                    if (column >= _csv.Headers.Length)
+                    if (column >= CsvRepresentation.Headers.Length)
                     {
                         column = 0;
                         row++;
 
-                        if (row >= _csv.Records.Count)
+                        if (row >= CsvRepresentation.Records.Count)
                             row = 0;
                     }
                 }
@@ -352,11 +352,11 @@ namespace GlueCsvEditor.Data
                     column--;
                     if (column < 0)
                     {
-                        column = _csv.Headers.Length - 1;
+                        column = CsvRepresentation.Headers.Length - 1;
                         row--;
 
                         if (row < 0)
-                            row = _csv.Records.Count - 1;
+                            row = CsvRepresentation.Records.Count - 1;
                     }
                 }
 
@@ -373,8 +373,8 @@ namespace GlueCsvEditor.Data
         public void Reload()
         {
             CsvFileManager.Delimiter = _delimiter;
-            _csv = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
-            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
+            CsvRepresentation = CsvFileManager.CsvDeserializeToRuntime(_csvPath);
+            CsvRepresentation.RemoveHeaderWhitespaceAndDetermineIfRequired();
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace GlueCsvEditor.Data
         {
             GeneralResponse toReturn = new GeneralResponse();
 
-            _csv.RemoveHeaderWhitespaceAndDetermineIfRequired();
+            CsvRepresentation.RemoveHeaderWhitespaceAndDetermineIfRequired();
 
             FileInfo fileInfo = new FileInfo(_csvPath);
             if (fileInfo.IsReadOnly)
@@ -398,7 +398,7 @@ namespace GlueCsvEditor.Data
                 CsvFileManager.Delimiter = _delimiter;
                 try
                 {
-                    CsvFileManager.Serialize(_csv, _csvPath);
+                    CsvFileManager.Serialize(CsvRepresentation, _csvPath);
                     toReturn.Succeeded = true;
                 }
                 catch (IOException)
@@ -422,7 +422,7 @@ namespace GlueCsvEditor.Data
         /// <param name="column"></param>
         public IEnumerable<string> GetKnownValues(int column)
         {
-            string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[column].OriginalText);
+            string type = CsvHeader.GetClassNameFromHeader(CsvRepresentation.Headers[column].OriginalText);
             type = type ?? string.Empty;
 
             // Remove the List<> if exists
@@ -431,7 +431,7 @@ namespace GlueCsvEditor.Data
             var foundTypes = GetKnownValuesForType(type);
             var knownValues = foundTypes as string[] ?? foundTypes.ToArray();
             if (!knownValues.Any())
-                return new UsedRcrColumnValueRetriever(_csv, column).GetKnownValues(type);
+                return new UsedRcrColumnValueRetriever(CsvRepresentation, column).GetKnownValues(type);
 
             return knownValues;
         }
@@ -474,23 +474,36 @@ namespace GlueCsvEditor.Data
             if (!_cachedTypes.IsCacheReady)
                 return new ComplexTypeProperty[0];
 
-            string type = CsvHeader.GetClassNameFromHeader(_csv.Headers[columnIndex].OriginalText);
-            if (!string.IsNullOrWhiteSpace(type))
+            string typeName = CsvHeader.GetClassNameFromHeader(CsvRepresentation.Headers[columnIndex].OriginalText);
+
+            return GetKnownProperties(typeName);
+        }
+
+        public IEnumerable<ComplexTypeProperty> GetKnownProperties(string typeName)
+        {
+            if (!string.IsNullOrWhiteSpace(typeName))
             {
                 // Remove the List<> if exists
-                type = type.Replace("List<", "").Replace(">", "");
+                typeName = typeName.Replace("List<", "").Replace(">", "");
 
 
                 // Check if the type matches a ParsedClass
                 var parsedClass = _cachedTypes.ProjectClasses
-                                              .FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(type, StringComparison.OrdinalIgnoreCase));
+                                              .FirstOrDefault(x => string.Concat(x.Namespace, ".", x.Name).Equals(typeName, StringComparison.OrdinalIgnoreCase));
                 if (parsedClass != null)
                 {
                     return parsedClass.ParsedProperties
-                                      .Select(x => new ComplexTypeProperty
+                                      .Select(x =>
                                       {
-                                          Name = x.Name,
-                                          Type = x.Type.Name
+                                          var toReturn = new ComplexTypeProperty
+                                          {
+                                              Name = x.Name,
+                                              Type = x.Type.Name,
+                                          };
+
+                                          toReturn.Attributes.AddRange(x.Attributes);
+
+                                          return toReturn;
                                       })
                                       .ToArray();
                 }
@@ -498,9 +511,9 @@ namespace GlueCsvEditor.Data
                 {
 
                     var foundType = _cachedTypes.AssemblyClasses
-                        .FirstOrDefault(x => x.FullName.Equals(type, StringComparison.OrdinalIgnoreCase));
+                        .FirstOrDefault(x => x.FullName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
 
-                    if(foundType != null)
+                    if (foundType != null)
                     {
                         List<ComplexTypeProperty> toReturn = new List<ComplexTypeProperty>();
 
@@ -537,6 +550,8 @@ namespace GlueCsvEditor.Data
                                 toReturn.Add(toAdd);
                             }
                         }
+
+
                         return toReturn;
 
                     }

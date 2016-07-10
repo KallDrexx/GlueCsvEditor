@@ -12,6 +12,7 @@ using FormsTimer = System.Windows.Forms.Timer;
 using GlueCsvEditor.Controllers;
 using FlatRedBall.Glue.Plugins;
 using GlueCsvEditor.Styling;
+using FlatRedBall.IO.Csv;
 
 namespace GlueCsvEditor.Controls
 {
@@ -894,23 +895,50 @@ namespace GlueCsvEditor.Controls
             });
         }
 
-        private void UpdatePropertiesDisplay(string type, string value)
+        bool IsExcluded(ComplexTypeProperty property)
         {
-            if (string.IsNullOrWhiteSpace(type))
+            return property.Attributes.Any(attribute =>
+                        attribute.ToLowerInvariant().Contains("excludefromdesignerattribute"));
+        }
+
+        private void UpdatePropertiesDisplay(string defaultRowType, string cellValue)
+        {
+            if (string.IsNullOrWhiteSpace(defaultRowType))
                 return;
 
-            var ns = string.Empty;
-            if (type.Contains(".") && type.Last() != '.')
-            {
-                ns = type.Remove(type.LastIndexOf('.'));
-                type = type.Substring(type.LastIndexOf('.') + 1);
-            }
+            ComplexCsvTypeDetails complexType = GetComplexType(defaultRowType, cellValue);
+
 
             // Get property information for the type
-            var knownProperties = _data.GetKnownProperties(_currentColumnIndex);
-            var complexTypeProperties = knownProperties as ComplexTypeProperty[] ?? knownProperties.ToArray();
-            var complexType = ComplexCsvTypeDetails.ParseValue(value);
-            
+
+            var types = GetTypesIncludingInheritance(cellValue, complexType, defaultRowType);
+
+            List<ComplexTypeProperty> complexTypeProperties = new List<ComplexTypeProperty>();
+
+            foreach (var type in types)
+            {
+                complexTypeProperties.AddRange(_data.GetKnownProperties(type));
+            }
+
+            for(int i = complexTypeProperties.Count - 1; i > -1; i--)
+            {
+                var candidateForRemoval = complexTypeProperties[i];
+
+                bool isExcluded = IsExcluded(candidateForRemoval);
+
+                if(isExcluded)
+                {
+                    // skip it for now, we'll remove this later
+                }
+                else if(complexTypeProperties.Any(item=>item.Name == candidateForRemoval.Name && item != candidateForRemoval) )
+                {
+                    complexTypeProperties.RemoveAt(i);
+                }
+            }
+
+            complexTypeProperties.RemoveAll(item => IsExcluded(item));
+
+
             btnShowComplexProperties.Visible = true;
 
             if (!complexTypeProperties.Any() && complexType == null)
@@ -919,13 +947,6 @@ namespace GlueCsvEditor.Controls
                 return;
             }
 
-            // If the complex type coudln't be parsed from the current value, create one manually
-            if (complexType == null)
-            {
-                complexType = new ComplexCsvTypeDetails { Namespace = ns, TypeName = type };
-            }
-
-            complexType.DefaultType = type;
 
             // Go through all the properties and add any "known ones" that weren't part of the parsed set
             foreach (var prop in complexTypeProperties)
@@ -933,13 +954,16 @@ namespace GlueCsvEditor.Controls
                 var tp = complexType.Properties.FirstOrDefault(x => x.Name.Equals(prop.Name, StringComparison.OrdinalIgnoreCase));
 
                 if (tp == null)
+                {
                     complexType.Properties.Add(new ComplexTypeProperty { Name = prop.Name, Type = prop.Type });
-
+                }
                 // Otherwise if the property exists then update the type
                 else
+                {
                     tp.Type = prop.Type;
+                }
             }
-            
+
             // Setup pgrid displayer
             // Note: While the displayer variable is never used, this cannot be deleted.
             //   The propertygrid property assignment triggers the property grid to show the complex properties
@@ -952,6 +976,69 @@ namespace GlueCsvEditor.Controls
                 PropertyGrid = pgrPropertyEditor
             };
 #pragma warning restore 168
+        }
+
+        private List<string> GetTypesIncludingInheritance(string cellValue, ComplexCsvTypeDetails complexType, string defaultType)
+        {
+
+            string mostDerivedType = defaultType;
+
+            List<string> cellTypeIncludingInheritance = new List<string>();
+
+            // todo - need to get the parsed class, consider inheritance, and recursively find the inheritance chain
+
+            cellTypeIncludingInheritance.Add(defaultType);
+
+            if (cellValue.Contains("new"))
+            {
+                if (!string.IsNullOrEmpty(complexType?.Namespace))
+                {
+                    mostDerivedType = complexType.Namespace + "." + complexType.TypeName;
+                }
+                else
+                {
+                    mostDerivedType = complexType?.TypeName;
+                }
+            }
+
+            FillTypeListRecursively(mostDerivedType, cellTypeIncludingInheritance);
+            
+            return cellTypeIncludingInheritance;
+        }
+
+        private void FillTypeListRecursively(string className, List<string> cellTypeIncludingInheritance)
+        {
+            ParsedClass parsedClass = this._cachedTypes.ProjectClasses.FirstOrDefault(item=>item.Name == className);
+
+            cellTypeIncludingInheritance.Add(className);
+
+            if(parsedClass?.ParentParsedClasses != null)
+            {
+                foreach(var parentClass in parsedClass.ParentParsedClasses.Where(item=>item.IsInterface == false))
+                {
+                    FillTypeListRecursively(parentClass.Name, cellTypeIncludingInheritance);
+                }
+            }
+        }
+
+        private static ComplexCsvTypeDetails GetComplexType(string type, string value)
+        {
+            var complexType = ComplexCsvTypeDetails.ParseValue(value);
+
+            var ns = string.Empty;
+            if (type.Contains(".") && type.Last() != '.')
+            {
+                ns = type.Remove(type.LastIndexOf('.'));
+                type = type.Substring(type.LastIndexOf('.') + 1);
+            }
+            // If the complex type coudln't be parsed from the current value, create one manually
+            if (complexType == null)
+            {
+                complexType = new ComplexCsvTypeDetails { Namespace = ns, TypeName = type };
+            }
+
+            complexType.DefaultType = type;
+            return complexType;
         }
 
         private void ComplexTypeUpdated(string complexTypeString)
