@@ -406,12 +406,8 @@ namespace GlueCsvEditor.Controls
         private void dgrEditor_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
             DataLoadingCount++;
-
-            string oldValue = _data.GetValue(e.RowIndex, e.ColumnIndex);
-
-            _data.SetValue(e.RowIndex, e.ColumnIndex, e.Value as string);
-
-
+            
+            _data.TrySetValue(e.RowIndex, e.ColumnIndex, e.Value as string);
 
             cmbCelldata.Text = e.Value as string;
             SaveCsv();
@@ -898,7 +894,7 @@ namespace GlueCsvEditor.Controls
         bool IsExcluded(ComplexTypeProperty property)
         {
             return property.Attributes.Any(attribute =>
-                        attribute.ToLowerInvariant().Contains("excludefromdesignerattribute"));
+                        attribute.ToLowerInvariant().Contains("excludefromdesigner"));
         }
 
         private void UpdatePropertiesDisplay(string defaultRowType, string cellValue)
@@ -989,7 +985,7 @@ namespace GlueCsvEditor.Controls
 
             cellTypeIncludingInheritance.Add(defaultType);
 
-            if (cellValue.Contains("new"))
+            if (cellValue != null && cellValue.Contains("new"))
             {
                 if (!string.IsNullOrEmpty(complexType?.Namespace))
                 {

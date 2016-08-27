@@ -181,6 +181,17 @@ namespace GlueCsvEditor.Data
             return false;
         }
 
+        public bool TrySetValue(int row, int column, string value)
+        {
+            if(row < CsvRepresentation.Records.Count &&
+                column < CsvRepresentation.Records[row].Length)
+            {
+                SetValue(row, column, value);
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Updates the value in the specified row and column
         /// </summary>
