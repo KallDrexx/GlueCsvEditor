@@ -172,14 +172,14 @@
             // 
             this.txtHeaderType.Location = new System.Drawing.Point(242, 3);
             this.txtHeaderType.Name = "txtHeaderType";
-            this.txtHeaderType.Size = new System.Drawing.Size(99, 20);
+            this.txtHeaderType.Size = new System.Drawing.Size(223, 20);
             this.txtHeaderType.TabIndex = 11;
             this.txtHeaderType.TextChanged += new System.EventHandler(this.txtHeaderType_TextChanged);
             // 
             // chkIsList
             // 
             this.chkIsList.AutoSize = true;
-            this.chkIsList.Location = new System.Drawing.Point(432, 5);
+            this.chkIsList.Location = new System.Drawing.Point(546, 5);
             this.chkIsList.Name = "chkIsList";
             this.chkIsList.Size = new System.Drawing.Size(42, 17);
             this.chkIsList.TabIndex = 14;
@@ -190,7 +190,7 @@
             // chkIsRequired
             // 
             this.chkIsRequired.AutoSize = true;
-            this.chkIsRequired.Location = new System.Drawing.Point(357, 5);
+            this.chkIsRequired.Location = new System.Drawing.Point(471, 5);
             this.chkIsRequired.Name = "chkIsRequired";
             this.chkIsRequired.Size = new System.Drawing.Size(69, 17);
             this.chkIsRequired.TabIndex = 13;
