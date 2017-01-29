@@ -5,10 +5,18 @@ using System.Reflection;
 
 namespace GlueCsvEditor.KnownValues
 {
+    /// <summary>
+    /// A value retriever which returns the known fields and properties for any assemblies loaded by Glue. This does not include the game's 
+    /// </summary>
     public class EnumReflectionValueRetriever : IKnownValueRetriever
     {
         protected static object _threadLock = new object();
         protected static Dictionary<string, IEnumerable<string>> _cachedTypeValues;
+
+        /// <summary>
+        /// All types in all assemblies, cached for performance reasons. This should never change
+        /// </summary>
+        static Dictionary<string, Type> typeCache;
 
         public IEnumerable<string> GetKnownValues(string fullTypeName)
         {
@@ -34,12 +42,29 @@ namespace GlueCsvEditor.KnownValues
         {
             IEnumerable<string> foundValues;
 
-            // Use reflection to retrieve the specified enum
-            var type = AppDomain.CurrentDomain
-                                .GetAssemblies()
-                                .SelectMany(x => x.GetTypes())
-                                .Where(x => x.FullName.Equals(fullTypeName.Trim(), StringComparison.OrdinalIgnoreCase))
-                                .FirstOrDefault(x => x.IsEnum);
+            if(typeCache == null)
+            {
+                typeCache = new Dictionary<string, Type>();
+                var assemblies =
+                    AppDomain.CurrentDomain
+                             .GetAssemblies();
+                // Use reflection to retrieve the specified enum
+                foreach(var typeToAdd in assemblies.SelectMany(x => x.GetTypes()))
+                {
+                    string name = typeToAdd.Name.ToLowerInvariant();
+                    if(typeCache.ContainsKey(name) == false)
+                    {
+                        typeCache.Add(name, typeToAdd);
+                    }
+                }
+
+            }
+
+
+            var fullTypeNameTrimmed = fullTypeName.Trim().ToLowerInvariant();
+
+            Type type = null;
+            typeCache.TryGetValue(fullTypeNameTrimmed, out type);
 
             if (type == null)
             {

@@ -381,6 +381,8 @@ namespace GlueCsvEditor.Controls
             UpdateColumnDetails();
             SetupCellKnownValuesComboBox();
             FilterKnownTypes();
+            UpdateCellDisplays();
+
         }
 
         private void chkIsRequired_CheckedChanged(object sender, EventArgs e)
@@ -999,7 +1001,7 @@ namespace GlueCsvEditor.Controls
 
             FillTypeListRecursively(mostDerivedType, cellTypeIncludingInheritance);
             
-            return cellTypeIncludingInheritance;
+            return cellTypeIncludingInheritance.Distinct().ToList();
         }
 
         private void FillTypeListRecursively(string className, List<string> cellTypeIncludingInheritance)

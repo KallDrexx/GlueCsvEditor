@@ -142,76 +142,81 @@ namespace GlueCsvEditor.Data
 
         protected void StartCacheTask(CachedTypesReadyHandler typesReadyHandler)
         {
-            new Task(() =>
+            FlatRedBall.Glue.Managers.TaskManager.Self.AddAsyncTask(
+                () => PerformCache(typesReadyHandler),
+                "Caching CSV types");
+            //);
+            //}).Start();
+        }
+
+        private void PerformCache(CachedTypesReadyHandler typesReadyHandler)
+        {
+            lock (_cacheLock)
             {
-                lock (_cacheLock)
+                _cacheReady = false;
+            }
+
+            try
+            {
+                PluginManager.ReceiveOutput("Caching of project types for CSV editor has begun.  " +
+                                            "Some functionality will not be available until this is complete");
+
+                // Save all the entity screens and 
+                _entities = ObjectFinder.Self.GlueProject.Entities;
+                _screens = ObjectFinder.Self.GlueProject.Screens;
+
+                // Go through all the code in the project and generate a list of enums and classes
+                var items = ProjectManager.ProjectBase.EvaluatedItems.ToArray().Where(x => x.ItemType == "Compile");
+                string baseDirectory = ProjectManager.ProjectBase.Directory;
+
+                _parsedPrjectClasses = new List<ParsedClass>();
+                _parsedProjectEnums = new List<ParsedEnum>();
+
+                foreach (var item in items)
                 {
-                    _cacheReady = false;
-                }
-
-                try
-                {
-                    PluginManager.ReceiveOutput("Caching of project types for CSV editor has begun.  " +
-                                                "Some functionality will not be available until this is complete");
-
-                    // Save all the entity screens and 
-                    _entities = ObjectFinder.Self.GlueProject.Entities;
-                    _screens = ObjectFinder.Self.GlueProject.Screens;
-
-                    // Go through all the code in the project and generate a list of enums and classes
-                    var items = ProjectManager.ProjectBase.Where(x => x.Name == "Compile");
-                    string baseDirectory = ProjectManager.ProjectBase.Directory;
-
-                    _parsedPrjectClasses = new List<ParsedClass>();
-                    _parsedProjectEnums = new List<ParsedEnum>();
-
-                    foreach (var item in items)
+                    var file = new ParsedFile(baseDirectory + item.EvaluatedInclude);
+                    foreach (var ns in file.Namespaces)
                     {
-                        var file = new ParsedFile(baseDirectory + item.Include);
-                        foreach (var ns in file.Namespaces)
-                        {
-                            _parsedProjectEnums.AddRange(ns.Enums);
-                            _parsedPrjectClasses.AddRange(ns.Classes);
-                        }
+                        _parsedProjectEnums.AddRange(ns.Enums);
+                        _parsedPrjectClasses.AddRange(ns.Classes);
                     }
-
-                    // Get a list of all enums via reflection
-                    _assemblyEnums = AppDomain.CurrentDomain
-                                              .GetAssemblies()
-                                              .SelectMany(x => x.GetTypes())
-                                              .Where(x => x.IsEnum)
-                                              .ToList();
-
-                    _assemblyClasses = AppDomain.CurrentDomain
-                                              .GetAssemblies()
-                                              .SelectMany(x => x.GetTypes())
-                                              .Where(x => !x.IsEnum)
-                                              .ToList();
-                }
-                catch (Exception ex)
-                {
-                    PluginManager.ReceiveOutput(
-                        string.Concat(
-                            "Exception occurred while caching project types: ",
-                            ex.GetType(),
-                            ":",
-                            ex.Message));
-
-                    return;
                 }
 
-                lock (_cacheLock)
-                {
-                    _cacheReady = true;
-                }
+                // Get a list of all enums via reflection
+                _assemblyEnums = AppDomain.CurrentDomain
+                                          .GetAssemblies()
+                                          .SelectMany(x => x.GetTypes())
+                                          .Where(x => x.IsEnum)
+                                          .ToList();
 
-                PluginManager.ReceiveOutput("Caching of project types completed");
+                _assemblyClasses = AppDomain.CurrentDomain
+                                          .GetAssemblies()
+                                          .SelectMany(x => x.GetTypes())
+                                          .Where(x => !x.IsEnum)
+                                          .ToList();
+            }
+            catch (Exception ex)
+            {
+                PluginManager.ReceiveOutput(
+                    string.Concat(
+                        "Exception occurred while caching project types: ",
+                        ex.GetType(),
+                        ":",
+                        ex.Message));
 
-                // Run the CachedTypesHandler delegate
-                if (typesReadyHandler != null)
-                    typesReadyHandler();
+                return;
+            }
 
-            }).Start();
+            lock (_cacheLock)
+            {
+                _cacheReady = true;
+            }
+
+            PluginManager.ReceiveOutput("Caching of project types completed");
+
+            // Run the CachedTypesHandler delegate
+            if (typesReadyHandler != null)
+                typesReadyHandler();
         }
 
         protected IEnumerable<string> GetGlueStateNamespaces(EntitySave entity)
