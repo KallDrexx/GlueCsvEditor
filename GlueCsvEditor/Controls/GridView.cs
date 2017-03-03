@@ -526,7 +526,10 @@ namespace GlueCsvEditor.Controls
 
                 e.Handled = true;
             }
-
+            else if(e.KeyCode == Keys.Enter && e.Control)
+            {
+                AddRowAtIndex(_currentRowIndex + 1);
+            }
             // If an arrow key is pushed, note it down
             else if (arrowKeys.Contains(e.KeyCode))
             {
