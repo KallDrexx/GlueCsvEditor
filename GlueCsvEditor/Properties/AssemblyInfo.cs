@@ -33,4 +33,8 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 // 1.12.* - Added CTRL + enter to add new row
-[assembly: AssemblyVersion("1.12.*")]
+// 1.13.* 
+// - Added CTRL + SHIFT + enter to insert row above current row
+// - Updated to latest MSBuild to work with latest Glue
+// - Added tips to right-click menu so users know about CTRL + (shift?) enter
+[assembly: AssemblyVersion("1.13.*")]

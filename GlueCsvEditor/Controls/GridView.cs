@@ -526,9 +526,16 @@ namespace GlueCsvEditor.Controls
 
                 e.Handled = true;
             }
-            else if(e.KeyCode == Keys.Enter && e.Control)
+            else if(e.KeyCode == Keys.Enter)
             {
-                AddRowAtIndex(_currentRowIndex + 1);
+                if(e.Control && e.Shift)
+                {
+                    AddRowAtIndex(_currentRowIndex);
+                }
+                else if (e.Control)
+                {
+                    AddRowAtIndex(_currentRowIndex + 1);
+                }
             }
             // If an arrow key is pushed, note it down
             else if (arrowKeys.Contains(e.KeyCode))
@@ -1281,12 +1288,12 @@ namespace GlueCsvEditor.Controls
             {
                 ToolStripMenuItem rowAddItem = items.Add("Add Row") as ToolStripMenuItem;
 
-                rowAddItem.DropDownItems.Add("Before", null, (a, b) =>
+                rowAddItem.DropDownItems.Add("Before (CTRL + SHIFT + Enter)", null, (a, b) =>
                     {
                         AddRowAtIndex(row);
 
                     });
-                rowAddItem.DropDownItems.Add("After", null, (a, b) =>
+                rowAddItem.DropDownItems.Add("After (CTRL + Enter)", null, (a, b) =>
                     {
                         AddRowAtIndex(row + 1);
                     });
