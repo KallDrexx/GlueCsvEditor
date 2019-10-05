@@ -13,8 +13,6 @@ namespace GlueCsvEditor.Controls
 
         UndoController mUndoController;
 
-        string mCsvFileName;
-
         public EditorMain()
         {
             InitializeComponent();
@@ -37,9 +35,18 @@ namespace GlueCsvEditor.Controls
         public void NotifyOfCsvUpdate()
         {
             if (_gridView.IgnoreNextFileChange)
+            {
                 _gridView.IgnoreNextFileChange = false;
+            }
             else
-                ReloadCsv();
+            {
+                // The change may have occurred because the file was removed. Don't want
+                // to reload if it doesn't exist...
+                if(System.IO.File.Exists( _csvData.CsvPath))
+                {
+                    ReloadCsv();
+                }
+            }
         }
 
         public void SaveEditorSettings()
@@ -66,7 +73,9 @@ namespace GlueCsvEditor.Controls
             {
                 _csvData.Reload();
                 _gridView.ReloadCsvDisplay();
+                
             }
+
         }
 
         private void CachedTypesReadyHandler()

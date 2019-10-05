@@ -37,4 +37,6 @@ using System.Runtime.InteropServices;
 // - Added CTRL + SHIFT + enter to insert row above current row
 // - Updated to latest MSBuild to work with latest Glue
 // - Added tips to right-click menu so users know about CTRL + (shift?) enter
-[assembly: AssemblyVersion("1.13.*")]
+// 1.14.*
+// - Fixed crash that can occur when the plugin reloads if the CSV file is deleted.
+[assembly: AssemblyVersion("1.14.*")]
