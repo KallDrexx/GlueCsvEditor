@@ -39,4 +39,6 @@ using System.Runtime.InteropServices;
 // - Added tips to right-click menu so users know about CTRL + (shift?) enter
 // 1.14.*
 // - Fixed crash that can occur when the plugin reloads if the CSV file is deleted.
-[assembly: AssemblyVersion("1.14.*")]
+// 1.14.1
+// - Updated to latest Newtonsoft Json (FRB Glue requirement)
+[assembly: AssemblyVersion("1.14.1.*")]
