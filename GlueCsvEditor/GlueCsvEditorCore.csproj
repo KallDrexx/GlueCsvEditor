@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FlatRedBall\FRBDK\FRBDK Supporting Projects\EditorObjects\EditorObjectsXna4.csproj" />
+    <ProjectReference Include="..\..\FlatRedBall\FRBDK\Glue\FlatRedBall.Plugin\FlatRedBall.Plugin.csproj" />
+    <ProjectReference Include="..\..\FlatRedBall\FRBDK\Glue\FlatRedBall.PropertyGrid\FlatRedBall.PropertyGrid.csproj" />
+    <ProjectReference Include="..\..\FlatRedBall\FRBDK\Glue\GlueCommon\GlueCommon.csproj" />
+    <ProjectReference Include="..\..\FlatRedBall\FRBDK\Glue\GlueSaveClasses\GlueSaveClasses.csproj" />
+    <ProjectReference Include="..\..\FlatRedBall\FRBDK\Glue\Glue\GlueFormsCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&#xD;&#xA;md %25appdata%25\FRBDK\Plugins\GlueCsvEditor\&#xD;&#xA;&#xD;&#xA;copy $(TargetDir)GlueCsvEditorCore.dll %25appdata%25\FRBDK\Plugins\GlueCsvEditor\GlueCsvEditorCore.dll&#xD;&#xA;copy $(TargetDir)GlueCsvEditorCore.pdb %25appdata%25\FRBDK\Plugins\GlueCsvEditor\GlueCsvEditorCore.pdb&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;" />
+  </Target>
+
+</Project>
